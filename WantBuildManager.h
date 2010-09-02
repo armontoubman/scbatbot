@@ -1,0 +1,55 @@
+#pragma once
+#include <BWAPI.h>
+#include "BuildList.h"
+#include "EnemyUnitDataManager.h"
+class WantBuildManager
+{
+public:
+	WantBuildManager();
+	WantBuildManager(EnemyUnitDataManager* e);
+
+	void update();
+
+	void doLists();
+
+	void addWant(BWAPI::UnitType unittype);
+	void addWant(BWAPI::UnitType unittype, int amount);
+	void addWant(BWAPI::TechType techtype);
+	void addWant(BWAPI::UpgradeType upgradetype);
+
+	void addBuild(BWAPI::UnitType unittype);
+	void addBuild(BWAPI::UnitType unittype, int amount);
+	void addBuild(BWAPI::TechType techtype);
+	void addBuild(BWAPI::UpgradeType upgradetype);
+
+	void addBuildTop(BWAPI::UnitType unittype);
+
+	void wantExpand();
+	void buildExpand();
+
+	int nrOfEnemy(BWAPI::UnitType unittype);
+	int nrOfOwn(BWAPI::UnitType unittype);
+	
+	bool wantListIsEmpty();
+	bool buildListIsEmpty();
+
+	bool wantListContains(BWAPI::UnitType unittype);
+	bool buildListContains(BWAPI::UnitType unittype);
+
+	bool wantListIsCompleted();
+
+	int nrOfEnemyMilitaryUnits();
+	int nrOfOwnMilitaryUnits();
+
+	int nrOfEnemyBases();
+
+	bool photonCannonNearBase();
+	int countEggsMorphingInto(BWAPI::UnitType unittype);
+	UnitGroup getHatcheriesWithMinerals();
+	BWTA::BaseLocation* getNaturalExpansion();
+
+	BuildList buildList;
+	BuildList wantList;
+
+	EnemyUnitDataManager* eudm;
+};
