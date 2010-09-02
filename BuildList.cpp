@@ -18,6 +18,11 @@ void BuildList::removeItem(BuildItem b)
 	this->buildlist.erase(find(this->buildlist.begin(), this->buildlist.end(), b));
 }
 
+void BuildList::removeTop()
+{
+	this->buildlist.erase(this->buildlist.begin());
+}
+
 void BuildList::removeAll(BuildItem b)
 {
 	std::list<BuildItem>::iterator curr = this->buildlist.begin();

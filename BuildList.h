@@ -8,6 +8,7 @@ public:
 	void addItem(BuildItem b);
 	void removeItem(BuildItem b);
 	void removeAll(BuildItem b);
+	void removeTop();
 	void clear();
 	int count(BWAPI::UnitType t);
 	int count(BWAPI::TechType t);

@@ -2,11 +2,13 @@
 #include <BWAPI.h>
 #include "BuildList.h"
 #include "EnemyUnitDataManager.h"
+#include "BuildOrderManager.h"
+#include "BaseManager.h"
 class WantBuildManager
 {
 public:
 	WantBuildManager();
-	WantBuildManager(EnemyUnitDataManager* e);
+	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba);
 
 	void update();
 
@@ -52,4 +54,6 @@ public:
 	BuildList wantList;
 
 	EnemyUnitDataManager* eudm;
+	BuildOrderManager* bom;
+	BaseManager* bm;
 };

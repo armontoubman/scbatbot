@@ -5,10 +5,14 @@
 #include "BuildItem.h"
 #include "BuildList.h"
 #include "MicroManager.h"
+#include "BuildOrderManager.h"
+#include "BaseManager.h"
 
-WantBuildManager::WantBuildManager(EnemyUnitDataManager* e)
+WantBuildManager::WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba)
 {
 	this->eudm = e;
+	this->bom = b;
+	this->bm = ba;
 }
 
 int WantBuildManager::nrOfEnemy(BWAPI::UnitType unittype)
@@ -246,8 +250,74 @@ int WantBuildManager::nrOfEnemyBases()
 
 void WantBuildManager::update()
 {
-
 	// Actual building of items
+	BuildItem b = buildList.top();
+	if(b.typenr != 4 && !(BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+	{
+		if(b.typenr == 1)
+		{
+			if(!BWAPI::Broodwar->canMake(NULL, b.buildtype))
+			{
+				buildList.removeTop();
+				return;
+			}
+		}
+		if(b.typenr == 2)
+		{
+			if(!BWAPI::Broodwar->canResearch(NULL, b.researchtype))
+			{
+				buildList.removeTop();
+				return;
+			}
+		}
+		if(b.typenr == 3)
+		{
+			if(!BWAPI::Broodwar->canUpgrade(NULL, b.upgradetype))
+			{
+				buildList.removeTop();
+				return;
+			}
+		}
+	}
+	else if(b.typenr != 4)
+	{
+		if(b.typenr == 1)
+		{
+			if(BWAPI::Broodwar->canMake(NULL, b.buildtype))
+			{
+				this->bom->build(1, b.buildtype, 1);
+				buildList.removeTop();
+				return;
+			}
+		}
+		if(b.typenr == 2)
+		{
+			if(BWAPI::Broodwar->canResearch(NULL, b.researchtype))
+			{
+				this->bom->research(b.researchtype, 1);
+				buildList.removeTop();
+				return;
+			}
+		}
+		if(b.typenr == 3)
+		{
+			if(BWAPI::Broodwar->canUpgrade(NULL, b.upgradetype))
+			{
+				this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)+1, b.upgradetype, 1);
+				buildList.removeTop();
+				return;
+			}
+		}
+	}
+	else if(b.typenr == 4)
+	{
+		if(BWAPI::Broodwar->self()->minerals() >= BWAPI::UnitTypes::Zerg_Hatchery.mineralPrice())
+		{
+			this->bm->expand();
+			buildList.removeTop();
+			return;
+		}
+	}
 }
 
 void WantBuildManager::doLists()
