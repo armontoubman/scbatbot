@@ -1042,6 +1042,29 @@ void WantBuildManager::doLists()
 	//Generieke rule:
 	for(std::list<BuildItem>::iterator it=wantList.buildlist.begin(); it!=wantList.buildlist.end(); it++)
 	{
-
+		if((*it).typenr == 1)
+		{
+			int wantAantal = wantList.count((*it).buildtype);
+			int buildAantal = buildList.count((*it).buildtype);
+			int hebAantal = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType,(*it).buildtype).size();
+			if(wantAantal < buildAantal+hebAantal)
+			{
+				addBuild((*it).buildtype);
+			}
+		}
+		if((*it).typenr == 2)
+		{
+			if(buildList.count((*it).researchtype) == 0 && !BWAPI::Broodwar->self()->hasResearched((*it).researchtype))
+			{
+				addBuild((*it).researchtype);
+			}
+		}
+		if((*it).typenr == 3)
+		{
+			if(buildList.count((*it).upgradetype) == 0 && !BWAPI::Broodwar->self()->getUpgradeLevel((*it).upgradetype))
+			{
+				addBuild((*it).upgradetype);
+			}
+		}
 	}
 }
