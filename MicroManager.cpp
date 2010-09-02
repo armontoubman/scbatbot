@@ -1158,6 +1158,32 @@ bool MicroManager::canAttackGround(std::set<BWAPI::Unit*> units)
 	return false;
 }
 
+int MicroManager::amountCanAttackAir(std::set<BWAPI::Unit*> units)
+{
+	int amount = 0;
+	for(std::set<BWAPI::Unit*>::iterator it = units.begin(); it != units.end(); it++)
+	{
+		if(canAttackAir(*it))
+		{
+			amount++;
+		}
+	}
+	return amount;
+}
+
+int MicroManager::amountCanAttackGround(std::set<BWAPI::Unit*> units)
+{
+	int amount = 0;
+	for(std::set<BWAPI::Unit*>::iterator it = units.begin(); it != units.end(); it++)
+	{
+		if(canAttackGround(*it))
+		{
+			amount++;
+		}
+	}
+	return amount;
+}
+
 double MicroManager::minimalDistanceToGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units)
 {
 	double minimalDistance = -1.00;
