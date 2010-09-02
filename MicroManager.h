@@ -40,6 +40,7 @@ public:
 	BWAPI::Unit* nearestSwarm(BWAPI::Unit* unit);
 	BWAPI::Unit* nearestEnemyNotUnderDarkSwarm(BWAPI::Unit* unit);
 	BWAPI::Position splitup(BWAPI::Unit* unit);
+	int amountCanAttackGround(std::set<BWAPI::Unit*> units);
 
 	void doMicro(std::list<UnitGroup> listUG);
 

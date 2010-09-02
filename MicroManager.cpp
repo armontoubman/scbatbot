@@ -1335,3 +1335,16 @@ BWAPI::Position MicroManager::splitup(BWAPI::Unit* unit)
 	}
 	return bestePositie;
 }
+
+int MicroManager::amountCanAttackGround(std::set<BWAPI::Unit*> units)
+{
+	int amount = 0;
+	for(std::set<BWAPI::Unit*>::iterator it = units.begin(); it != units.end(); it++)
+	{
+		if(canAttackGround(*it))
+		{
+			amount++;
+		}
+	}
+	return amount;
+}
