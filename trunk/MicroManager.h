@@ -33,6 +33,8 @@ public:
 	bool canAttackAir(std::set<BWAPI::Unit*> units);
 	bool canAttackGround(BWAPI::Unit* unit);
 	bool canAttackGround(std::set<BWAPI::Unit*> units);
+	int amountCanAttackAir(std::set<BWAPI::Unit*> units);
+	int amountCanAttackGround(std::set<BWAPI::Unit*> units);
 	double minimalDistanceToGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units);
 	BWAPI::Unit* nearestUnitInGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units);
 	BWAPI::Unit* nearestEnemyThatCanAttackAir(BWAPI::Unit* unit);
@@ -40,7 +42,6 @@ public:
 	BWAPI::Unit* nearestSwarm(BWAPI::Unit* unit);
 	BWAPI::Unit* nearestEnemyNotUnderDarkSwarm(BWAPI::Unit* unit);
 	BWAPI::Position splitup(BWAPI::Unit* unit);
-	int amountCanAttackGround(std::set<BWAPI::Unit*> units);
 
 	void doMicro(std::list<UnitGroup> listUG);
 
