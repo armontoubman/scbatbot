@@ -74,3 +74,15 @@ std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype)
 	}
 	return result;
 }
+
+std::set<Task> TaskManager::findTasksWithType(int t)
+{
+	std::set<Task> result;
+	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
+	{
+		if(i->type == t) {
+			result.insert(*i);
+		}
+	}
+	return result;
+}
