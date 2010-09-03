@@ -15,6 +15,7 @@ public:
 	Task findTaskWithUnitGroup(UnitGroup* ug);
 	Task findTaskWithUnit(BWAPI::Unit* unit);
 	std::set<Task> findTasksWithUnitType(BWAPI::UnitType unittype);
+	std::set<Task> findTasksWithType(int t);
 
 	void update();
 
