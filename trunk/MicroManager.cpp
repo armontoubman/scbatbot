@@ -996,15 +996,16 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							Task* hydratask = NULL;
 							for(std::set<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
 							{
-								if((*taskit).type == 2 || (*taskit).type == 3 && allSelfUnits(Overlord).inRadius(10.00, (*(*taskit).unitGroup.begin())->getPosition()).size() == 0)
+								if((*taskit).type == 2 || (*taskit).type == 3 && allSelfUnits(Overlord).inRadius(10.00, (*(*taskit).unitGroup->begin())->getPosition()).size() == 0)
 								{
-									hydratask = &(*taskit);
+									Task loltask = *taskit;
+									hydratask = &loltask;
 									break;
 								}
 							}
 							if(hydratask != NULL)
 							{
-								BWAPI::Unit* volghydra = *(hydratask->unitGroup.begin());
+								BWAPI::Unit* volghydra = *(hydratask->unitGroup->begin());
 								(*unitit)->rightClick(volghydra->getPosition());
 							}
 							else
