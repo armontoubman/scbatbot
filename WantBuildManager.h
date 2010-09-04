@@ -48,6 +48,7 @@ public:
 	bool photonCannonNearBase();
 	int countEggsMorphingInto(BWAPI::UnitType unittype);
 	UnitGroup getHatcheriesWithMinerals();
+	UnitGroup getUnusedMineralsNearHatcheries();
 	BWTA::BaseLocation* getNaturalExpansion();
 
 	BuildList buildList;

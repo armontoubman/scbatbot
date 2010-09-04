@@ -25,7 +25,9 @@ public:
 	BWAPI::Unit* nearestUnit(BWAPI::Position pos, UnitGroup ug);
 	UnitGroup enemiesInSeekRange(BWAPI::Position p, double radius, int type);
 	bool alliesCanAttack(BWAPI::Position p, UnitGroup ug);
-	int harvest(BWAPI::Unit* unit);
+	BWAPI::Unit harvest(BWAPI::Unit* unit);
+	BWAPI::Unit mineWhere(BWAPI::Unit* unit);
+	BWAPI::Unit gasWhere(BWAPI::Unit* unit);
 	void moveToNearestBase(BWAPI::Unit* unit);
 	void moveToNearestBase(std::set<BWAPI::Unit*> units);
 	bool isUnderDarkSwarm(BWAPI::Unit* unit);
@@ -42,6 +44,8 @@ public:
 	BWAPI::Unit* nearestSwarm(BWAPI::Unit* unit);
 	BWAPI::Unit* nearestEnemyNotUnderDarkSwarm(BWAPI::Unit* unit);
 	BWAPI::Position splitup(BWAPI::Unit* unit);
+	UnitGroup* MicroManager::inRadiusUnitGroup(double radius, UnitGroup* ug);
+	UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut);
 
 	void doMicro(std::list<UnitGroup> listUG);
 
