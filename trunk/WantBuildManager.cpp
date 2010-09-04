@@ -198,12 +198,30 @@ UnitGroup WantBuildManager::getHatcheriesWithMinerals()
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
 	for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
 	{
-		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); it!=minerals.end(); mit++)
+		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)  // stond eerst it!=minerals.end(), lijkt me beetje raar als de rest mit staat? ***
 		{
 			if((*it)->getDistance(*mit) <= 8.00)
 			{
 				result.insert(*it);
 				break;
+			}
+		}
+	}
+	return result;
+}
+
+UnitGroup WantBuildManager::getUnusedMineralsNearHatcheries()
+{
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
+	UnitGroup result = UnitGroup();
+	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
+	for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
+	{
+		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
+		{
+			if((*it)->getDistance(*mit) <= 8.00 && !*mit.isBeingGathered())
+			{
+				result.insert(*mit);
 			}
 		}
 	}
@@ -1093,7 +1111,7 @@ void WantBuildManager::doLists()
 	if( (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Protoss || BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Terran)
 		&& (nrOfEnemyBases() *2 >= nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)) && !buildList.containsExpand() && enemiesNearNatural == 0)
 	{
-			buildExpand();
+		buildExpand();
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() > 250 && enemiesNearNatural == 0 && !buildList.containsExpand())
