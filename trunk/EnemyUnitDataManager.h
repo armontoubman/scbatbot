@@ -5,6 +5,7 @@
 #include <UnitGroup.h>
 class EnemyUnitDataManager
 {
+	friend class HighCommand;
 public:
 	EnemyUnitDataManager();
 	EnemyUnitDataManager(InformationManager* im);

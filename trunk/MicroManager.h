@@ -8,6 +8,7 @@
 #include "EigenUnitDataManager.h"
 class MicroManager
 {
+	friend class HighCommand;
 public:
 	MicroManager();
 	MicroManager(BuildOrderManager* b, EnemyUnitDataManager* e, TaskManager* t, HighCommand* h, EigenUnitDataManager* ei);

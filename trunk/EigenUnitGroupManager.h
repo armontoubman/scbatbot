@@ -8,6 +8,7 @@ class HighCommand;
 class EigenUnitDataManager;
 class EigenUnitGroupManager
 {
+	friend class HighCommand;
 public:
 	EigenUnitGroupManager(HighCommand* hc, EigenUnitDataManager* e, TaskManager* t);
 	bool canAttackAir(UnitGroup unitGroup);
