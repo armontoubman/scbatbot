@@ -219,7 +219,7 @@ UnitGroup WantBuildManager::getUnusedMineralsNearHatcheries()
 	{
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 		{
-			if((*it)->getDistance(*mit) <= 8.00 && !*mit.isBeingGathered())
+			if((*it)->getDistance(*mit) <= 8.00 && !(*mit).isBeingGathered())
 			{
 				result.insert(*mit);
 			}

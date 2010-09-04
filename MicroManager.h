@@ -25,9 +25,9 @@ public:
 	BWAPI::Unit* nearestUnit(BWAPI::Position pos, UnitGroup ug);
 	UnitGroup enemiesInSeekRange(BWAPI::Position p, double radius, int type);
 	bool alliesCanAttack(BWAPI::Position p, UnitGroup ug);
-	BWAPI::Unit harvest(BWAPI::Unit* unit);
-	BWAPI::Unit mineWhere(BWAPI::Unit* unit);
-	BWAPI::Unit gasWhere(BWAPI::Unit* unit);
+	BWAPI::Unit* harvest(BWAPI::Unit* unit);
+	BWAPI::Unit* mineWhere(BWAPI::Unit* unit);
+	BWAPI::Unit* gasWhere(BWAPI::Unit* unit);
 	void moveToNearestBase(BWAPI::Unit* unit);
 	void moveToNearestBase(std::set<BWAPI::Unit*> units);
 	bool isUnderDarkSwarm(BWAPI::Unit* unit);
@@ -48,6 +48,10 @@ public:
 	UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut);
 
 	void doMicro(std::list<UnitGroup> listUG);
+
+	// zelfde als in WantBuildManager
+	UnitGroup getHatcheriesWithMinerals();
+	UnitGroup getUnusedMineralsNearHatcheries();
 
 	BuildOrderManager* bom;
 	EnemyUnitDataManager* eudm;
