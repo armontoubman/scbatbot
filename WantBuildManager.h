@@ -6,6 +6,7 @@
 #include "BaseManager.h"
 class WantBuildManager
 {
+	friend class HighCommand;
 public:
 	WantBuildManager();
 	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba);

@@ -4,6 +4,7 @@
 #include <BWAPI.h>
 #include <list>
 class TaskManager {
+	friend class HighCommand;
 public:
 	TaskManager();
 	TaskManager(EigenUnitGroupManager* e);

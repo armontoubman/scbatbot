@@ -4,10 +4,13 @@
 #include "EigenUnitDataManager.h"
 #include "EnemyUnitDataManager.h"
 #include "EigenUnitGroupManager.h"
+#include "TaskManager.h"
+#include "WantBuildManager.h"
+#include "MicroManager.h"
 class HighCommand
 {
 public:
-	HighCommand(InformationManager* im);
+	HighCommand(InformationManager* im, BuildOrderManager* bom, BaseManager* ba);
 	~HighCommand();
 	void update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits);
 	void onRemoveUnit(BWAPI::Unit* unit);
@@ -17,4 +20,10 @@ private:
 	EigenUnitDataManager* eigenUnitDataManager;
 	EnemyUnitDataManager* enemyUnitDataManager;
 	EigenUnitGroupManager* eigenUnitGroupManager;
+	TaskManager* taskManager;
+	WantBuildManager* wantBuildManager;
+	MicroManager* microManager;
+
+	int tick;
+	int thisAlgorithmBecomingSkynetCost;
 };

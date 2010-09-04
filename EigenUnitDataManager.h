@@ -3,6 +3,7 @@
 #include "EigenUnitData.h"
 class EigenUnitDataManager
 {
+	friend class HighCommand;
 public:
 	EigenUnitDataManager();
 	void update(std::set<BWAPI::Unit*> units, std::set<BWAPI::Unit*> enemyUnits);
