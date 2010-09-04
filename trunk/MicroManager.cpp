@@ -11,6 +11,7 @@
 #include "Task.h"
 #include "HighCommand.h"
 #include "EigenUnitDataManager.h"
+#include "Util.h"
 
 MicroManager::MicroManager()
 {
@@ -195,7 +196,7 @@ int MicroManager::compareArmySize(UnitGroup x, UnitGroup y)
 
 BWAPI::Unit* MicroManager::nearestUnit(BWAPI::Position pos, UnitGroup ug)
 {
-	int besteAfstand = -1;
+	double besteAfstand = -1.00;
 	BWAPI::Unit* besteUnit = NULL;
 
 	for(std::set<BWAPI::Unit*>::iterator it = ug.begin(); it != ug.end(); it++)
@@ -936,6 +937,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* OVERLORD */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 				{
+					char* msg;
+					sprintf_s(msg, 1000, "doMicro overlord %d", (*unitit)->getID()); 
+					log(msg);
 					if((*unitit)->isUnderStorm())
 					{
 						(*unitit)->rightClick(moveAway(*unitit));
@@ -1048,6 +1052,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* DRONE */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Drone)
 				{
+					char* msg;
+					sprintf_s(msg, 1000, "doMicro drone %d", (*unitit)->getID()); 
+					log(msg);
 					if((*unitit)->isUnderStorm())
 					{
 						moveToNearestBase(*unitit);
