@@ -68,7 +68,6 @@ BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit, double radius)
 			{
 				// bonus
 				aantal++;
-				(*iten)->getDistance(
 			}
 		}
 
@@ -100,7 +99,7 @@ void MicroManager::moveAway(std::set<BWAPI::Unit*> units)
 {
 	for(std::set<BWAPI::Unit*>::iterator it=units.begin(); it!=units.end(); it++)
 	{
-		(*it)->move(moveAway((*it)));
+		(*it)->rightClick(moveAway((*it)));
 	}
 }
 
@@ -373,7 +372,7 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 	{
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 		{
-			if((*it)->getDistance(*mit) <= 8.00 && !(*mit).isBeingGathered())
+			if((*it)->getDistance(*mit) <= 8.00 && !(*mit)->isBeingGathered())
 			{
 				result.insert(*mit);
 			}
@@ -427,7 +426,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			{
 				if(airenemies.size() > 0)
 				{
-					if(canAttackAir(allenemies) || airenemies.size() > 2*(*it).size()) // nakijken
+					if(canAttackAir(allenemies) || airenemies.size() > 2*(*it)->size()) // nakijken
 					{
 						moveAway(**it);
 					}
@@ -454,7 +453,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		/* EINDE SCOURGE */
 
 		 /* MUTALISK */
-		else if((*it)(Mutalisk).size() > 0)
+		else if((**it)(Mutalisk).size() > 0)
 		{
 			BWAPI::Unit* eerste = *((*it)->begin());
 			if(eerste->isUnderStorm() || (**it)(Mutalisk).size() < 6) 
@@ -516,10 +515,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		/* EINDE MUTALISK */
 
 		/* ZERGLING */
-		else if((*it)(Zergling).size() > 0)
+		else if((**it)(Zergling).size() > 0)
 		{
 			BWAPI::Unit* eerste = *((*it)->begin());
-			if((*it).size() == 1)
+			if((**it).size() == 1)
 			{
 				if (amountCanAttackGround(enemiesInRange(eerste->getPosition(),8,0))>1)
 				{
@@ -564,11 +563,11 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					{
 						if(!isUnderDarkSwarm(eerste))
 						{
-							(*it).rightClick(swarm->getPosition());
+							(**it).rightClick(swarm->getPosition());
 						}
 						else
 						{
-							(*it).attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 10.00, 1)));
+							(**it).attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 10.00, 1)));
 						}
 					}
 					else // <-
@@ -589,7 +588,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										BWAPI::Unit* enemy = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 10.00, 1));
 										UnitGroup enemyUG = enemiesInRange(enemy->getPosition(), 6.00, 1);
 										BWAPI::Position center = enemyUG.getCenter();
-										BWAPI::Position eigencenter = (*it).getCenter();
+										BWAPI::Position eigencenter = (**it).getCenter();
 										if(center.getDistance(eigencenter) < 3.00)
 										{
 											(*it)->attackMove(center);

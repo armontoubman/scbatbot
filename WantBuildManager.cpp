@@ -163,7 +163,7 @@ bool WantBuildManager::wantListIsCompleted()
 	{
 		if(it->typenr == 1)
 		{
-			if(!algehad.count(it->buildtype) > 0)
+			if(!(algehad.count(it->buildtype) > 0))
 			{
 				int verwachteaantal = wantList.count(it->buildtype);
 				algehad.insert(it->buildtype);
@@ -219,7 +219,7 @@ UnitGroup WantBuildManager::getUnusedMineralsNearHatcheries()
 	{
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 		{
-			if((*it)->getDistance(*mit) <= 8.00 && !(*mit).isBeingGathered())
+			if((*it)->getDistance(*mit) <= 8.00 && !(**mit).isBeingGathered())
 			{
 				result.insert(*mit);
 			}
@@ -400,7 +400,7 @@ void WantBuildManager::doLists()
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
 					stap = 3;
 				}
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) > 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon,2)))
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) > 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon) < 2))
 				{
 					addWant(BWAPI::UnitTypes::Zerg_Zergling, 20);
 					if(	nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery) < 2)
@@ -531,7 +531,7 @@ void WantBuildManager::doLists()
 		{
 			if(nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) )
+				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -560,7 +560,7 @@ void WantBuildManager::doLists()
 		{
 			if(nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) )
+				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -616,7 +616,7 @@ void WantBuildManager::doLists()
 		{
 			if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) )
+				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -853,7 +853,7 @@ void WantBuildManager::doLists()
 		{
 			if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) )
+				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -958,7 +958,7 @@ void WantBuildManager::doLists()
 			}
 			else
 			{
-				if(nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) >= 11 && nrOfEnemy(BWAPI::UnitTypes::Zerg_Hydralisk) > &)
+				if(nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) >= 11 && nrOfEnemy(BWAPI::UnitTypes::Zerg_Hydralisk) > 7)
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling, 3);
 				}

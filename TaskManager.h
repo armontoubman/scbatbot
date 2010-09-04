@@ -3,6 +3,7 @@
 #include "EigenUnitGroupManager.h"
 #include <BWAPI.h>
 #include <list>
+class EigenUnitGroupManager;
 class TaskManager {
 	friend class HighCommand;
 public:
@@ -20,5 +21,5 @@ public:
 
 	void update();
 
-	std::list<Task> tasklist;
+	std::set<Task> tasklist;
 };

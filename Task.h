@@ -18,4 +18,5 @@ public:
 	UnitGroup unitGroup;
 	UnitGroup enemy;
 	bool operator==(const Task& param) const;
+	bool operator<(const Task& rhs) const;
 };

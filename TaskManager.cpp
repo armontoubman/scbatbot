@@ -2,8 +2,11 @@
 #include "Task.h"
 #include "EigenUnitGroupManager.h"
 #include <BWAPI.h>
-#include <list>
+#include <set>
 #include <algorithm>
+#include "Task.h"
+class Task;
+class EigenUnitGroupManager;
 TaskManager::TaskManager()
 {
 }
@@ -15,9 +18,9 @@ TaskManager::TaskManager(EigenUnitGroupManager* e)
 
 void TaskManager::insertTask(Task t)
 {
-	std::list<Task>::iterator insertposition;
+	std::set<Task>::iterator insertposition;
 	bool plek = false;
-	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
+	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
 		if((*i).priority > t.priority) {
 			insertposition = i;
@@ -29,7 +32,7 @@ void TaskManager::insertTask(Task t)
 		this->tasklist.insert(insertposition, t);
 	}
 	else {
-		this->tasklist.push_back(t);
+		this->tasklist.insert(this->tasklist.end(), t);
 	}
 }
 
@@ -40,12 +43,12 @@ void TaskManager::removeTask(Task t)
 
 Task TaskManager::highestPriorityTask()
 {
-	return this->tasklist.back();
+	return *this->tasklist.end();
 }
 
 Task TaskManager::findTaskWithUnitGroup(UnitGroup* ug)
 {
-	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
+	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
 		if(&(i->unitGroup) == ug) {
 			return *i;
@@ -66,7 +69,7 @@ void TaskManager::update()
 std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype)
 {
 	std::set<Task> result;
-	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
+	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
 		if(i->unitGroup(GetType,unittype).size() > 0) {
 			result.insert(*i);
@@ -78,7 +81,7 @@ std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype)
 std::set<Task> TaskManager::findTasksWithType(int t)
 {
 	std::set<Task> result;
-	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
+	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
 		if(i->type == t) {
 			result.insert(*i);

@@ -6,6 +6,11 @@
 #include "TaskManager.h"
 #include "HighCommand.h"
 #include "EigenUnitDataManager.h"
+class BuildOrderManager;
+class EnemyUnitDataManager;
+class TaskManager;
+class HighCommand;
+class EigenUnitDataManager;
 class MicroManager
 {
 	friend class HighCommand;
