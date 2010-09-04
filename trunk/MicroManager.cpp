@@ -282,7 +282,7 @@ BWAPI::Unit* MicroManager::harvest(BWAPI::Unit* unit) // returnt een unit terug 
 	UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringGas);
 	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor);
 	
-	if (extractors.size()>0 && gasDrones.size() < extractors.size()*3)
+	if (gasDrones.size() < extractors.size()*3)
 	{
 		if (mineralDrones.size()<5)
 		{
@@ -298,6 +298,22 @@ BWAPI::Unit* MicroManager::harvest(BWAPI::Unit* unit) // returnt een unit terug 
 		else
 		{
 			return gasWhere(unit);
+		}
+	}
+	else
+	{
+		if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
+		{
+			if (unit.isCarryingGas())
+			{
+				return this->hc->getNearestHatchery(unit->getPosition());
+			}
+			else
+			{
+				return mineWhere(unit);
+			}
+			// return de gas terug enzo, rechtermuisklik op nearest hatchery
+			// mogelijke probleem hierbij is dat ze allemaal teruggaan, als carryinggas == returngas/gatheringGas
 		}
 	}
 	return mineWhere(unit);
@@ -578,7 +594,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							if(enemyInRange(eerste->getPosition(), 7.00, 1))
 							{
 								BWAPI::Unit* nearest = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 10.00, 1).not(isBuilding).not(isWorker));
-								if(true) // if between nearest ground enemy && UG geen wall bevindt (aka kan er naar toe bewegen enzo)
+								if(true) // if between nearest ground enemy && UG geen wall bevindt (aka kan er naar toe bewegen enzo), een check voor wall vraagt om watvoor gebouw het is en of ernaast een cliff/gebouw bevindt. Wat ook kan is dat we het gewoon altijd wegbewege en juist mutalisks/hydra korte mette mee laten maken.
 								{
 									if(canAttackGround(enemiesInRange(eerste->getPosition(), 6.00, 2)))
 									{
@@ -1068,7 +1084,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(7.00, (*unitit)->getPosition());
 								UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(7.00, (*unitit)->getPosition());
 								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 7.00, 0);
-								if(!canAttackGround(allyAirInRange) && 4*enemies.size() <= dronesInRange.size())
+								if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
 								{
 									(*unitit)->attackUnit(*enemies.begin());
 								}
@@ -1086,12 +1102,16 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										{
 											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), militaryInRange)->getPosition());
 										}
+										else
+										{
+											(*unitit)->rightClick(moveAway(*unitit));
+										}
 									}
 								}
 							}
 							else
 							{
-								harvest(*unitit);
+								(*unitit)->rightClick(harvest(*unitit));
 							}
 						}
 						else
@@ -1115,7 +1135,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					if((*unitit)->isIdle())
 					{
-						harvest(*unitit);
+						(*unitit)->rightClick(harvest(*unitit));
 					}
 				}
 				/* EINDE DRONE */
