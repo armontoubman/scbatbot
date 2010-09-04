@@ -64,4 +64,8 @@ public:
 	TaskManager* tm;
 	HighCommand* hc;
 	EigenUnitDataManager* eiudm;
+
+	
+	std::string intToString(int i);
+	void logx(const char* func, int id, const char* msg);
 };

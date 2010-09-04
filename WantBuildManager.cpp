@@ -535,7 +535,7 @@ void WantBuildManager::doLists()
 						addBuild(BWAPI::UnitTypes::Zerg_Ultralisk);
 					}
 				}
-				else if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.containsExpand(BWAPI::UnitTypes::Zerg_Mutalisk)<4)
+				else if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<4)
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
 				}
@@ -546,11 +546,7 @@ void WantBuildManager::doLists()
 		{
 			if(nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-<<<<<<< .mine
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
-=======
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
->>>>>>> .r16
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -579,11 +575,7 @@ void WantBuildManager::doLists()
 		{
 			if(nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-<<<<<<< .mine
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
-=======
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
->>>>>>> .r16
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -645,11 +637,7 @@ void WantBuildManager::doLists()
 		{
 			if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-<<<<<<< .mine
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
-=======
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
->>>>>>> .r16
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -913,11 +901,7 @@ void WantBuildManager::doLists()
 		{
 			if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
-<<<<<<< .mine
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
-=======
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling < 26) || ( nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7) ) ) )
->>>>>>> .r16
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				}
@@ -1029,11 +1013,7 @@ void WantBuildManager::doLists()
 			}
 			else
 			{
-<<<<<<< .mine
 				if(nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) >= 11 && nrOfEnemy(BWAPI::UnitTypes::Zerg_Hydralisk) > 7 && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3)
-=======
-				if(nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) >= 11 && nrOfEnemy(BWAPI::UnitTypes::Zerg_Hydralisk) > 7)
->>>>>>> .r16
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling, 3);
 				}
