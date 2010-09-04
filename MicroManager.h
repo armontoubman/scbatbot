@@ -67,5 +67,5 @@ public:
 
 	
 	std::string intToString(int i);
-	void logx(const char* func, int id, const char* msg);
+	void logx(std::string func, int id, std::string msg);
 };
