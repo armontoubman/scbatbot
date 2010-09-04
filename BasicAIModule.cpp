@@ -4,7 +4,7 @@ using namespace BWAPI;
 
 void BasicAIModule::onStart()
 {
-  this->showManagerAssignments=false;
+  this->showManagerAssignments=true;
   if (Broodwar->isReplay()) return;
   // Enable some cheat flags
   Broodwar->enableFlag(Flag::UserInput);
@@ -44,6 +44,7 @@ void BasicAIModule::onStart()
   BWAPI::UnitType workerType=race.getWorker();
   
   //this->buildOrderManager->enableDependencyResolver();
+  this->workerManager->disableAutoBuild();
   
   if (race == Races::Zerg)
   {
@@ -89,14 +90,14 @@ void BasicAIModule::onFrame()
   this->buildManager->update();
   this->buildOrderManager->update();
   this->baseManager->update();
-  this->workerManager->update();
+  //this->workerManager->update();
   this->techManager->update();
   this->upgradeManager->update();
-  this->supplyManager->update();
-  this->scoutManager->update();
+  //this->supplyManager->update();
+  //this->scoutManager->update();
   this->enhancedUI->update();
   this->borderManager->update();
-  this->defenseManager->update();
+  //this->defenseManager->update();
   this->arbitrator.update();
 
   this->highCommand->update(Broodwar->self()->getUnits(), Broodwar->enemy()->getUnits());

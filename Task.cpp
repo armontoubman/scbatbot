@@ -5,7 +5,7 @@ Task::Task()
 {
 }
 
-Task::Task(int t, int p, BWAPI::Position pos, UnitGroup ug)
+Task::Task(int t, int p, BWAPI::Position pos, UnitGroup* ug)
 {
 	this->type = t;
 	this->priority = p;

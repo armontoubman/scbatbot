@@ -27,6 +27,9 @@ EigenUnitGroupManager::EigenUnitGroupManager(HighCommand* hc, EigenUnitDataManag
 	addUG(this->defendmutaUG);
 	addUG(this->defendgroepUG);
 	addUG(this->lurkergroepUG);
+
+	std::set<BWAPI::Unit*> units = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	assignUnits(units);
 }
 
 bool EigenUnitGroupManager::canAttackAir(UnitGroup unitGroup)
@@ -144,9 +147,9 @@ UnitGroup* EigenUnitGroupManager::findUnitGroupWithUnit(BWAPI::Unit* unit)
 
 void EigenUnitGroupManager::assignUnits(std::set<BWAPI::Unit*> units)
 {
-	for(std::set<BWAPI::Unit*>::iterator it=units.begin(); it!=units.end(); it++)
+	for each(BWAPI::Unit* u in units)
 	{
-		assignUnit(*it);
+		assignUnit(u);
 	}
 }
 
@@ -177,6 +180,8 @@ void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
 	{
 		this->defendgroepUG->insert(unit);
 	}
+
+	BWAPI::Broodwar->printf("%s %s", "assignUnit", unit->getType().getName());
 }
 
 void EigenUnitGroupManager::update()

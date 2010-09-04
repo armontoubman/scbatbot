@@ -12,6 +12,7 @@
 #include "TaskManager.h"
 #include "WantBuildManager.h"
 #include "MicroManager.h"
+#include "Task.h"
 
 HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseManager* ba)
 {
@@ -24,6 +25,9 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->thisAlgorithmBecomingSkynetCost = 999999999;
 	this->tick = 1;
 	this->wantBuildManager->doLists();
+
+	Task t = Task(1, 1, BWTA::getStartLocation(BWAPI::Broodwar->enemy())->getPosition(), this->eigenUnitGroupManager->overlordUG);
+	this->taskManager->insertTask(t);
 }
 
 HighCommand::~HighCommand() {

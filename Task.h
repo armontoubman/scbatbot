@@ -4,7 +4,7 @@
 class Task {
 public:
 	Task();
-	Task(int t, int p, BWAPI::Position pos, UnitGroup ug);
+	Task(int t, int p, BWAPI::Position pos, UnitGroup* ug);
 	int type;
 	/*
 	types:
@@ -15,8 +15,8 @@ public:
 	*/
 	int priority;
 	BWAPI::Position position;
-	UnitGroup unitGroup;
-	UnitGroup enemy;
+	UnitGroup* unitGroup;
+	UnitGroup* enemy;
 	bool operator==(const Task& param) const;
 	bool operator<(const Task& rhs) const;
 };

@@ -34,6 +34,8 @@ void TaskManager::insertTask(Task t)
 	else {
 		this->tasklist.insert(this->tasklist.end(), t);
 	}
+
+	BWAPI::Broodwar->printf("%s %d", "Task gemaakt met type", t.type);
 }
 
 void TaskManager::removeTask(Task t)
@@ -50,7 +52,7 @@ Task TaskManager::findTaskWithUnitGroup(UnitGroup* ug)
 {
 	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
-		if(&(i->unitGroup) == ug) {
+		if((i->unitGroup) == ug) {
 			return *i;
 		}
 	}
@@ -71,7 +73,8 @@ std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype)
 	std::set<Task> result;
 	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
-		if(i->unitGroup(GetType,unittype).size() > 0) {
+		UnitGroup* mettype = &(*i->unitGroup)(GetType,unittype);
+		if(mettype->size() > 0) {
 			result.insert(*i);
 		}
 	}
