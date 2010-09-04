@@ -68,4 +68,6 @@ public:
 	
 	std::string intToString(int i);
 	void logx(std::string func, int id, std::string msg);
+
+	double dist(int d);
 };
