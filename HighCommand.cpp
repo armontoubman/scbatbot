@@ -26,8 +26,8 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->tick = 1;
 	this->wantBuildManager->doLists();
 
-	Task t = Task(1, 1, BWTA::getStartLocation(BWAPI::Broodwar->enemy())->getPosition(), this->eigenUnitGroupManager->overlordUG);
-	this->taskManager->insertTask(t);
+	//Task t = Task(1, 1, BWTA::getStartLocation(BWAPI::Broodwar->enemy())->getPosition(), this->eigenUnitGroupManager->overlordUG);
+	//this->taskManager->insertTask(t);
 }
 
 HighCommand::~HighCommand() {
