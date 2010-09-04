@@ -424,6 +424,7 @@ UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug,
 
 void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 {
+	log("doMicro\n");
 
 	UnitGroup allSelfUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	UnitGroup allEnemyUnits = this->eudm->getUG();
@@ -954,16 +955,17 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* OVERLORD */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 				{
-					logx("doMicro overlord ", (*unitit)->getID(), " start\n"); 
+					logx("\n\ndoMicro overlord ", (*unitit)->getID(), "\n"); 
 					if((*unitit)->isUnderStorm())
 					{
+						logx("doMicro overlord ", (*unitit)->getID(), " under storm moveAway\n");
 						(*unitit)->rightClick(moveAway(*unitit));
 					}
 					else
 					{
 						Task t = currentTask;
 						
-						logx("doMicro overlord ", (*unitit)->getID(), std::string(" task.type=").append(intToString(t.type)).c_str());
+						logx("doMicro overlord ", (*unitit)->getID(), std::string(" task.type=").append(intToString(t.type)).append("\n").c_str());
 						if(t.type == 1 || t.type == 4)
 						{
 							if((*unitit)->getPosition().getDistance(nearestEnemyThatCanAttackAir(*unitit)->getPosition()) < 8.00 && t.type == 1)
@@ -1097,22 +1099,26 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* DRONE */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Drone)
 				{
-					logx("doMicro drone ", (*unitit)->getID(), "\n");
+					logx("\n\ndoMicro drone ", (*unitit)->getID(), "\n");
 					if((*unitit)->isUnderStorm())
 					{
+						logx("doMicro drone ", (*unitit)->getID(), " under storm moveAway\n");
 						moveToNearestBase(*unitit);
 					}
 					else
 					{
 						if(currentTask.type != 1)
 						{
+							logx("doMicro drone ", (*unitit)->getID(), " task.type != 1\n");
 							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), 5.00, 0)) || this->eiudm->lostHealthThisFrame(*unitit))
 							{
+								logx("doMicro drone ", (*unitit)->getID(), " ground enemies of geraakt\n");
 								UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(7.00, (*unitit)->getPosition());
 								UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(7.00, (*unitit)->getPosition());
 								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 7.00, 0);
 								if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
 								{
+									logx("doMicro drone ", (*unitit)->getID(), "\n");
 									(*unitit)->attackUnit(*enemies.begin());
 								}
 								else
@@ -1120,6 +1126,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									UnitGroup detectorsInRange = enemiesInRange((*unitit)->getPosition(), 10.00, 0)(isDetector);
 									if(BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Burrowing) && detectorsInRange.size() == 0)
 									{
+										logx("doMicro drone ", (*unitit)->getID(), " geen detectors, wel burrow\n");
 										(*unitit)->burrow();
 									}
 									else
@@ -1127,10 +1134,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										UnitGroup militaryInRange = allSelfUnits.inRadius(14.00, (*unitit)->getPosition()).not(isWorker)(canAttack);
 										if(militaryInRange.size() > 0)
 										{
+											logx("doMicro drone ", (*unitit)->getID(), " military \n");
 											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), militaryInRange)->getPosition());
 										}
 										else
 										{
+											logx("doMicro drone ", (*unitit)->getID(), " geen military moveAway\n");
 											(*unitit)->rightClick(moveAway(*unitit));
 										}
 									}
@@ -1138,6 +1147,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
+								logx("doMicro drone ", (*unitit)->getID(), " harvest\n");
 								(*unitit)->rightClick(harvest(*unitit));
 							}
 						}
@@ -1145,16 +1155,19 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						{
 							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), 7.00, 0)))
 							{
+								logx("doMicro drone ", (*unitit)->getID(), " enemies moveAway\n");
 								(*unitit)->rightClick(moveAway(*unitit));
 							}
 							else
 							{
 								if((*unitit)->getPosition().getDistance(currentTask.position) < 7)
 								{
+									logx("doMicro drone ", (*unitit)->getID(), " moveToNearestBase\n");
 									moveToNearestBase(*unitit);
 								}
 								else
 								{
+									logx("doMicro drone ", (*unitit)->getID(), " naar task\n");
 									(*unitit)->rightClick(currentTask.position);
 								}
 							}
@@ -1162,6 +1175,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					if((*unitit)->isIdle())
 					{
+						logx("doMicro drone ", (*unitit)->getID(), " isIdle, harvest\n");
 						(*unitit)->rightClick(harvest(*unitit));
 					}
 				}
@@ -1585,7 +1599,7 @@ std::string MicroManager::intToString(int i) {
 	return buffer.str();
 }
 
-void MicroManager::logx(const char* func, int id, const char* msg)
+void MicroManager::logx(std::string func, int id, std::string msg)
 {
 	log(std::string(func).append(intToString(id)).append(std::string(msg)).c_str());
 }
