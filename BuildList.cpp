@@ -10,7 +10,10 @@ BuildList::BuildList()
 
 void BuildList::addItem(BuildItem b)
 {
+	if (this->buildlist.size()<20)
+	{
 	this->buildlist.push_back(b);
+	}
 }
 
 void BuildList::removeItem(BuildItem b)
