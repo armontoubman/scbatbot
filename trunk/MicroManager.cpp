@@ -94,7 +94,7 @@ BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit, double radius)
 
 BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit)
 {
-	return moveAway(unit, 13.00);
+	return moveAway(unit, dist(13.00));
 }
 
 void MicroManager::moveAway(std::set<BWAPI::Unit*> units)
@@ -109,16 +109,18 @@ std::set<BWAPI::Position> MicroManager::getAdjacentPositions(BWAPI::Position p)
 {
 	std::set<BWAPI::Position> result;
 
-	result.insert(BWAPI::Position(p.x()-1, p.y()+1));
-	result.insert(BWAPI::Position(p.x(), p.y()+1));
-	result.insert(BWAPI::Position(p.x()+1, p.y()+1));
+	int factor = dist(1); // was 1
 
-	result.insert(BWAPI::Position(p.x()-1, p.y()));
-	result.insert(BWAPI::Position(p.x()+1, p.y()));
+	result.insert(BWAPI::Position(p.x()-factor, p.y()+factor));
+	result.insert(BWAPI::Position(p.x(), p.y()+factor));
+	result.insert(BWAPI::Position(p.x()+factor, p.y()+factor));
 
-	result.insert(BWAPI::Position(p.x()-1, p.y()-1));
+	result.insert(BWAPI::Position(p.x()-factor, p.y()));
+	result.insert(BWAPI::Position(p.x()+factor, p.y()));
+
+	result.insert(BWAPI::Position(p.x()-factor, p.y()-factor));
 	result.insert(BWAPI::Position(p.x(), p.y()-1));
-	result.insert(BWAPI::Position(p.x()+1, p.y()-1));
+	result.insert(BWAPI::Position(p.x()+factor, p.y()-factor));
 
 	return result;
 }
@@ -155,7 +157,7 @@ bool MicroManager::enemyInRange(BWAPI::Position p, double radius, int type)
 
 bool MicroManager::enemyInRange(BWAPI::Position p)
 {
-	return enemyInRange(p, 13.00, 0);
+	return enemyInRange(p, dist(13.00), 0);
 }
 
 UnitGroup MicroManager::enemiesInRange(BWAPI::Position p, double radius, int type) // 0 beide, 1 ground, 2 flyer
@@ -349,7 +351,7 @@ BWAPI::Unit* MicroManager::gasWhere(BWAPI::Unit* unit)
 		UnitGroup result = extractors;
 		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 		{
-			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone).inRadius(6, (*it)->getPosition()).size()<3)
+			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone).inRadius(dist(6), (*it)->getPosition()).size()<3)
 			{
 				result.erase(*it); // ug met een unit ehh
 			}
@@ -371,7 +373,7 @@ UnitGroup MicroManager::getHatcheriesWithMinerals()
 	{
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)  // stond eerst it!=minerals.end(), lijkt me beetje raar als de rest mit staat? ***
 		{
-			if((*it)->getDistance(*mit) <= 8.00)
+			if((*it)->getDistance(*mit) <= dist(8.00))
 			{
 				result.insert(*it);
 				break;
@@ -390,7 +392,7 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 	{
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 		{
-			if((*it)->getDistance(*mit) <= 8.00 && !(*mit)->isBeingGathered())
+			if((*it)->getDistance(*mit) <= dist(8.00) && !(*mit)->isBeingGathered())
 			{
 				result.insert(*mit);
 			}
@@ -424,7 +426,7 @@ UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug,
 
 void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 {
-	log("doMicro\n");
+	log("\n\ndoMicro\n\n");
 
 	UnitGroup allSelfUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	UnitGroup allEnemyUnits = this->eudm->getUG();
@@ -435,8 +437,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		if((**it)(Scourge).size() > 0)
 		{
 			BWAPI::Unit* eerste = *((*it)->begin());
-			UnitGroup airenemies = enemiesInRange(eerste->getPosition(), 7.00, 2);
-			UnitGroup allenemies = enemiesInRange(eerste->getPosition(), 7.00, 0);
+			UnitGroup airenemies = enemiesInRange(eerste->getPosition(), dist(7.00), 2);
+			UnitGroup allenemies = enemiesInRange(eerste->getPosition(), dist(7.00), 0);
 			if(eerste->isUnderStorm() || canAttackAir(allenemies) && airenemies.size() == 0)
 			{
 				(*it)->rightClick(this->hc->getNearestHatchery(eerste->getPosition())->getPosition());
@@ -455,7 +457,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 				}
 				else {
-					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < 9.00)
+					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(9.00))
 					{
 						for(std::set<BWAPI::Unit*>::iterator scourgeit=(*it)->begin(); scourgeit!=(*it)->end(); scourgeit++)
 						{
@@ -483,14 +485,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			{
 				if(eerste->getGroundWeaponCooldown() != 0)
 				{
-					if(canAttackAir(enemiesInRange(eerste->getPosition(), 7.00, 0)))
+					if(canAttackAir(enemiesInRange(eerste->getPosition(), dist(7.00), 0)))
 					{
 						BWAPI::Position pos = moveAway(eerste);
 						(*it)->rightClick(pos);
 					}
 					else
 					{
-						if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < 9.00)
+						if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(9.00))
 						{
 							moveToNearestBase(**it);
 						}
@@ -502,13 +504,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				}
 				else
 				{
-					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < 9.00)
+					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < (9.00))
 					{
 						BWAPI::Unit* nearestAirEnemy = nearestEnemyThatCanAttackAir(eerste);
 						double distanceAE = eerste->getPosition().getDistance(nearestAirEnemy->getPosition());
 						BWAPI::Unit* nearestNonBuilding = nearestNonBuildingEnemy(eerste);
 						double distanceNB = eerste->getPosition().getDistance(nearestNonBuilding->getPosition());
-						if(distanceNB < 9.00)
+						if(distanceNB < (9.00))
 						{
 							if(distanceAE < distanceNB)
 							{
@@ -521,7 +523,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							(*it)->attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 9.00, 0)));
+							(*it)->attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(9.00), 0)));
 						}
 					}
 					else
@@ -539,7 +541,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			BWAPI::Unit* eerste = *((*it)->begin());
 			if((**it).size() == 1)
 			{
-				if (amountCanAttackGround(enemiesInRange(eerste->getPosition(),8,0))>1)
+				if (amountCanAttackGround(enemiesInRange(eerste->getPosition(),dist(8),0))>1)
 				{
 					moveToNearestBase(**it);
 				}
@@ -552,8 +554,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						{
 							int x = eerste->getPosition().x();
 							int y = eerste->getPosition().y();
-							int newx = x + (rand() % 10 - 5);
-							int newy = y + (rand() % 10 - 5);
+							int factor = dist(10);
+							int newx = x + (rand() % factor - factor/2);
+							int newy = y + (rand() % factor - factor/2);
 							eerste->rightClick(BWAPI::Position(newx, newy));
 						}
 						else
@@ -569,8 +572,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			}
 			else
 			{
-				UnitGroup enemies = enemiesInRange(eerste->getPosition(), 10.00, 1);
-				UnitGroup allies = allSelfUnits.inRadius(10.00, eerste->getPosition());
+				UnitGroup enemies = enemiesInRange(eerste->getPosition(), dist(10.00), 1);
+				UnitGroup allies = allSelfUnits.inRadius(dist(10.00), eerste->getPosition());
 				if((**it).size() * 0.8 < enemies.size() && allies.size() < 3)
 				{
 					moveAway(**it);
@@ -578,7 +581,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				else
 				{
 					BWAPI::Unit* swarm = nearestSwarm(eerste);
-					if(swarm != NULL && swarm->getPosition().getDistance(eerste->getPosition()) < 9.00)
+					if(swarm != NULL && swarm->getPosition().getDistance(eerste->getPosition()) < dist(9.00))
 					{
 						if(!isUnderDarkSwarm(eerste))
 						{
@@ -586,29 +589,29 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							(**it).attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 10.00, 1)));
+							(**it).attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10.00), 1)));
 						}
 					}
 					else // <-
 					{
 						if((**it).size() > 7)
 						{
-							if(enemyInRange(eerste->getPosition(), 7.00, 1))
+							if(enemyInRange(eerste->getPosition(), dist(7.00), 1))
 							{
-								BWAPI::Unit* nearest = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 10.00, 1).not(isBuilding).not(isWorker));
+								BWAPI::Unit* nearest = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10.00), 1).not(isBuilding).not(isWorker));
 								if(true) // if between nearest ground enemy && UG geen wall bevindt (aka kan er naar toe bewegen enzo), een check voor wall vraagt om watvoor gebouw het is en of ernaast een cliff/gebouw bevindt. Wat ook kan is dat we het gewoon altijd wegbewege en juist mutalisks/hydra korte mette mee laten maken.
 								{
-									if(canAttackGround(enemiesInRange(eerste->getPosition(), 6.00, 2)))
+									if(canAttackGround(enemiesInRange(eerste->getPosition(), dist(6.00), 2)))
 									{
 										moveAway(**it);
 									}
 									else
 									{
-										BWAPI::Unit* enemy = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), 10.00, 1));
-										UnitGroup enemyUG = enemiesInRange(enemy->getPosition(), 6.00, 1);
+										BWAPI::Unit* enemy = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10.00), 1));
+										UnitGroup enemyUG = enemiesInRange(enemy->getPosition(), dist(6.00), 1);
 										BWAPI::Position center = enemyUG.getCenter();
 										BWAPI::Position eigencenter = (**it).getCenter();
-										if(center.getDistance(eigencenter) < 3.00)
+										if(center.getDistance(eigencenter) < dist(3.00))
 										{
 											(*it)->attackMove(center);
 										}
@@ -625,8 +628,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								UnitGroup buildings = enemiesInRange(eerste->getPosition(), 7.00, 1)(isBuilding);
-								UnitGroup workers = enemiesInRange(eerste->getPosition(), 10.00, 1)(isWorker);
+								UnitGroup buildings = enemiesInRange(eerste->getPosition(), dist(7.00), 1)(isBuilding);
+								UnitGroup workers = enemiesInRange(eerste->getPosition(), dist(10.00), 1)(isWorker);
 								if(buildings.size() > 0)
 								{
 									if(workers.size() > 0)
@@ -640,7 +643,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < 6.00)
+									if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(6.00))
 									{
 										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
 										{
@@ -656,15 +659,15 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							UnitGroup enemies = enemiesInRange(eerste->getPosition(), 7.00, 1);
+							UnitGroup enemies = enemiesInRange(eerste->getPosition(), dist(7.00), 1);
 							if(enemies.size() > 0)
 							{
 								(*it)->attackMove(enemies.getCenter());
 							}
 							else
 							{
-								UnitGroup buildings = enemiesInRange(eerste->getPosition(), 7.00, 1)(isBuilding);
-								UnitGroup workers = enemiesInRange(eerste->getPosition(), 10.00, 1)(isWorker);
+								UnitGroup buildings = enemiesInRange(eerste->getPosition(), dist(7.00), 1)(isBuilding);
+								UnitGroup workers = enemiesInRange(eerste->getPosition(), dist(10.00), 1)(isWorker);
 								if(buildings.size() > 0)
 								{
 									if(workers.size() > 0)
@@ -678,7 +681,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < 6.00)
+									if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(6.00))
 									{
 										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
 										{
@@ -710,14 +713,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				{
 					if((*unitit)->isIrradiated())
 					{
-						if(allSelfUnits.inRadius(3.00, (*unitit)->getPosition()).size() > 0)
+						if(allSelfUnits.inRadius(dist(3.00), (*unitit)->getPosition()).size() > 0)
 						{
 							BWAPI::Position base = BWAPI::Broodwar->enemy()->getStartLocation();
 							(*unitit)->attackMove(base);
 						}
 						else
 						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 7.00, 0);
+							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7.00), 0);
 							if(enemies.size() > 0)
 							{
 								(*unitit)->attackUnit(*enemies.begin());
@@ -737,7 +740,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							UnitGroup swarms = UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits())(Dark_Swarm).inRadius(9.00, (*unitit)->getPosition());
+							UnitGroup swarms = UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits())(Dark_Swarm).inRadius(dist(9.00), (*unitit)->getPosition());
 							if(swarms.size() > 0)
 							{
 								if(isUnderDarkSwarm(*unitit))
@@ -751,9 +754,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								if((*unitit)->getDistance(currentTask.position) < 8.00)
+								if((*unitit)->getDistance(currentTask.position) < dist(8.00))
 								{
-									(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), 8.00, 0).begin());
+									(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), dist(8.00), 0).begin());
 								}
 								else
 								{
@@ -776,7 +779,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							if((*unitit)->getPosition().getDistance(currentTask.position) > 6.00 && enemiesInRange((*unitit)->getPosition(), 13.00, 0).size() == 0)
+							if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6.00) && enemiesInRange((*unitit)->getPosition(), 13.00, 0).size() == 0)
 							{
 								(*unitit)->rightClick(currentTask.position);
 							}
@@ -794,8 +797,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 6.00, 0);
-							if(enemiesInRange((*unitit)->getPosition(), 13.00, 0).size() > 0)
+							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(6.00), 0);
+							if(enemiesInRange((*unitit)->getPosition(), dist(13.00), 0).size() > 0)
 							{
 								if(!this->eiudm->unitIsSeen(*unitit))
 								{
@@ -803,7 +806,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										if(enemies(Marine).size() > 0 || enemies(isWorker).size() > 0 || enemies(Zealot).size() > 0 || enemies(Medic).size() > 0 || enemies(Zergling).size() > 0)
 										{
-											if(nearestUnit((*unitit)->getPosition(), enemies)->getPosition().getDistance((*unitit)->getPosition()) < 3.00)
+											if(nearestUnit((*unitit)->getPosition(), enemies)->getPosition().getDistance((*unitit)->getPosition()) < dist(3.00))
 											{
 												(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemies));
 											}
@@ -830,7 +833,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										UnitGroup structures = allSelfUnits(isBuilding);
 										BWAPI::Unit* neareststructure = nearestUnit((*unitit)->getPosition(), structures);
-										if((*it)->getCenter().getDistance(neareststructure->getPosition()) < 10.00)
+										if((*it)->getCenter().getDistance(neareststructure->getPosition()) < dist(10.00))
 										{
 											(*unitit)->attackUnit(*enemies.begin());
 										}
@@ -843,7 +846,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								if((*unitit)->getPosition().getDistance(currentTask.position) > 6.00)
+								if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6.00))
 								{
 									(*unitit)->unburrow();
 								}
@@ -877,7 +880,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					{
 						if(allSelfUnits.inRadius(10.00, (*unitit)->getPosition()).not(Defiler).size() > 3)
 						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 9.00, 0);
+							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(9.00), 0);
 							bool atleastoneunderswarm = false;
 							for(std::set<BWAPI::Unit*>::iterator swarmit=enemies.begin(); swarmit!=enemies.end(); swarmit++)
 							{
@@ -909,7 +912,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									BWAPI::Unit* swarm = nearestSwarm(nenuds);
 									if(nenuds != NULL && swarm != NULL)
 									{
-										if(nenuds->getPosition().getDistance(swarm->getPosition()) > 5.00)
+										if(nenuds->getPosition().getDistance(swarm->getPosition()) > dist(5.00))
 										{
 											int x = abs(nenuds->getPosition().x() - swarm->getPosition().x());
 											int y = abs(nenuds->getPosition().y() - swarm->getPosition().y());
@@ -930,10 +933,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 9.00, 0);
+							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(9.00), 0);
 							if(enemies.size() > 0)
 							{
-								UnitGroup buildings = allSelfUnits(isBuilding).inRadius(5.00, (*unitit)->getPosition());
+								UnitGroup buildings = allSelfUnits(isBuilding).inRadius(dist(5.00), (*unitit)->getPosition());
 								if(buildings.size() > 0)
 								{
 									(*unitit)->useTech(BWAPI::TechTypes::Dark_Swarm, (*unitit));
@@ -968,14 +971,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						logx("doMicro overlord ", (*unitit)->getID(), std::string(" task.type=").append(intToString(t.type)).append("\n").c_str());
 						if(t.type == 1 || t.type == 4)
 						{
-							if((*unitit)->getPosition().getDistance(nearestEnemyThatCanAttackAir(*unitit)->getPosition()) < 8.00 && t.type == 1)
+							if((*unitit)->getPosition().getDistance(nearestEnemyThatCanAttackAir(*unitit)->getPosition()) < dist(8.00) && t.type == 1)
 							{
 								logx("doMicro overlord ", (*unitit)->getID(), " air enemy dichtbij\n");
 								if(overlordSupplyProvidedSoon())
 								{
 									
 									logx("doMicro overlord ", (*unitit)->getID(), " overlordSupplySoon");
-									UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(8.00, t.position);
+									UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(dist(8.00), t.position);
 									if(buildings.size() == 0)
 									{
 										logx("doMicro overlord ", (*unitit)->getID(), " geen buildings");
@@ -985,7 +988,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										
 										logx("doMicro overlord ", (*unitit)->getID(), " wel buildings\n");
-										if((*unitit)->getPosition().getDistance(t.position) < 2.00)
+										if((*unitit)->getPosition().getDistance(t.position) < dist(2.00))
 										{
 											
 											logx("doMicro overlord ", (*unitit)->getID(), " moveAway\n");
@@ -1012,7 +1015,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									else
 									{
 										UnitGroup dropships = allEnemyUnits(Dropship) + allEnemyUnits(Shuttle);
-										dropships = dropships.inRadius(10.00, (*unitit)->getPosition());
+										dropships = dropships.inRadius(dist(10.00), (*unitit)->getPosition());
 										if(dropships.size() > 0)
 										{
 											
@@ -1035,7 +1038,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							Task* hydratask = NULL;
 							for(std::set<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
 							{
-								if((*taskit).type == 2 || (*taskit).type == 3 && allSelfUnits(Overlord).inRadius(10.00, (*(*taskit).unitGroup->begin())->getPosition()).size() == 0)
+								if((*taskit).type == 2 || (*taskit).type == 3 && allSelfUnits(Overlord).inRadius(dist(10.00), (*(*taskit).unitGroup->begin())->getPosition()).size() == 0)
 								{
 									Task loltask = *taskit;
 									hydratask = &loltask;
@@ -1051,12 +1054,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								UnitGroup overlordsnearby = allSelfUnits(Overlord).inRadius(10.00, (*unitit)->getPosition());
-								if(overlordsnearby.size() > 0)
+								UnitGroup overlordsnearby = allSelfUnits(Overlord).inRadius(dist(10.00), (*unitit)->getPosition());
+								if(overlordsnearby.size() > 1)
 								{
 									
 									logx("doMicro overlord ", (*unitit)->getID(), " andere overlord\n");
-									if(canAttackAir(enemiesInRange((*unitit)->getPosition(), 8.00, 0)))
+									if(canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(8.00), 0)))
 									{
 										
 										logx("doMicro overlord ", (*unitit)->getID(), " canAttackAir moveAway\n");
@@ -1071,15 +1074,17 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									UnitGroup buildings = allSelfUnits(isBuilding).inRadius(15.00, (*unitit)->getPosition());
+									UnitGroup buildings = allSelfUnits(isBuilding).inRadius(dist(15.00), (*unitit)->getPosition());
 									if(buildings.size() > 0)
 									{
 										
 										logx("doMicro overlord ", (*unitit)->getID(), " building random\n");
+										// als dit elk frame gebeurt, krijgt hij elk frame een nieuwe positie -> stuiterbal
 										int x = (*unitit)->getPosition().x();
 										int y = (*unitit)->getPosition().y();
-										int newx = x + (rand() % 10 - 5);
-										int newy = y + (rand() % 10 - 5);
+										int factor = dist(10);
+										int newx = x + (rand() % factor - factor/2);
+										int newy = y + (rand() % factor - factor/2);
 										(*unitit)->rightClick(BWAPI::Position(newx, newy));
 									}
 									else
@@ -1110,12 +1115,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						if(currentTask.type != 1)
 						{
 							logx("doMicro drone ", (*unitit)->getID(), " task.type != 1\n");
-							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), 5.00, 0)) || this->eiudm->lostHealthThisFrame(*unitit))
+							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(5.00), 0)) || this->eiudm->lostHealthThisFrame(*unitit))
 							{
 								logx("doMicro drone ", (*unitit)->getID(), " ground enemies of geraakt\n");
-								UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(7.00, (*unitit)->getPosition());
-								UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(7.00, (*unitit)->getPosition());
-								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 7.00, 0);
+								UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(dist(7.00), (*unitit)->getPosition());
+								UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(dist(7.00), (*unitit)->getPosition());
+								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7.00), 0);
 								if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
 								{
 									logx("doMicro drone ", (*unitit)->getID(), "\n");
@@ -1123,7 +1128,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									UnitGroup detectorsInRange = enemiesInRange((*unitit)->getPosition(), 10.00, 0)(isDetector);
+									UnitGroup detectorsInRange = enemiesInRange((*unitit)->getPosition(), dist(10.00), 0)(isDetector);
 									if(BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Burrowing) && detectorsInRange.size() == 0)
 									{
 										logx("doMicro drone ", (*unitit)->getID(), " geen detectors, wel burrow\n");
@@ -1131,7 +1136,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										UnitGroup militaryInRange = allSelfUnits.inRadius(14.00, (*unitit)->getPosition()).not(isWorker)(canAttack);
+										UnitGroup militaryInRange = allSelfUnits.inRadius(dist(14.00), (*unitit)->getPosition()).not(isWorker)(canAttack);
 										if(militaryInRange.size() > 0)
 										{
 											logx("doMicro drone ", (*unitit)->getID(), " military \n");
@@ -1148,19 +1153,22 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							else
 							{
 								logx("doMicro drone ", (*unitit)->getID(), " harvest\n");
-								(*unitit)->rightClick(harvest(*unitit));
+								BWAPI::Unit* h = harvest(*unitit);
+								BWAPI::Broodwar->drawLineMap((*unitit)->getPosition().x(), (*unitit)->getPosition().y(), h->getPosition().x(), h->getPosition().y(), BWAPI::Colors::Green);
+								if(!(*unitit)->isGatheringGas() && !(*unitit)->isGatheringMinerals()) // quick fix voor spam
+								(*unitit)->rightClick(h);
 							}
 						}
 						else
 						{
-							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), 7.00, 0)))
+							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(7.00), 0)))
 							{
 								logx("doMicro drone ", (*unitit)->getID(), " enemies moveAway\n");
 								(*unitit)->rightClick(moveAway(*unitit));
 							}
 							else
 							{
-								if((*unitit)->getPosition().getDistance(currentTask.position) < 7)
+								if((*unitit)->getPosition().getDistance(currentTask.position) < dist(7))
 								{
 									logx("doMicro drone ", (*unitit)->getID(), " moveToNearestBase\n");
 									moveToNearestBase(*unitit);
@@ -1176,7 +1184,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					if((*unitit)->isIdle())
 					{
 						logx("doMicro drone ", (*unitit)->getID(), " isIdle, harvest\n");
-						(*unitit)->rightClick(harvest(*unitit));
+						BWAPI::Unit* h = harvest(*unitit);
+						BWAPI::Broodwar->drawLineMap((*unitit)->getPosition().x(), (*unitit)->getPosition().y(), h->getPosition().x(), h->getPosition().y(), BWAPI::Colors::Green);
+						if(!(*unitit)->isGatheringGas() && !(*unitit)->isGatheringMinerals()) // quick fix voor spam
+						(*unitit)->rightClick(h);
 					}
 				}
 				/* EINDE DRONE */
@@ -1186,14 +1197,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				{
 					if((*unitit)->isUnderStorm())
 					{
-						(*unitit)->rightClick(moveAway(*unitit, 20.00));
+						(*unitit)->rightClick(moveAway(*unitit, dist(20.00)));
 					}
 					else
 					{
 						UnitGroup allEnemies = allEnemyUnits;
 						UnitGroup allMelee = allEnemies(Drone) + allEnemies(Zealot) + allEnemies(Zergling) + allEnemies(SCV) + allEnemies(Probe) + allEnemies(Ultralisk);
-						allMelee = allMelee.inRadius(6.00, (*unitit)->getPosition());
-						if(nearestSwarm(*unitit)->getPosition().getDistance((*unitit)->getPosition()) < 10.00 && allMelee.size() == 0)
+						allMelee = allMelee.inRadius(dist(6.00), (*unitit)->getPosition());
+						if(nearestSwarm(*unitit)->getPosition().getDistance((*unitit)->getPosition()) < dist(10.00) && allMelee.size() == 0)
 						{
 							if(!isUnderDarkSwarm(*unitit))
 							{
@@ -1201,7 +1212,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), 10.00, 0);
+								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(10.00), 0);
 								BWAPI::Unit* target = NULL;
 								for(std::set<BWAPI::Unit*>::iterator enit=enemies.begin(); enit!=enemies.end(); enit++)
 								{
@@ -1221,8 +1232,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						{
 							if(allSelfUnits(Hydralisk).inRadius(8.00, (*unitit)->getPosition()).size() > 0)
 							{
-								int allies = allSelfUnits.inRadius(15.00, (*unitit)->getPosition()).size();
-								int enemies = allEnemyUnits.inRadius(15.00, (*unitit)->getPosition()).size();
+								int allies = allSelfUnits.inRadius(dist(15.00), (*unitit)->getPosition()).size();
+								int enemies = allEnemyUnits.inRadius(dist(15.00), (*unitit)->getPosition()).size();
 								if(enemies * 1.5 > allies)
 								{
 									if((*unitit)->getGroundWeaponCooldown() != 0)
@@ -1231,19 +1242,19 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(15.00, (*unitit)->getPosition())));
+										(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15.00), (*unitit)->getPosition())));
 									}
 								}
 								else
 								{
-									if((*unitit)->getPosition().getDistance(currentTask.position) > 8.00)
+									if((*unitit)->getPosition().getDistance(currentTask.position) > dist(8.00))
 									{
-										if(enemiesInRange((*unitit)->getPosition(), 9.00, 0).size() > 0)
+										if(enemiesInRange((*unitit)->getPosition(), dist(9.00), 0).size() > 0)
 										{
-											BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(15.00, (*unitit)->getPosition()));
-											if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < 9.00)
+											BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15.00), (*unitit)->getPosition()));
+											if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9.00))
 											{
-												if(allSelfUnits(Hydralisk).inRadius(9.00, nearesttarget->getPosition()).size() > 0)
+												if(allSelfUnits(Hydralisk).inRadius(dist(9.00), nearesttarget->getPosition()).size() > 0)
 												{
 													(*unitit)->rightClick(moveAway(*unitit));
 												}
@@ -1278,12 +1289,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										if(enemiesInRange((*unitit)->getPosition(), 9.00, 0).size() > 0)
+										if(enemiesInRange((*unitit)->getPosition(), dist(9.00), 0).size() > 0)
 										{
-											BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(15.00, (*unitit)->getPosition()));
-											if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < 9.00)
+											BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15.00), (*unitit)->getPosition()));
+											if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9.00))
 											{
-												if(allSelfUnits(Hydralisk).inRadius(9.00, nearesttarget->getPosition()).size() > 0)
+												if(allSelfUnits(Hydralisk).inRadius(dist(9.00), nearesttarget->getPosition()).size() > 0)
 												{
 													(*unitit)->rightClick(moveAway(*unitit));
 												}
@@ -1320,7 +1331,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								UnitGroup nearEnemies = enemiesInRange((*unitit)->getPosition(), 9.00, 0);
+								UnitGroup nearEnemies = enemiesInRange((*unitit)->getPosition(), dist(9.00), 0);
 								if(nearEnemies.size() > 0 && canAttackGround(nearEnemies))
 								{
 									(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), nearEnemies));
@@ -1557,8 +1568,9 @@ BWAPI::Position MicroManager::splitup(BWAPI::Unit* unit)
 	{
 		int x = current.x();
 		int y = current.y();
-		int newx = x + (rand() % 20 - 10);
-		int newy = y + (rand() % 20 - 10);
+		int factor = dist(20);
+		int newx = x + (rand() % factor - factor/2);
+		int newy = y + (rand() % factor - factor/2);
 		return BWAPI::Position(newx, newy);
 	}
 	// van set naar map
@@ -1602,4 +1614,9 @@ std::string MicroManager::intToString(int i) {
 void MicroManager::logx(std::string func, int id, std::string msg)
 {
 	log(std::string(func).append(intToString(id)).append(std::string(msg)).c_str());
+}
+
+double MicroManager::dist(int d)
+{
+	return d*32;
 }

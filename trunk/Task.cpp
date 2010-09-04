@@ -3,6 +3,7 @@
 #include <UnitGroup.h>
 Task::Task()
 {
+	this->type = -1;
 }
 
 Task::Task(int t, int p, BWAPI::Position pos, UnitGroup* ug)

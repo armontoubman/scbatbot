@@ -31,14 +31,20 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	//Task t = Task(1, 1, BWTA::getStartLocation(BWAPI::Broodwar->enemy())->getPosition(), this->eigenUnitGroupManager->overlordUG);
 	//this->taskManager->insertTask(t);
 
+	log("\n\n\n\nNEW GAME\n\n\n\n");
 
 	time_t rawtime;
 	struct tm * timeinfo;
 
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
-	log("\n\n\n\n");
+	log("\n");
 	log(asctime(timeinfo));
+	log("\n");
+
+	std::ostringstream buffer;
+	buffer << BWAPI::UnitTypes::Zerg_Drone.sightRange();
+	log(buffer.str().c_str());
 }
 
 HighCommand::~HighCommand() {
