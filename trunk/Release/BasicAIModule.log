@@ -1,10 +1,13 @@
-﻿Build started 4-9-2010 20:12:54.
+﻿Build started 4-9-2010 21:46:55.
      1>Project "C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\BasicAIModule\BasicAIModule.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
-         Creating "Release\BasicAIModule.unsuccessfulbuild" because "AlwaysCreate" was specified.
+         Touching "Release\BasicAIModule.unsuccessfulbuild".
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\CL.exe /c /I../../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc90.pdb" /Gd /TP /analyze- /errorReport:prompt MicroManager.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\CL.exe /c /I../../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc90.pdb" /Gd /TP /analyze- /errorReport:prompt MicroManager.cpp WantBuildManager.cpp
          MicroManager.cpp
+         WantBuildManager.cpp
+     1>WantBuildManager.cpp(182): warning C4018: '<' : signed/unsigned mismatch
+     1>WantBuildManager.cpp(1189): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.dll" /NOLOGO ../../lib/BWAPI.lib ../../lib/BWTA.lib "../../lib/CGAL-vc90-mt.lib" "../../lib/gmp-vc90-mt.lib" "../../lib/libboost_thread-vc90-mt-1_40.lib" "../../lib/mpfr-vc90-mt.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\BasicAIModule.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.lib" /MACHINE:X86 /DLL Release\Assignment.obj
          Release\BasicAIModule.obj
@@ -47,8 +50,6 @@
          Release\BorderManager.obj
             Creating library C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.lib and object C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.exp
          Generating code
-     1>c:\users\armon\documents\bwsal_0.9.8\basicaimodule\basicaimodule\micromanager.cpp(941): warning C4700: uninitialized local variable 'msg' used
-     1>c:\users\armon\documents\bwsal_0.9.8\basicaimodule\basicaimodule\micromanager.cpp(1056): warning C4700: uninitialized local variable 'msg' used
          Finished generating code
          BasicAIModule.vcxproj -> C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.dll
        Manifest:
@@ -60,4 +61,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:16.85
+Time Elapsed 00:00:18.43

@@ -13,6 +13,7 @@
 #include "WantBuildManager.h"
 #include "MicroManager.h"
 #include "Task.h"
+#include <time.h>
 
 HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseManager* ba)
 {
@@ -26,8 +27,16 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->tick = 1;
 	this->wantBuildManager->doLists();
 
-	//Task t = Task(1, 1, BWTA::getStartLocation(BWAPI::Broodwar->enemy())->getPosition(), this->eigenUnitGroupManager->overlordUG);
-	//this->taskManager->insertTask(t);
+	Task t = Task(1, 1, BWTA::getStartLocation(BWAPI::Broodwar->enemy())->getPosition(), this->eigenUnitGroupManager->overlordUG);
+	this->taskManager->insertTask(t);
+
+
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+	log(asctime(timeinfo));
 }
 
 HighCommand::~HighCommand() {

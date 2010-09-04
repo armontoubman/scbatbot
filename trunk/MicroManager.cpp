@@ -12,6 +12,7 @@
 #include "HighCommand.h"
 #include "EigenUnitDataManager.h"
 #include "Util.h"
+#include <sstream>
 
 MicroManager::MicroManager()
 {
@@ -304,7 +305,7 @@ BWAPI::Unit* MicroManager::harvest(BWAPI::Unit* unit) // returnt een unit terug 
 	{
 		if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
 		{
-			if (unit.isCarryingGas())
+			if (unit->isCarryingGas())
 			{
 				return this->hc->getNearestHatchery(unit->getPosition());
 			}
@@ -953,9 +954,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* OVERLORD */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 				{
-					char* msg;
-					sprintf_s(msg, 1000, "doMicro overlord %d", (*unitit)->getID()); 
-					log(msg);
+					logx("doMicro overlord ", (*unitit)->getID(), " start\n"); 
 					if((*unitit)->isUnderStorm())
 					{
 						(*unitit)->rightClick(moveAway(*unitit));
@@ -963,25 +962,37 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					else
 					{
 						Task t = currentTask;
+						
+						logx("doMicro overlord ", (*unitit)->getID(), std::string(" task.type=").append(intToString(t.type)).c_str());
 						if(t.type == 1 || t.type == 4)
 						{
 							if((*unitit)->getPosition().getDistance(nearestEnemyThatCanAttackAir(*unitit)->getPosition()) < 8.00 && t.type == 1)
 							{
+								logx("doMicro overlord ", (*unitit)->getID(), " air enemy dichtbij\n");
 								if(overlordSupplyProvidedSoon())
 								{
+									
+									logx("doMicro overlord ", (*unitit)->getID(), " overlordSupplySoon");
 									UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(8.00, t.position);
 									if(buildings.size() == 0)
 									{
+										logx("doMicro overlord ", (*unitit)->getID(), " geen buildings");
 										(*unitit)->rightClick(moveAway(*unitit));
 									}
 									else
 									{
+										
+										logx("doMicro overlord ", (*unitit)->getID(), " wel buildings\n");
 										if((*unitit)->getPosition().getDistance(t.position) < 2.00)
 										{
+											
+											logx("doMicro overlord ", (*unitit)->getID(), " moveAway\n");
 											(*unitit)->rightClick(moveAway(*unitit));
 										}
 										else
 										{
+											
+											logx("doMicro overlord ", (*unitit)->getID(), " move naar task\n");
 											(*unitit)->rightClick(t.position);
 										}
 									}
@@ -992,6 +1003,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									BWAPI::Unit* neareststealth = nearestUnit((*unitit)->getPosition(), stealths);
 									if(neareststealth != NULL)
 									{
+										
+										logx("doMicro overlord ", (*unitit)->getID(), " stealth gezien\n");
 										(*unitit)->rightClick(neareststealth->getPosition());
 									}
 									else
@@ -1000,10 +1013,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										dropships = dropships.inRadius(10.00, (*unitit)->getPosition());
 										if(dropships.size() > 0)
 										{
+											
+											logx("doMicro overlord ", (*unitit)->getID(), " dropship gezien\n");
 											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
 										}
 										else
 										{
+											
+											logx("doMicro overlord ", (*unitit)->getID(), " geen dropship, move naar task\n");
 											(*unitit)->rightClick(t.position);
 										}
 									}
@@ -1025,6 +1042,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							if(hydratask != NULL)
 							{
+								
+								logx("doMicro overlord ", (*unitit)->getID(), " hydratask\n");
 								BWAPI::Unit* volghydra = *(hydratask->unitGroup->begin());
 								(*unitit)->rightClick(volghydra->getPosition());
 							}
@@ -1033,12 +1052,18 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								UnitGroup overlordsnearby = allSelfUnits(Overlord).inRadius(10.00, (*unitit)->getPosition());
 								if(overlordsnearby.size() > 0)
 								{
+									
+									logx("doMicro overlord ", (*unitit)->getID(), " andere overlord\n");
 									if(canAttackAir(enemiesInRange((*unitit)->getPosition(), 8.00, 0)))
 									{
+										
+										logx("doMicro overlord ", (*unitit)->getID(), " canAttackAir moveAway\n");
 										(*unitit)->rightClick(moveAway(*unitit));
 									}
 									else
 									{
+										
+										logx("doMicro overlord ", (*unitit)->getID(), " splitup\n");
 										(*unitit)->rightClick(splitup(*unitit));
 									}
 								}
@@ -1047,6 +1072,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									UnitGroup buildings = allSelfUnits(isBuilding).inRadius(15.00, (*unitit)->getPosition());
 									if(buildings.size() > 0)
 									{
+										
+										logx("doMicro overlord ", (*unitit)->getID(), " building random\n");
 										int x = (*unitit)->getPosition().x();
 										int y = (*unitit)->getPosition().y();
 										int newx = x + (rand() % 10 - 5);
@@ -1055,6 +1082,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
+										
+										logx("doMicro overlord ", (*unitit)->getID(), " eigen building\n");
 										BWAPI::Unit* nearestbuilding = nearestUnit((*unitit)->getPosition(), allSelfUnits(isBuilding));
 										(*unitit)->rightClick(nearestbuilding->getPosition());
 									}
@@ -1068,9 +1097,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* DRONE */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Drone)
 				{
-					char* msg;
-					sprintf_s(msg, 1000, "doMicro drone %d", (*unitit)->getID()); 
-					log(msg);
+					logx("doMicro drone ", (*unitit)->getID(), "\n");
 					if((*unitit)->isUnderStorm())
 					{
 						moveToNearestBase(*unitit);
@@ -1550,4 +1577,15 @@ BWAPI::Position MicroManager::splitup(BWAPI::Unit* unit)
 		}
 	}
 	return bestePositie;
+}
+
+std::string MicroManager::intToString(int i) {
+	std::ostringstream buffer;
+	buffer << i;
+	return buffer.str();
+}
+
+void MicroManager::logx(const char* func, int id, const char* msg)
+{
+	log(std::string(func).append(intToString(id)).append(std::string(msg)).c_str());
 }
