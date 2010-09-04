@@ -48,7 +48,7 @@ public:
 	UnitGroup* MicroManager::inRadiusUnitGroup(double radius, UnitGroup* ug);
 	UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut);
 
-	void doMicro(std::list<UnitGroup> listUG);
+	void doMicro(std::set<UnitGroup*> listUG);
 
 	// zelfde als in WantBuildManager
 	UnitGroup getHatcheriesWithMinerals();
