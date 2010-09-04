@@ -23,6 +23,7 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->microManager = new MicroManager(bom, this->enemyUnitDataManager, this->taskManager, this, this->eigenUnitDataManager);
 	this->thisAlgorithmBecomingSkynetCost = 999999999;
 	this->tick = 1;
+	this->wantBuildManager->doLists();
 }
 
 HighCommand::~HighCommand() {
@@ -43,7 +44,19 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	{
 	}
 
-	this->microManager->doMicro((&(this->eigenUnitGroupManager->unitGroups)));
+	this->microManager->doMicro(this->eigenUnitGroupManager->unitGroups);
+	this->wantBuildManager->update();
+
+	if(this->tick == 5)
+	{
+		this->wantBuildManager->doLists();
+	}
+
+	this->tick++;
+	if(this->tick == 10)
+	{
+		this->tick = 0;
+	}
 }
 
 void HighCommand::onRemoveUnit(BWAPI::Unit* unit)

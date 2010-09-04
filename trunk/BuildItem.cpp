@@ -2,6 +2,12 @@
 #include "BuildItem.h"
 #include <BWAPI.h>
 
+BuildItem::BuildItem()
+{
+	this->priority = 1;
+	this->base = 0;
+}
+
 BuildItem::BuildItem(BWAPI::UnitType t, int p)
 {
 	this->buildtype = t;
@@ -108,4 +114,20 @@ bool BuildItem::operator==(const BuildItem& other) const
 			return false;
 		}
 	}
+	if(typenr == 4)
+	{
+		if(other.typenr == 4)
+		{
+			return true;
+		} else {
+			return false;
+		}
+	}
+	return false;
+}
+
+BuildItem BuildItem::expand()
+{
+	this->typenr = 4;
+	return *this;
 }

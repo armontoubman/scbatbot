@@ -17,3 +17,8 @@ bool Task::operator==(const Task& param) const
 {
 	return param.type == type && param.priority == priority && param.position == position && param.unitGroup == unitGroup;
 }
+
+bool Task::operator<(const Task& rhs) const
+{
+	return priority < rhs.priority;
+}

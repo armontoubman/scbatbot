@@ -7,6 +7,12 @@
 #include "TaskManager.h"
 #include "WantBuildManager.h"
 #include "MicroManager.h"
+class EigenUnitDataManager;
+class EnemyUnitDataManager;
+class EigenUnitGroupManager;
+class TaskManager;
+class WantBuildManager;
+class MicroManager;
 class HighCommand
 {
 public:
