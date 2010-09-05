@@ -1258,6 +1258,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								// return de gas terug enzo, rechtermuisklik op nearest hatchery
 								// mogelijke probleem hierbij is dat ze allemaal teruggaan, als carryinggas == returngas/gatheringGas
 							}
+							else
+							{
+								mineWhere(*unitit);
+							}
 						}
 						logx("doMicro drone ", (*unitit)->getID(), " harvestdonewasidle\n");	
 					}
@@ -1265,7 +1269,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* EINDE DRONE */
 
 				/* HYDRALISK */
-				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Drone)
+				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Hydralisk)
 				{
 					if((*unitit)->isUnderStorm())
 					{
