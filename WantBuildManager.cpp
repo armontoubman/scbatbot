@@ -308,7 +308,6 @@ void WantBuildManager::update()
 					log("\nsend to BOM\n");
 					//this->bom->build(1, b.buildtype, 1);
 					(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
-					log(std::string(intToString(this->bom->getPlannedCount(b.buildtype))).append("=bom->getPlannedCount()\n").c_str());
 					buildList.removeTop();
 					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 					return;
@@ -1301,7 +1300,7 @@ bool WantBuildManager::requirementsSatisfied(BWAPI::UnitType unittype)
 	bool reqsMet = true;
 	for each(std::pair<BWAPI::UnitType, int> req in reqs)
 	{
-		if(allUnits(GetType, unittype).size() == 0)
+		if(allUnits(GetType, req.first).size() == 0)
 		{
 			reqsMet = false;
 		}
