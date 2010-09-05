@@ -31,9 +31,8 @@ public:
 	BWAPI::Unit* nearestUnit(BWAPI::Position pos, UnitGroup ug);
 	UnitGroup enemiesInSeekRange(BWAPI::Position p, double radius, int type);
 	bool alliesCanAttack(BWAPI::Position p, UnitGroup ug);
-	BWAPI::Unit* harvest(BWAPI::Unit* unit);
-	BWAPI::Unit* mineWhere(BWAPI::Unit* unit);
-	BWAPI::Unit* gasWhere(BWAPI::Unit* unit);
+	void mineWhere(BWAPI::Unit* unit);
+	void gasWhere(BWAPI::Unit* unit);
 	void moveToNearestBase(BWAPI::Unit* unit);
 	void moveToNearestBase(std::set<BWAPI::Unit*> units);
 	bool isUnderDarkSwarm(BWAPI::Unit* unit);
