@@ -1158,7 +1158,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							{
 								logx("doMicro drone ", (*unitit)->getID(), " harvestcheck\n");
 								UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
-								UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(MoveToGas, WaitForGas, HarvestGas, ReturnGas); // has Order gather gas moet er nog bij of juist ipv
+								UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringGas); // has Order gather gas moet er nog bij of juist ipv
 								UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
 								if (gasDrones.size() < extractors.size()*3)
 								{
@@ -1182,9 +1182,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								{
 									if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
 									{
-										if (unitit->isCarryingGas())
+										if (*unitit->isCarryingGas())
 										{
-											(*unitit)->rightClick(this->hc->getNearestHatchery(unitit->getPosition()));
+											moveToNearestBase(*unitit);
 										}
 										else
 										{
@@ -1247,9 +1247,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						{
 							if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
 							{
-								if (unitit->isCarryingGas())
+								if (*unitit->isCarryingGas())
 								{
-									(*unitit)->rightClick(this->hc->getNearestHatchery(unitit->getPosition()));
+									moveToNearestBase(*unitit);
 								}
 								else
 								{
