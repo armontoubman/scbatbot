@@ -252,7 +252,7 @@ UnitGroup MicroManager::enemiesInSeekRange(BWAPI::Position p, double radius, int
 
 bool MicroManager::alliesCanAttack(BWAPI::Position p, UnitGroup enemies)
 {
-	UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(9.00, p);
+	UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(9.00), p);
 	if(allies.size() == 0) return false;
 	bool alliesGroundWeapons = false;
 	bool alliesAirWeapons = false;
@@ -504,13 +504,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				}
 				else
 				{
-					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < (9.00))
+					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(9.00))
 					{
 						BWAPI::Unit* nearestAirEnemy = nearestEnemyThatCanAttackAir(eerste);
 						double distanceAE = eerste->getPosition().getDistance(nearestAirEnemy->getPosition());
 						BWAPI::Unit* nearestNonBuilding = nearestNonBuildingEnemy(eerste);
 						double distanceNB = eerste->getPosition().getDistance(nearestNonBuilding->getPosition());
-						if(distanceNB < (9.00))
+						if(distanceNB < dist(9.00))
 						{
 							if(distanceAE < distanceNB)
 							{
@@ -550,7 +550,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					Task currentTask = this->tm->findTaskWithUnit(eerste);
 					if (currentTask.type != 1)
 					{
-						if (eerste->getPosition().getDistance(currentTask.position) < 5)
+						if (eerste->getPosition().getDistance(currentTask.position) < dist(5))
 						{
 							int x = eerste->getPosition().x();
 							int y = eerste->getPosition().y();
@@ -779,7 +779,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6.00) && enemiesInRange((*unitit)->getPosition(), 13.00, 0).size() == 0)
+							if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6.00) && enemiesInRange((*unitit)->getPosition(), dist(13.00), 0).size() == 0)
 							{
 								(*unitit)->rightClick(currentTask.position);
 							}
@@ -878,7 +878,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					else
 					{
-						if(allSelfUnits.inRadius(10.00, (*unitit)->getPosition()).not(Defiler).size() > 3)
+						if(allSelfUnits.inRadius(dist(10.00), (*unitit)->getPosition()).not(Defiler).size() > 3)
 						{
 							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(9.00), 0);
 							bool atleastoneunderswarm = false;
@@ -1230,7 +1230,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							if(allSelfUnits(Hydralisk).inRadius(8.00, (*unitit)->getPosition()).size() > 0)
+							if(allSelfUnits(Hydralisk).inRadius(dist(8.00), (*unitit)->getPosition()).size() > 0)
 							{
 								int allies = allSelfUnits.inRadius(dist(15.00), (*unitit)->getPosition()).size();
 								int enemies = allEnemyUnits.inRadius(dist(15.00), (*unitit)->getPosition()).size();
@@ -1363,7 +1363,7 @@ void MicroManager::moveToNearestBase(std::set<BWAPI::Unit*> units)
 bool MicroManager::isUnderDarkSwarm(BWAPI::Unit* unit)
 {
 	UnitGroup darkSwarms = UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits())(Dark_Swarm);
-	return darkSwarms.inRadius(4.5, unit->getPosition()).size() > 0;
+	return darkSwarms.inRadius(dist(5), unit->getPosition()).size() > 0;
 }
 
 bool MicroManager::canAttackAir(BWAPI::Unit* unit)
@@ -1563,7 +1563,7 @@ BWAPI::Position MicroManager::splitup(BWAPI::Unit* unit)
 	std::set<BWAPI::Position> mogelijkePosities = sanitizePositions(getAdjacentPositions(current));
 	if(mogelijkePosities.empty()) { return unit->getPosition(); }
 	std::map<BWAPI::Position, int> telling;
-	UnitGroup enemies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unit->getType()).inRadius(15.00, unit->getPosition());
+	UnitGroup enemies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unit->getType()).inRadius(dist(13.00), unit->getPosition());
 	if(enemies.size() == 0)
 	{
 		int x = current.x();
