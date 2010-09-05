@@ -139,7 +139,7 @@ bool WantBuildManager::photonCannonNearBase()
 		{
 			for(std::set<BWAPI::Unit*>::iterator hit=hatcheries.begin(); hit!=hatcheries.end(); hit++)
 			{
-				if(it->first->getDistance(*hit) < 15.00)
+				if(it->first->getDistance(*hit) < dist(15.00))
 				{
 					return true;
 				}
@@ -212,7 +212,7 @@ UnitGroup WantBuildManager::getHatcheriesWithMinerals()
 	{
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)  // stond eerst it!=minerals.end(), lijkt me beetje raar als de rest mit staat? ***
 		{
-			if((*it)->getDistance(*mit) <= 8.00)
+			if((*it)->getDistance(*mit) <= dist(8.00))
 			{
 				result.insert(*it);
 				break;
@@ -231,7 +231,7 @@ UnitGroup WantBuildManager::getUnusedMineralsNearHatcheries()
 	{
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 		{
-			if((*it)->getDistance(*mit) <= 8.00 && !(**mit).isBeingGathered())
+			if((*it)->getDistance(*mit) <= dist(8.00) && !(**mit).isBeingGathered())
 			{
 				result.insert(*mit);
 			}
@@ -1186,7 +1186,7 @@ void WantBuildManager::doLists()
 	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor);
 	for(std::set<BWAPI::Unit*>::iterator hit=hatcheries.begin(); hit!=hatcheries.end(); hit++)
 	{
-		if(geysers.inRadius(8.00, (*hit)->getPosition()).size() > 0 && extractors.inRadius(8.00, (*hit)->getPosition()).size() == 0 && buildList.count(BWAPI::UnitTypes::Zerg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
+		if(geysers.inRadius(dist(8.00), (*hit)->getPosition()).size() > 0 && extractors.inRadius(dist(8.00), (*hit)->getPosition()).size() == 0 && buildList.count(BWAPI::UnitTypes::Zerg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
 		{
 			addWant(BWAPI::UnitTypes::Zerg_Extractor);
 		}
@@ -1196,7 +1196,7 @@ void WantBuildManager::doLists()
 	int enemiesNearNatural = 0;
 	if(natural != NULL)
 	{
-		enemiesNearNatural = this->eudm->getUG().inRadius(10.00, natural->getPosition()).size();
+		enemiesNearNatural = this->eudm->getUG().inRadius(dist(10.00), natural->getPosition()).size();
 	}
 
 	if( (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Protoss || BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Terran)
