@@ -60,4 +60,6 @@ public:
 	BaseManager* bm;
 
 	double dist(int d);
+	void logx(std::string func, int id, std::string msg);
+	std::string intToString(int i);
 };

@@ -27,6 +27,7 @@ void BasicAIModule::onStart()
   this->enhancedUI         = new EnhancedUI();
 
   this->highCommand = new HighCommand(this->informationManager, this->buildOrderManager, this->baseManager);
+  this->buildOrderManager->setDebugMode(true);
 
   this->supplyManager->setBuildManager(this->buildManager);
   this->supplyManager->setBuildOrderManager(this->buildOrderManager);
