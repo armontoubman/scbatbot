@@ -279,11 +279,12 @@ bool MicroManager::alliesCanAttack(BWAPI::Position p, UnitGroup enemies)
 	return false;
 }
 
+/*
 BWAPI::Unit* MicroManager::harvest(BWAPI::Unit* unit) // returnt een unit terug waarop rechtermuisgeklikt mag worden
 {
 	UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
-	UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringGas);
-	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor);
+	UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(MoveToGas, WaitForGas, HarvestGas, ReturnGas); // has Order gather gas moet er nog bij of juist ipv
+	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
 	
 	if (gasDrones.size() < extractors.size()*3)
 	{
@@ -321,33 +322,34 @@ BWAPI::Unit* MicroManager::harvest(BWAPI::Unit* unit) // returnt een unit terug 
 	}
 	return mineWhere(unit);
 }
+*/
 
-BWAPI::Unit* MicroManager::mineWhere(BWAPI::Unit* unit)
+void MicroManager::mineWhere(BWAPI::Unit* unit)
 {
 	if (unit->isGatheringMinerals())
 	{
-		return unit->getTarget(); // vraag is, beweegt het dan telkens juist weer terug naar de patch of blijft het lekker gatheren? als het telkens terug gaat, is het mogelijk return null te doen? en anders wordt het complexer
+		// unit->getTarget(); // vraag is, beweegt het dan telkens juist weer terug naar de patch of blijft het lekker gatheren? als het telkens terug gaat, is het mogelijk return null te doen? en anders wordt het complexer
 	}
 	else
 	{
 		UnitGroup minerals = getUnusedMineralsNearHatcheries(); // pak alle unused minerals die in de nabijheid van een hatchery bevinden
 		if(minerals.empty()) // voor als het vol is enzo
 		{
-			return this->hc->getNearestHatchery(unit->getPosition());
+			unit->rightClick(this->hc->getNearestHatchery(unit->getPosition()));
 		}
-		return nearestUnitInGroup(unit, minerals);
+		unit->rightClick(nearestUnitInGroup(unit, minerals));
 	}
 }
 
-BWAPI::Unit* MicroManager::gasWhere(BWAPI::Unit* unit)
+void MicroManager::gasWhere(BWAPI::Unit* unit)
 {
 	if (unit->isGatheringGas())
 	{
-		return unit->getTarget();
+		//return unit->getTarget();
 	}
 	else
 	{
-		UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor);
+		UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
 		UnitGroup result = extractors;
 		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 		{
@@ -358,9 +360,9 @@ BWAPI::Unit* MicroManager::gasWhere(BWAPI::Unit* unit)
 		}
 		if (result.empty())
 		{
-			return this->hc->getNearestHatchery(unit->getPosition());
+			unit->rightClick(this->hc->getNearestHatchery(unit->getPosition()));
 		}
-		return nearestUnitInGroup(unit, result);
+		unit->rightClick(nearestUnitInGroup(unit, result));
 	}
 }
 
@@ -1152,11 +1154,45 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								logx("doMicro drone ", (*unitit)->getID(), " harvest\n");
-								BWAPI::Unit* h = harvest(*unitit);
-								BWAPI::Broodwar->drawLineMap((*unitit)->getPosition().x(), (*unitit)->getPosition().y(), h->getPosition().x(), h->getPosition().y(), BWAPI::Colors::Green);
-								if(!(*unitit)->isGatheringGas() && !(*unitit)->isGatheringMinerals()) // quick fix voor spam
-								(*unitit)->rightClick(h);
+								logx("doMicro drone ", (*unitit)->getID(), " harvestcheck\n");
+								UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
+								UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(MoveToGas, WaitForGas, HarvestGas, ReturnGas); // has Order gather gas moet er nog bij of juist ipv
+								UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
+								if (gasDrones.size() < extractors.size()*3)
+								{
+									if (mineralDrones.size()<5)
+									{
+										if (mineralDrones.size()<3 || gasDrones.size() >= extractors.size()*2)
+										{
+											mineWhere(*unitit);
+										}
+										else
+										{
+											gasWhere(*unitit);
+										}
+									}
+									else
+									{
+										gasWhere(*unitit);
+									}
+								}
+								else
+								{
+									if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
+									{
+										if (unitit->isCarryingGas())
+										{
+											(*unitit)->rightClick(this->hc->getNearestHatchery(unitit->getPosition()));
+										}
+										else
+										{
+											mineWhere(*unitit);
+										}
+										// return de gas terug enzo, rechtermuisklik op nearest hatchery
+										// mogelijke probleem hierbij is dat ze allemaal teruggaan, als carryinggas == returngas/gatheringGas
+									}
+								}
+								logx("doMicro drone ", (*unitit)->getID(), " harvestdone\n");							
 							}
 						}
 						else
@@ -1183,11 +1219,45 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					if((*unitit)->isIdle())
 					{
-						logx("doMicro drone ", (*unitit)->getID(), " isIdle, harvest\n");
-						BWAPI::Unit* h = harvest(*unitit);
-						BWAPI::Broodwar->drawLineMap((*unitit)->getPosition().x(), (*unitit)->getPosition().y(), h->getPosition().x(), h->getPosition().y(), BWAPI::Colors::Green);
-						if(!(*unitit)->isGatheringGas() && !(*unitit)->isGatheringMinerals()) // quick fix voor spam
-						(*unitit)->rightClick(h);
+						logx("doMicro drone ", (*unitit)->getID(), " harvestcheckidle\n");
+						UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
+						UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(MoveToGas, WaitForGas, HarvestGas, ReturnGas); // has Order gather gas moet er nog bij of juist ipv
+						UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
+						if (gasDrones.size() < extractors.size()*3)
+						{
+							if (mineralDrones.size()<5)
+							{
+								if (mineralDrones.size()<3 || gasDrones.size() >= extractors.size()*2)
+								{
+									mineWhere(*unitit);
+								}
+								else
+								{
+									gasWhere(*unitit);
+								}
+							}
+							else
+							{
+								gasWhere(*unitit);
+							}
+						}
+						else
+						{
+							if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
+							{
+								if (unitit->isCarryingGas())
+								{
+									(*unitit)->rightClick(this->hc->getNearestHatchery(unitit->getPosition()));
+								}
+								else
+								{
+									mineWhere(*unitit);
+								}
+								// return de gas terug enzo, rechtermuisklik op nearest hatchery
+								// mogelijke probleem hierbij is dat ze allemaal teruggaan, als carryinggas == returngas/gatheringGas
+							}
+						}
+						logx("doMicro drone ", (*unitit)->getID(), " harvestdonewasidle\n");	
 					}
 				}
 				/* EINDE DRONE */
