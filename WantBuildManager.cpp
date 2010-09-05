@@ -1247,3 +1247,8 @@ void WantBuildManager::doLists()
 		}
 	}
 }
+
+double WantBuildManager::dist(int d)
+{
+	return d*32;
+}

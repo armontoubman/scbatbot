@@ -58,4 +58,6 @@ public:
 	EnemyUnitDataManager* eudm;
 	BuildOrderManager* bom;
 	BaseManager* bm;
+
+	double dist(int d);
 };
