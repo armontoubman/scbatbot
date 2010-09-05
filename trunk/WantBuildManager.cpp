@@ -7,6 +7,8 @@
 #include "MicroManager.h"
 #include "BuildOrderManager.h"
 #include "BaseManager.h"
+#include "Util.h"
+#include <sstream>
 
 WantBuildManager::WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba)
 {
@@ -73,6 +75,7 @@ void WantBuildManager::addWant(BWAPI::UpgradeType upgradetype)
 void WantBuildManager::addBuild(BWAPI::UnitType unittype)
 {
 	addBuild(unittype, 1);
+	log(std::string("addBuild ").append(unittype.getName()).append("\n").c_str());
 }
 
 void WantBuildManager::addBuild(BWAPI::UnitType unittype, int amount)
@@ -80,6 +83,7 @@ void WantBuildManager::addBuild(BWAPI::UnitType unittype, int amount)
 	for(int i=0; i<amount; i++)
 	{
 		this->buildList.addItem(BuildItem(unittype, 1));
+		log(std::string("addBuild ").append(unittype.getName()).append("\n").c_str());
 	}
 }
 
@@ -280,73 +284,82 @@ int WantBuildManager::nrOfEnemyBases()
 
 void WantBuildManager::update()
 {
+	log("WantBuildManager::update()\n");
 	// Actual building of items
-	BuildItem b = buildList.top();
-	if(b.typenr != 4 && !(BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+	if(buildList.size() > 0)
 	{
-		if(b.typenr == 1)
+		BuildItem b = buildList.top();
+		log(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
+		if(BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0)
 		{
-			if(!BWAPI::Broodwar->canMake(NULL, b.buildtype))
-			{
-				buildList.removeTop();
-				return;
-			}
-		}
-		if(b.typenr == 2)
-		{
-			if(!BWAPI::Broodwar->canResearch(NULL, b.researchtype))
-			{
-				buildList.removeTop();
-				return;
-			}
-		}
-		if(b.typenr == 3)
-		{
-			if(!BWAPI::Broodwar->canUpgrade(NULL, b.upgradetype))
-			{
-				buildList.removeTop();
-				return;
-			}
-		}
-	}
-	else if(b.typenr != 4)
-	{
-		if(b.typenr == 1)
-		{
-			if(BWAPI::Broodwar->canMake(NULL, b.buildtype))
-			{
-				this->bom->build(1, b.buildtype, 1);
-				buildList.removeTop();
-				return;
-			}
-		}
-		if(b.typenr == 2)
-		{
-			if(BWAPI::Broodwar->canResearch(NULL, b.researchtype))
-			{
-				this->bom->research(b.researchtype, 1);
-				buildList.removeTop();
-				return;
-			}
-		}
-		if(b.typenr == 3)
-		{
-			if(BWAPI::Broodwar->canUpgrade(NULL, b.upgradetype))
-			{
-				this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)+1, b.upgradetype, 1);
-				buildList.removeTop();
-				return;
-			}
-		}
-	}
-	else if(b.typenr == 4)
-	{
-		if(BWAPI::Broodwar->self()->minerals() >= BWAPI::UnitTypes::Zerg_Hatchery.mineralPrice())
-		{
-			this->bm->expand();
 			buildList.removeTop();
-			return;
+			log("remove want niet genoeg gas of workers op gas\n");
 		}
+		else
+		{
+			log("gasconditie->true\n");
+			if(b.typenr == 1)
+			{
+				if(BWAPI::Broodwar->canMake(NULL, b.buildtype))
+				{
+					log("can make\n\t");
+					log(b.buildtype.getName().c_str());
+					log("\nsend to BOM\n");
+					this->bom->build(1, b.buildtype, 1);
+					log(std::string(intToString(this->bom->getPlannedCount(b.buildtype))).append("=bom->getPlannedCount()\n").c_str());
+					buildList.removeTop();
+					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+					return;
+				} else
+				{
+					log("can't make\n\t");
+					log(b.buildtype.getName().c_str());
+					log("\nremove\n");
+					buildList.removeTop();
+					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+					return;
+				}
+			}
+			if(b.typenr == 2)
+			{
+				if(BWAPI::Broodwar->canResearch(NULL, b.researchtype))
+				{
+					this->bom->research(b.researchtype, 1);
+					buildList.removeTop();
+					return;
+				} else
+				{
+					buildList.removeTop();
+					return;
+				}
+			}
+			if(b.typenr == 3)
+			{
+				if(BWAPI::Broodwar->canUpgrade(NULL, b.upgradetype))
+				{
+					this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)+1, b.upgradetype, 1);
+					buildList.removeTop();
+					return;
+				} else
+				{
+					buildList.removeTop();
+					return;
+				}
+			}
+			if(b.typenr == 4)
+			{
+				if(BWAPI::Broodwar->self()->minerals() >= BWAPI::UnitTypes::Zerg_Hatchery.mineralPrice())
+				{
+					this->bm->expand();
+					buildList.removeTop();
+					return;
+				}
+			}
+		}
+	}
+	else
+	{
+		log("buildlist is leeg\n");
 	}
 }
 
@@ -356,11 +369,14 @@ void WantBuildManager::doLists()
 
 	int stap = 1;
 
+	log("doLists\n\n");
+
 	if(enemyRace == BWAPI::Races::Protoss)
 	{
 		
 		if(	stap == 1 && (buildListIsEmpty()) && (wantListIsEmpty())) 
 		{
+			log("doLists stap 1 lege lijsten\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 4);
 			addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
 			addBuild(BWAPI::UnitTypes::Zerg_Overlord);
@@ -372,6 +388,7 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 2)
 		{
+			log("doLists stap 2\n");
 			if(	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) == 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 4) && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<4)
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Zergling);
@@ -1251,4 +1268,15 @@ void WantBuildManager::doLists()
 double WantBuildManager::dist(int d)
 {
 	return d*32;
+}
+
+void WantBuildManager::logx(std::string func, int id, std::string msg)
+{
+	log(std::string(func).append(intToString(id)).append(std::string(msg)).c_str());
+}
+
+std::string WantBuildManager::intToString(int i) {
+	std::ostringstream buffer;
+	buffer << i;
+	return buffer.str();
 }

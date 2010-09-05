@@ -41,10 +41,6 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	log("\n");
 	log(asctime(timeinfo));
 	log("\n");
-
-	std::ostringstream buffer;
-	buffer << BWAPI::UnitTypes::Zerg_Drone.sightRange();
-	log(buffer.str().c_str());
 }
 
 HighCommand::~HighCommand() {
