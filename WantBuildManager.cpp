@@ -290,27 +290,9 @@ void WantBuildManager::update()
 	{
 		BuildItem b = buildList.top();
 		log(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
-		if(BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0)
-		{
-			buildList.removeTop();
-			log("remove want niet genoeg gas of workers op gas\n");
-		}
-		else
-		{
-			log("gasconditie->true\n");
 			if(b.typenr == 1)
 			{
-				if(BWAPI::Broodwar->canMake(NULL, b.buildtype))
-				{
-					log("can make\n\t");
-					log(b.buildtype.getName().c_str());
-					log("\nsend to BOM\n");
-					this->bom->build(1, b.buildtype, 1);
-					log(std::string(intToString(this->bom->getPlannedCount(b.buildtype))).append("=bom->getPlannedCount()\n").c_str());
-					buildList.removeTop();
-					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-					return;
-				} else
+				if(!requirementsSatisfied(b.buildtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					log("can't make\n\t");
 					log(b.buildtype.getName().c_str());
@@ -319,43 +301,57 @@ void WantBuildManager::update()
 					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 					return;
 				}
+				else if(canBeMade(b.buildtype))
+				{
+					log("can make\n\t");
+					log(b.buildtype.getName().c_str());
+					log("\nsend to BOM\n");
+					//this->bom->build(1, b.buildtype, 1);
+					(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
+					log(std::string(intToString(this->bom->getPlannedCount(b.buildtype))).append("=bom->getPlannedCount()\n").c_str());
+					buildList.removeTop();
+					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+					return;
+				} 
+				log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 			}
 			if(b.typenr == 2)
 			{
-				if(BWAPI::Broodwar->canResearch(NULL, b.researchtype))
-				{
-					this->bom->research(b.researchtype, 1);
-					buildList.removeTop();
-					return;
-				} else
+				if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					buildList.removeTop();
 					return;
 				}
+				else if(canBeMade(b.researchtype))
+				{
+					this->bom->research(b.researchtype, 1);
+					buildList.removeTop();
+					return;
+				} 
 			}
 			if(b.typenr == 3)
 			{
-				if(BWAPI::Broodwar->canUpgrade(NULL, b.upgradetype))
+				if(!requirementsSatisfied(b.upgradetype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
-					this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)+1, b.upgradetype, 1);
 					buildList.removeTop();
 					return;
-				} else
+				}
+				else if(canBeMade(b.upgradetype))
 				{
+					this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)+1, b.upgradetype, 1);
 					buildList.removeTop();
 					return;
 				}
 			}
 			if(b.typenr == 4)
 			{
-				if(BWAPI::Broodwar->self()->minerals() >= BWAPI::UnitTypes::Zerg_Hatchery.mineralPrice())
+				if(requirementsSatisfied(BWAPI::UnitTypes::Zerg_Hatchery) && canBeMade(BWAPI::UnitTypes::Zerg_Hatchery))
 				{
 					this->bm->expand();
 					buildList.removeTop();
 					return;
 				}
 			}
-		}
 	}
 	else
 	{
@@ -1279,4 +1275,59 @@ std::string WantBuildManager::intToString(int i) {
 	std::ostringstream buffer;
 	buffer << i;
 	return buffer.str();
+}
+
+bool WantBuildManager::canBeMade(BWAPI::UnitType unittype)
+{
+	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	return ((!unittype.isBuilding() && allUnits(Larva).size() > 0) || unittype.isBuilding()) && unittype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && unittype.gasPrice() <= BWAPI::Broodwar->self()->gas() && unittype.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed());
+}
+
+bool WantBuildManager::canBeMade(BWAPI::TechType techtype)
+{
+	return techtype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && techtype.gasPrice() <= BWAPI::Broodwar->self()->gas();
+}
+
+bool WantBuildManager::canBeMade(BWAPI::UpgradeType upgradetype)
+{
+	return upgradetype.mineralPriceBase() <= BWAPI::Broodwar->self()->minerals() && upgradetype.gasPriceBase() <= BWAPI::Broodwar->self()->gas();
+}
+
+
+bool WantBuildManager::requirementsSatisfied(BWAPI::UnitType unittype)
+{
+	std::map<BWAPI::UnitType, int> reqs = unittype.requiredUnits();
+	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	bool reqsMet = true;
+	for each(std::pair<BWAPI::UnitType, int> req in reqs)
+	{
+		if(allUnits(GetType, unittype).size() == 0)
+		{
+			reqsMet = false;
+		}
+	}
+	if(unittype == BWAPI::UnitTypes::Zerg_Lurker || unittype == BWAPI::UnitTypes::Zerg_Lurker_Egg)
+	{
+		if(!BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Lurker_Aspect))
+		{
+			reqsMet = false;
+		}
+	}
+	return reqsMet;
+}
+
+bool WantBuildManager::requirementsSatisfied(BWAPI::TechType techtype)
+{
+	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	bool reqsMet = true;
+	reqsMet = allUnits(GetType, techtype.whatResearches()).size() > 0;
+	return reqsMet;
+}
+
+bool WantBuildManager::requirementsSatisfied(BWAPI::UpgradeType upgradetype)
+{
+	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	bool reqsMet = true;
+	reqsMet = allUnits(GetType, upgradetype.whatUpgrades()).size() > 0;
+	return reqsMet;
 }

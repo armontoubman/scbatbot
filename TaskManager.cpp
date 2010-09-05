@@ -1,6 +1,8 @@
 #include "TaskManager.h"
 #include "Task.h"
 #include "EigenUnitGroupManager.h"
+#include "EnemyUnitDataManager.h"
+#include "EnemyUnitData.h"
 #include <BWAPI.h>
 #include <set>
 #include <algorithm>
@@ -11,9 +13,10 @@ TaskManager::TaskManager()
 {
 }
 
-TaskManager::TaskManager(EigenUnitGroupManager* e)
+TaskManager::TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu)
 {
 	this->eugm = e;
+	this->eudm = eu;
 }
 
 void TaskManager::insertTask(Task t)
@@ -66,6 +69,16 @@ Task TaskManager::findTaskWithUnit(BWAPI::Unit* unit)
 
 void TaskManager::update()
 {
+	this->tasklist.clear();
+
+	std::map<BWAPI::Unit*, EnemyUnitData> datamap = this->eudm->getData();
+
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in datamap)
+	{
+		if(enemy.second.position == BWAPI::Positions::Unknown)
+		{
+		}
+	}
 }
 
 std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype)

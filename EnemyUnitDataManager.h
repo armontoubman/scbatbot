@@ -14,6 +14,8 @@ public:
 	std::map<BWAPI::Unit*,EnemyUnitData> getData();
 	int count(BWAPI::UnitType unittype);
 	UnitGroup getUG();
+	EnemyUnitData getEnemyUnitData(BWAPI::Unit* unit);
+	std::map<BWAPI::Unit*, EnemyUnitData> getEnemyUnitsInRadius(double radius, BWAPI::Position pos);
 private:
 	std::string intToString(int i);
 	std::map<BWAPI::Unit*,EnemyUnitData> enemyUnitsMap;

@@ -75,3 +75,29 @@ UnitGroup EnemyUnitDataManager::getUG()
 	}
 	return UnitGroup::getUnitGroup(unitset);
 }
+
+EnemyUnitData EnemyUnitDataManager::getEnemyUnitData(BWAPI::Unit* unit)
+{
+	EnemyUnitData result;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in enemyUnitsMap)
+	{
+		if(enemy.first == unit)
+		{
+			result = enemy.second;
+		}
+	}
+	return result;
+}
+
+std::map<BWAPI::Unit*, EnemyUnitData> EnemyUnitDataManager::getEnemyUnitsInRadius(double radius, BWAPI::Position pos)
+{
+	std::map<BWAPI::Unit*, EnemyUnitData> result;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in enemyUnitsMap)
+	{
+		if(enemy.second.position.getDistance(pos) <= radius)
+		{
+			result.insert(enemy);
+		}
+	}
+	return result;
+}

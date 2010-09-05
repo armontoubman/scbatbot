@@ -52,6 +52,13 @@ public:
 	UnitGroup getUnusedMineralsNearHatcheries();
 	BWTA::BaseLocation* getNaturalExpansion();
 
+	bool requirementsSatisfied(BWAPI::UnitType unittype);
+	bool requirementsSatisfied(BWAPI::TechType techtype);
+	bool requirementsSatisfied(BWAPI::UpgradeType upgradetype);
+	bool canBeMade(BWAPI::UnitType unittype);
+	bool canBeMade(BWAPI::TechType techtype);
+	bool canBeMade(BWAPI::UpgradeType upgradetype);
+
 	BuildList buildList;
 	BuildList wantList;
 
