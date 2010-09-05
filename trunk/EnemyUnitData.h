@@ -10,4 +10,5 @@ public:
 	BWAPI::UnitType unitType;
 	int hitPoints;
 	BWAPI::Position position;
+	int lastSeen;
 };

@@ -12,6 +12,16 @@ Task::Task(int t, int p, BWAPI::Position pos, UnitGroup* ug)
 	this->priority = p;
 	this->position = pos;
 	this->unitGroup = ug;
+	this->enemy = NULL;
+}
+
+Task::Task(int t, int p, BWAPI::Position pos, UnitGroup* ug, UnitGroup* e)
+{
+	this->type = t;
+	this->priority = p;
+	this->position = pos;
+	this->unitGroup = ug;
+	this->enemy = e;
 }
 
 bool Task::operator==(const Task& param) const

@@ -5,6 +5,7 @@ class Task {
 public:
 	Task();
 	Task(int t, int p, BWAPI::Position pos, UnitGroup* ug);
+	Task(int t, int p, BWAPI::Position pos, UnitGroup* ug, UnitGroup* e);
 	int type;
 	/*
 	types:

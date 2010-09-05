@@ -1,6 +1,7 @@
 #pragma once
 #include "Task.h"
 #include "EigenUnitGroupManager.h"
+#include "EnemyUnitDataManager.h"
 #include <BWAPI.h>
 #include <list>
 class EigenUnitGroupManager;
@@ -8,8 +9,9 @@ class TaskManager {
 	friend class HighCommand;
 public:
 	TaskManager();
-	TaskManager(EigenUnitGroupManager* e);
+	TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu);
 	EigenUnitGroupManager* eugm;
+	EnemyUnitDataManager* eudm;
 
 	void insertTask(Task t);
 	void removeTask(Task t);
