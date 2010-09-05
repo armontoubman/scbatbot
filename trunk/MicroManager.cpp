@@ -1079,15 +1079,17 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									UnitGroup buildings = allSelfUnits(isBuilding).inRadius(dist(15.00), (*unitit)->getPosition());
 									if(buildings.size() > 0)
 									{
-										
-										logx("doMicro overlord ", (*unitit)->getID(), " building random\n");
-										// als dit elk frame gebeurt, krijgt hij elk frame een nieuwe positie -> stuiterbal
-										int x = (*unitit)->getPosition().x();
-										int y = (*unitit)->getPosition().y();
-										int factor = dist(10);
-										int newx = x + (rand() % factor - factor/2);
-										int newy = y + (rand() % factor - factor/2);
-										(*unitit)->rightClick(BWAPI::Position(newx, newy));
+										if (!(*unitit)->isMoving())
+										{
+											logx("doMicro overlord ", (*unitit)->getID(), " building random\n");
+											// als dit elk frame gebeurt, krijgt hij elk frame een nieuwe positie -> stuiterbal
+											int x = (*unitit)->getPosition().x();
+											int y = (*unitit)->getPosition().y();
+											int factor = dist(10);
+											int newx = x + (rand() % factor - factor/2);
+											int newy = y + (rand() % factor - factor/2);
+											(*unitit)->rightClick(BWAPI::Position(newx, newy));
+										}
 									}
 									else
 									{
