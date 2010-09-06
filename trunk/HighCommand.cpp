@@ -99,6 +99,14 @@ void HighCommand::onRemoveUnit(BWAPI::Unit* unit)
 	}
 }
 
+void HighCommand::onUnitShow(BWAPI::Unit* unit)
+{
+	if(unit->getPlayer() == BWAPI::Broodwar->self())
+	{
+		this->eigenUnitGroupManager->assignUnit(unit);
+	}
+}
+
 BWAPI::Unit* HighCommand::getNearestHatchery(BWAPI::Position pos)
 {
 	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);

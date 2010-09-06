@@ -20,6 +20,7 @@ public:
 	~HighCommand();
 	void update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits);
 	void onRemoveUnit(BWAPI::Unit* unit);
+	void onUnitShow(BWAPI::Unit* unit);
 	BWAPI::Unit* getNearestHatchery(BWAPI::Position pos);
 private:
 	std::string intToString(int i);
