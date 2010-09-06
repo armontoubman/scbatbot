@@ -1090,8 +1090,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 											int x = (*unitit)->getPosition().x();
 											int y = (*unitit)->getPosition().y();
 											int factor = dist(10);
-											int newx = x + ((rand() % 10)*factor) - ((rand() % 10)*factor);
-											int newy = y + ((rand() % 10)*factor) - ((rand() % 10)*factor);
+											int newx = x + (((rand() % 30)-15)*factor);
+											int newy = y + (((rand() % 30)-15)*factor);
 											(*unitit)->rightClick(BWAPI::Position(newx, newy));
 										}
 									}
@@ -1277,7 +1277,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				{
 					if((*unitit)->isUnderStorm())
 					{
-						(*unitit)->rightClick(moveAway(*unitit, dist(20.00)));
+						(*unitit)->rightClick(moveAway(*unitit, dist(10.00)));
 					}
 					else
 					{
