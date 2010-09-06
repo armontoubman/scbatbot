@@ -466,7 +466,7 @@ void WantBuildManager::doLists()
 			log("doLists stap 1 lege lijsten\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 4);
 			addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
-			addBuild(BWAPI::UnitTypes::Zerg_Overlord);
+			//addBuild(BWAPI::UnitTypes::Zerg_Overlord);
 			addBuild(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Drone, 2);
@@ -787,7 +787,7 @@ void WantBuildManager::doLists()
 		{
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 4);
 			addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
-			addBuild(BWAPI::UnitTypes::Zerg_Overlord);
+			//addBuild(BWAPI::UnitTypes::Zerg_Overlord);
 			addBuild(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Drone, 2); //addWant(BWAPI::UnitTypes::drones, 11)?
@@ -1051,7 +1051,7 @@ void WantBuildManager::doLists()
 		{
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 4);
 			addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
-			addBuild(BWAPI::UnitTypes::Zerg_Overlord);
+			//addBuild(BWAPI::UnitTypes::Zerg_Overlord);
 			addBuild(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Drone, 2); //addWant(BWAPI::UnitTypes::drones, 11)?
@@ -1317,6 +1317,16 @@ void WantBuildManager::doLists()
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() > 250 && enemiesNearNatural > 0 && !buildList.containsExpand())
 	{
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
+	}
+
+	if(wantList.count(BWAPI::UnitTypes::Zerg_Spire) || wantList.count(BWAPI::TechTypes::Lurker_Aspect)) // toegevoegd
+	{
+		addWant(BWAPI::UnitTypes::Zerg_Lair);
+	}
+
+	if( BWAPI::Broodwar->self()->minerals() > 500 && wantList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den) == 0 && wantList.count(BWAPI::UnitTypes::Zerg_Spire) == 0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) >10) // toegevoegd
+	{
+		buildExpand();
 	}
 
 	//emergency
