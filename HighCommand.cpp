@@ -14,6 +14,7 @@
 #include "MicroManager.h"
 #include "Task.h"
 #include <time.h>
+#include <BWTA.h>
 
 HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseManager* ba)
 {
@@ -28,8 +29,20 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->wantBuildManager->doLists();
 
 	// crash
-	//Task t = Task(1, 1, BWTA::getStartLocation(BWAPI::Broodwar->enemy())->getPosition(), this->eigenUnitGroupManager->overlordUG);
-	//this->taskManager->insertTask(t);
+	log("locaties halen\n");
+	std::set<BWTA::BaseLocation*> locs = BWTA::getBaseLocations();
+	for each(BWTA::BaseLocation* loc in locs)
+	{
+		log("loc maken\n");
+		BWAPI::Position startpos = loc->getPosition();
+		log(this->wantBuildManager->intToString(startpos.x()).append(" ").append(this->wantBuildManager->intToString(startpos.y())).c_str());
+		log("ug* maken\n");
+		UnitGroup* lords = this->eigenUnitGroupManager->overlordUG;
+		log("task maken\n");
+		Task t = Task(1, 1, startpos, lords);
+		log("task inserten\n");
+		this->taskManager->insertTask(t);
+	}
 
 	log("\n\n\n\nNEW GAME\n\n\n\n");
 

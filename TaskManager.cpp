@@ -7,6 +7,7 @@
 #include <set>
 #include <algorithm>
 #include "Task.h"
+#include "Util.h"
 class Task;
 class EigenUnitGroupManager;
 TaskManager::TaskManager()
@@ -21,20 +22,25 @@ TaskManager::TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu)
 
 void TaskManager::insertTask(Task t)
 {
+	log("insertTask()\n");
 	std::set<Task>::iterator insertposition;
 	bool plek = false;
 	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
+		log("for\n");
 		if((*i).priority > t.priority) {
+			log("for if priority >\n");
 			insertposition = i;
 			plek = true;
 			break;
 		}
 	}
 	if(plek) {
+		log("if plek\n");
 		this->tasklist.insert(insertposition, t);
 	}
 	else {
+		log("else\n");
 		this->tasklist.insert(this->tasklist.end(), t);
 	}
 
