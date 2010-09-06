@@ -4,12 +4,13 @@
 #include "EnemyUnitDataManager.h"
 #include "BuildOrderManager.h"
 #include "BaseManager.h"
+#include "HighCommand.h"
 class WantBuildManager
 {
 	friend class HighCommand;
 public:
 	WantBuildManager();
-	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba);
+	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba, HighCommand* h);
 
 	void update();
 
@@ -59,14 +60,24 @@ public:
 	bool canBeMade(BWAPI::TechType techtype);
 	bool canBeMade(BWAPI::UpgradeType upgradetype);
 
+	BWAPI::TilePosition placeFound(BWAPI::UnitType unittype);
+	void bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType unittype);
+	BWAPI::Unit* pickBuildDrone(BWAPI::TilePosition tilepos);
+
 	BuildList buildList;
 	BuildList wantList;
 
 	EnemyUnitDataManager* eudm;
 	BuildOrderManager* bom;
 	BaseManager* bm;
+	HighCommand* hc;
+
+	// zelfde als in MicroManager
+	BWAPI::Unit* nearestUnit(BWAPI::Position pos, UnitGroup ug);
 
 	double dist(int d);
 	void logx(std::string func, int id, std::string msg);
 	std::string intToString(int i);
+
+	std::set<BWAPI::Unit*> bouwdrones;
 };

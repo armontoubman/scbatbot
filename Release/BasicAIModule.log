@@ -1,115 +1,18 @@
-﻿Build started 6-9-2010 18:21:31.
+﻿Build started 6-9-2010 21:48:21.
      1>Project "C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\BasicAIModule\BasicAIModule.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Release\BasicAIModule.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\CL.exe /c /I../../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc90.pdb" /Gd /TP /analyze- /errorReport:prompt BasicAIModule.cpp Dll.cpp EigenUnitGroupManager.cpp HighCommand.cpp MicroManager.cpp TaskManager.cpp WantBuildManager.cpp
-         BasicAIModule.cpp
-         Dll.cpp
-         EigenUnitGroupManager.cpp
-     1>EigenUnitGroupManager.cpp(243): warning C4018: '>' : signed/unsigned mismatch
-     1>EigenUnitGroupManager.cpp(275): warning C4018: '<' : signed/unsigned mismatch
-         HighCommand.cpp
-     1>HighCommand.cpp(53): warning C4996: 'localtime': This function or variable may be unsafe. Consider using localtime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\include\time.inl(114) : see declaration of 'localtime'
-     1>HighCommand.cpp(55): warning C4996: 'asctime': This function or variable may be unsafe. Consider using asctime_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-                 C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\include\time.h(164) : see declaration of 'asctime'
-         MicroManager.cpp
-     1>MicroManager.cpp(97): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(112): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(160): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(255): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(378): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(397): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(442): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(443): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(462): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(490): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(497): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(509): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(515): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(528): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(559): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(577): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(578): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(586): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(594): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(601): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(603): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(606): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(612): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(613): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(616): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(633): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(634): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(648): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(664): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(671): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(672): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(686): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(718): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(725): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(745): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(759): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(761): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(784): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(784): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(802): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(803): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(811): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(838): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(851): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(883): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(885): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(917): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(938): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(941): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(979): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(986): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(996): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1029): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1052): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1068): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1073): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1088): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1097): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1131): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1134): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1135): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1136): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1144): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1152): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1212): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1286): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1292): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1293): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1301): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1319): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1321): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1322): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1331): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1336): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1338): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1340): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1341): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1343): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1378): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1380): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1381): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1383): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1420): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1652): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1657): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-         TaskManager.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\CL.exe /c /I../../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc90.pdb" /Gd /TP /analyze- /errorReport:prompt WantBuildManager.cpp
          WantBuildManager.cpp
-     1>WantBuildManager.cpp(146): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(186): warning C4018: '<' : signed/unsigned mismatch
-     1>WantBuildManager.cpp(219): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(238): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1201): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1201): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1201): warning C4018: '<' : signed/unsigned mismatch
-     1>WantBuildManager.cpp(1211): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>WantBuildManager.cpp(149): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>WantBuildManager.cpp(189): warning C4018: '<' : signed/unsigned mismatch
+     1>WantBuildManager.cpp(222): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>WantBuildManager.cpp(241): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>WantBuildManager.cpp(1293): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>WantBuildManager.cpp(1293): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
+     1>WantBuildManager.cpp(1293): warning C4018: '<' : signed/unsigned mismatch
+     1>WantBuildManager.cpp(1303): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.dll" /NOLOGO ../../lib/BWAPI.lib ../../lib/BWTA.lib "../../lib/CGAL-vc90-mt.lib" "../../lib/gmp-vc90-mt.lib" "../../lib/libboost_thread-vc90-mt-1_40.lib" "../../lib/mpfr-vc90-mt.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\BasicAIModule.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.lib" /MACHINE:X86 /DLL Release\Assignment.obj
          Release\BasicAIModule.obj
@@ -152,6 +55,7 @@
          Release\BorderManager.obj
             Creating library C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.lib and object C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.exp
          Generating code
+     1>c:\users\armon\documents\bwsal_0.9.8\basicaimodule\basicaimodule\wantbuildmanager.cpp(1454): warning C4715: 'WantBuildManager::placeFound' : not all control paths return a value
          Finished generating code
          BasicAIModule.vcxproj -> C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.dll
        Manifest:
@@ -163,4 +67,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:25.09
+Time Elapsed 00:00:19.10

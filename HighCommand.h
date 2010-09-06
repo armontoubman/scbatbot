@@ -22,6 +22,8 @@ public:
 	void onRemoveUnit(BWAPI::Unit* unit);
 	void onUnitShow(BWAPI::Unit* unit);
 	BWAPI::Unit* getNearestHatchery(BWAPI::Position pos);
+
+	BWAPI::Unit* hatchery;
 private:
 	std::string intToString(int i);
 	EigenUnitDataManager* eigenUnitDataManager;

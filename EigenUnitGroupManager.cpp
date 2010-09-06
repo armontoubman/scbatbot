@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <set>
 #include "TaskManager.h"
+#include "Util.h"
 
 EigenUnitGroupManager::EigenUnitGroupManager(HighCommand* hc, EigenUnitDataManager* e, TaskManager* t)
 {
@@ -124,6 +125,10 @@ void EigenUnitGroupManager::moveUnitBetweenGroups(UnitGroup* ug1, BWAPI::Unit* u
 
 void EigenUnitGroupManager::onRemoveUnit(BWAPI::Unit* unit)
 {
+	if(unit->getType() == BWAPI::UnitTypes::Zerg_Larva || unit->getType() == BWAPI::UnitTypes::Zerg_Egg || unit->getType().isBuilding())
+	{
+		return;
+	}
 	for(std::set<UnitGroup*>::iterator i=unitGroups.begin();i!=unitGroups.end();i++)
 	{
 		(*i)->erase((*i)->find(unit));
@@ -185,7 +190,7 @@ void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
 		this->defendgroepUG->insert(unit);
 	}
 
-	BWAPI::Broodwar->printf("assignUnit %s", unit->getType().getName());
+	log(std::string("EUGM assignUnit ").append(unit->getType().getName()).append("\n").c_str());
 }
 
 void EigenUnitGroupManager::update()

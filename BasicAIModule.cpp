@@ -171,6 +171,11 @@ void BasicAIModule::onUnitMorph(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
   this->unitGroupManager->onUnitMorph(unit);
+
+  if(unit->getPlayer() == BWAPI::Broodwar->self())
+  {
+	  this->highCommand->onUnitShow(unit);
+  }
 }
 void BasicAIModule::onUnitRenegade(BWAPI::Unit* unit)
 {
