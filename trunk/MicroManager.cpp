@@ -973,7 +973,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						logx("doMicro overlord ", (*unitit)->getID(), std::string(" task.type=").append(intToString(t.type)).append("\n").c_str());
 						if(t.type == 1 || t.type == 4)
 						{
-							if((*unitit)->getPosition().getDistance(nearestEnemyThatCanAttackAir(*unitit)->getPosition()) < dist(8.00) && t.type == 1)
+							logx("doMicro overlord ", (*unitit)->getID(), " type=1||4");
+							BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
+							// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
+							if(nearAir != NULL && (*unitit)->getPosition().getDistance(nearAir->getPosition()) < dist(8.00) && t.type == 1)
 							{
 								logx("doMicro overlord ", (*unitit)->getID(), " air enemy dichtbij\n");
 								if(overlordSupplyProvidedSoon())
@@ -1036,6 +1039,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
+							logx("doMicro overlord ", (*unitit)->getID(), "hydratask deel");
 							std::set<Task> hydratasks = this->tm->findTasksWithUnitType(BWAPI::UnitTypes::Zerg_Hydralisk);
 							Task* hydratask = NULL;
 							for(std::set<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
