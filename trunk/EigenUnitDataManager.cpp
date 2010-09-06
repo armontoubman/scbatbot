@@ -17,7 +17,7 @@ void EigenUnitDataManager::update(std::set<BWAPI::Unit*> units, std::set<BWAPI::
 	int currentHitPoints;
 	for(std::set<BWAPI::Unit*>::iterator i=units.begin();i!=units.end();i++)
     {
-		BWAPI::Broodwar->drawCircleMap((*i)->getPosition().x(), (*i)->getPosition().y(), (*i)->getType().sightRange(), BWAPI::Color(BWAPI::Colors::Green), false);
+		//BWAPI::Broodwar->drawCircleMap((*i)->getPosition().x(), (*i)->getPosition().y(), (*i)->getType().sightRange(), BWAPI::Color(BWAPI::Colors::Green), false);
 		// currentUnitData is value (geen pointer) dus moet opnieuw opgeslagen dmv insert()
 		currentUnitData = myUnitsMap[*i];
 		currentHitPoints = (*i)->getHitPoints();

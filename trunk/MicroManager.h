@@ -6,17 +6,19 @@
 #include "TaskManager.h"
 #include "HighCommand.h"
 #include "EigenUnitDataManager.h"
+#include "WantBuildManager.h"
 class BuildOrderManager;
 class EnemyUnitDataManager;
 class TaskManager;
 class HighCommand;
 class EigenUnitDataManager;
+class WantBuildManager;
 class MicroManager
 {
 	friend class HighCommand;
 public:
 	MicroManager();
-	MicroManager(BuildOrderManager* b, EnemyUnitDataManager* e, TaskManager* t, HighCommand* h, EigenUnitDataManager* ei);
+	MicroManager(BuildOrderManager* b, EnemyUnitDataManager* e, TaskManager* t, HighCommand* h, EigenUnitDataManager* ei, WantBuildManager* w);
 	BWAPI::Position moveAway(BWAPI::Unit* unit, double radius);
 	BWAPI::Position moveAway(BWAPI::Unit* unit);
 	void moveAway(std::set<BWAPI::Unit*> units);
@@ -63,7 +65,7 @@ public:
 	TaskManager* tm;
 	HighCommand* hc;
 	EigenUnitDataManager* eiudm;
-
+	WantBuildManager* wbm;
 	
 	std::string intToString(int i);
 	void logx(std::string func, int id, std::string msg);
