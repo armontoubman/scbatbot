@@ -65,7 +65,7 @@ Task TaskManager::findTaskWithUnitGroup(UnitGroup* ug)
 			return *i;
 		}
 	}
-	return Task(1, 1, (*ug->begin())->getPosition(), ug);
+	return Task(-1, 1, (*ug->begin())->getPosition(), ug);
 }
 
 Task TaskManager::findTaskWithUnit(BWAPI::Unit* unit)

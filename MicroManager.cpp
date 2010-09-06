@@ -109,7 +109,7 @@ std::set<BWAPI::Position> MicroManager::getAdjacentPositions(BWAPI::Position p)
 {
 	std::set<BWAPI::Position> result;
 
-	int factor = dist(1); // was 1
+	int factor = dist(10); // was 1
 
 	result.insert(BWAPI::Position(p.x()-factor, p.y()+factor));
 	result.insert(BWAPI::Position(p.x(), p.y()+factor));
@@ -557,8 +557,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							int x = eerste->getPosition().x();
 							int y = eerste->getPosition().y();
 							int factor = dist(10);
-							int newx = x + (rand() % factor - factor/2);
-							int newy = y + (rand() % factor - factor/2);
+							int newx = x + (((rand() % 30)-15)*factor);
+							int newy = y + (((rand() % 30)-15)*factor);
 							eerste->rightClick(BWAPI::Position(newx, newy));
 						}
 						else
@@ -973,7 +973,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						logx("doMicro overlord ", (*unitit)->getID(), std::string(" task.type=").append(intToString(t.type)).append("\n").c_str());
 						if(t.type == 1 || t.type == 4)
 						{
-							logx("doMicro overlord ", (*unitit)->getID(), " type=1||4");
+							logx("doMicro overlord ", (*unitit)->getID(), " type=1||4\n");
 							BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
 							// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
 							if(nearAir != NULL && (*unitit)->getPosition().getDistance(nearAir->getPosition()) < dist(8.00) && t.type == 1)
@@ -1009,37 +1009,42 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									UnitGroup stealths = allEnemyUnits(isCloaked);
-									BWAPI::Unit* neareststealth = nearestUnit((*unitit)->getPosition(), stealths);
-									if(neareststealth != NULL)
-									{
+									logx("doMicro overlord ", (*unitit)->getID(), " moveAway\n");
+									(*unitit)->rightClick(moveAway(*unitit));
+								}
+							}
+							else
+							{
+								UnitGroup stealths = allEnemyUnits(isCloaked);
+								BWAPI::Unit* neareststealth = nearestUnit((*unitit)->getPosition(), stealths);
+								if(neareststealth != NULL)
+								{
 										
-										logx("doMicro overlord ", (*unitit)->getID(), " stealth gezien\n");
-										(*unitit)->rightClick(neareststealth->getPosition());
+									logx("doMicro overlord ", (*unitit)->getID(), " stealth gezien\n");
+									(*unitit)->rightClick(neareststealth->getPosition());
+								}
+								else
+								{
+									UnitGroup dropships = allEnemyUnits(Dropship) + allEnemyUnits(Shuttle);
+									dropships = dropships.inRadius(dist(10.00), (*unitit)->getPosition());
+									if(dropships.size() > 0)
+									{
+											
+										logx("doMicro overlord ", (*unitit)->getID(), " dropship gezien\n");
+										(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
 									}
 									else
 									{
-										UnitGroup dropships = allEnemyUnits(Dropship) + allEnemyUnits(Shuttle);
-										dropships = dropships.inRadius(dist(10.00), (*unitit)->getPosition());
-										if(dropships.size() > 0)
-										{
 											
-											logx("doMicro overlord ", (*unitit)->getID(), " dropship gezien\n");
-											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
-										}
-										else
-										{
-											
-											logx("doMicro overlord ", (*unitit)->getID(), " geen dropship, move naar task\n");
-											(*unitit)->rightClick(t.position);
-										}
+										logx("doMicro overlord ", (*unitit)->getID(), " geen dropship, move naar task\n");
+										(*unitit)->rightClick(t.position);
 									}
 								}
 							}
 						}
 						else
 						{
-							logx("doMicro overlord ", (*unitit)->getID(), "hydratask deel");
+							logx("doMicro overlord ", (*unitit)->getID(), " hydratask deel\n");
 							std::set<Task> hydratasks = this->tm->findTasksWithUnitType(BWAPI::UnitTypes::Zerg_Hydralisk);
 							Task* hydratask = NULL;
 							for(std::set<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
@@ -1203,6 +1208,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
+							logx("doMicro drone ", (*unitit)->getID(), " task.type = 1\n");
 							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(7.00), 0)))
 							{
 								logx("doMicro drone ", (*unitit)->getID(), " enemies moveAway\n");
@@ -1649,8 +1655,8 @@ BWAPI::Position MicroManager::splitup(BWAPI::Unit* unit)
 		int x = current.x();
 		int y = current.y();
 		int factor = dist(20);
-		int newx = x + (rand() % factor - factor/2);
-		int newy = y + (rand() % factor - factor/2);
+		int newx = x + (((rand() % 30)-15)*factor);
+		int newy = y + (((rand() % 30)-15)*factor);
 		return BWAPI::Position(newx, newy);
 	}
 	// van set naar map

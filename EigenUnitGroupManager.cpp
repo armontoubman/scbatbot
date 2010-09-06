@@ -156,6 +156,10 @@ void EigenUnitGroupManager::assignUnits(std::set<BWAPI::Unit*> units)
 void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
 {
 	BWAPI::UnitType type = unit->getType();
+	if(type == BWAPI::UnitTypes::Zerg_Larva || type == BWAPI::UnitTypes::Zerg_Egg || type.isBuilding())
+	{
+		return;
+	}
 	if(type == BWAPI::UnitTypes::Zerg_Zergling)
 	{
 		this->defendlingUG->insert(unit);
@@ -181,7 +185,7 @@ void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
 		this->defendgroepUG->insert(unit);
 	}
 
-	BWAPI::Broodwar->printf("%s %s", "assignUnit", unit->getType().getName());
+	BWAPI::Broodwar->printf("assignUnit %s", unit->getType().getName());
 }
 
 void EigenUnitGroupManager::update()

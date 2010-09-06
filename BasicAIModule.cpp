@@ -157,6 +157,8 @@ void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
   if (Broodwar->isReplay()) return;
   this->informationManager->onUnitShow(unit);
   this->unitGroupManager->onUnitShow(unit);
+
+  this->highCommand->onUnitShow(unit);
 }
 void BasicAIModule::onUnitHide(BWAPI::Unit* unit)
 {
