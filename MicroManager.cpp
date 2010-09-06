@@ -1086,8 +1086,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 											int x = (*unitit)->getPosition().x();
 											int y = (*unitit)->getPosition().y();
 											int factor = dist(10);
-											int newx = x + (rand() % factor - factor/2);
-											int newy = y + (rand() % factor - factor/2);
+											int newx = x + ((rand() % 10)*factor) - ((rand() % 10)*factor);
+											int newy = y + ((rand() % 10)*factor) - ((rand() % 10)*factor);
 											(*unitit)->rightClick(BWAPI::Position(newx, newy));
 										}
 									}
@@ -1219,7 +1219,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 						}
 					}
-					if((*unitit)->isIdle())
+					if((*unitit)->isIdle()==true || (*unitit)->getOrder() == BWAPI::Orders::None || (*unitit)->getOrder() == BWAPI::Orders::Nothing)
 					{
 						logx("doMicro drone ", (*unitit)->getID(), " harvestcheckidle\n");
 						UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
