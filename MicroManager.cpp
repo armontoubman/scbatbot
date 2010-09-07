@@ -42,6 +42,9 @@ BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit, double radius)
 	std::map<BWAPI::Position, int> telling;
 	// alle enemies in de gekozen radius
 	UnitGroup enemies = this->eudm->getUG().inRadius(radius, unit->getPosition());
+
+	UnitGroup buildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding);
+
 	// enemies bekijken en scores toewijzen aan de mogelijke posities
 	// voor alle mogelijke posities
 	for(std::set<BWAPI::Position>::iterator it = mogelijkePosities.begin(); it != mogelijkePosities.end(); it++)
@@ -71,6 +74,13 @@ BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit, double radius)
 			if((*iten)->getDistance(*it) > range)
 			{
 				// bonus
+				aantal++;
+			}
+
+			// bonuspunten voor positie richting nearest building
+			BWAPI::Unit* nearestbuilding = nearestUnit(unit->getPosition(), buildings);
+			if(unit->getDistance(nearestbuilding) > (*it).getDistance(nearestbuilding->getPosition()))
+			{
 				aantal++;
 			}
 		}
