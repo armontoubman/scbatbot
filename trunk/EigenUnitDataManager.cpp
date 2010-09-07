@@ -22,6 +22,8 @@ void EigenUnitDataManager::update(std::set<BWAPI::Unit*> units, std::set<BWAPI::
 		currentUnitData = myUnitsMap[*i];
 		currentHitPoints = (*i)->getHitPoints();
 
+		// TODO: als type niet meer drone is, uit wbm->bouwdrones halen
+
 		// nieuwe unit, hitpoints goed opslaan
 		if(currentUnitData.hitPoints == 0) {
 			currentUnitData.hitPoints = currentHitPoints;
