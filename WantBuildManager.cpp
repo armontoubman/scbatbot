@@ -112,7 +112,10 @@ void WantBuildManager::wantExpand()
 
 void WantBuildManager::buildExpand()
 {
-	this->buildList.addItem(BuildItem().expand());
+	if(this->buildList.countExpand() == 0)
+	{
+		this->buildList.addItem(BuildItem().expand());
+	}
 }
 
 bool WantBuildManager::wantListContains(BWAPI::UnitType unittype)
@@ -438,7 +441,7 @@ void WantBuildManager::update()
 			{
 				if(requirementsSatisfied(BWAPI::UnitTypes::Zerg_Hatchery) && canBeMade(BWAPI::UnitTypes::Zerg_Hatchery))
 				{
-					this->bm->expand();
+					doExpand();
 					buildList.removeTop();
 					return;
 				}
@@ -484,11 +487,11 @@ void WantBuildManager::doLists()
 			{
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 2)	&& photonCannonNearBase()	) // nakijken
 				{
-					wantExpand();
+					buildExpand();
 				}
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) >= 1)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 9)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 10)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery) == 2)	) // nakijken
 				{
-					wantExpand();
+					buildExpand();
 				}
 				if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Stargate) >= 1)
 				{
@@ -533,7 +536,7 @@ void WantBuildManager::doLists()
 				{
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
-					wantExpand();
+					buildExpand();
 					stap = 3;
 				}
 			}
@@ -796,7 +799,7 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 2)
 		{
-			wantExpand();
+			buildExpand();
 			if(nrOfEnemy(BWAPI::UnitTypes::Terran_Barracks) > 1)
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Extractor);
@@ -821,7 +824,7 @@ void WantBuildManager::doLists()
 				}
 				else if (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery) < 3 && !buildList.containsExpand() && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0)
 				{
-					wantExpand();
+					buildExpand();
 				}
 			}
 			if( wantListIsCompleted())
@@ -1075,7 +1078,7 @@ void WantBuildManager::doLists()
 			}
 			if( nrOfEnemy(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0 && !buildList.containsExpand())
 			{
-				wantExpand();
+				buildExpand();
 			}
 			if( (nrOfEnemy(BWAPI::UnitTypes::Zerg_Spire) > 0) || ( (nrOfEnemy(BWAPI::UnitTypes::Zerg_Hatchery) == 1) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 7) ))
 			{
@@ -1086,7 +1089,7 @@ void WantBuildManager::doLists()
 			{
 				if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 7) && !buildList.containsExpand())
 				{
-					wantExpand();
+					buildExpand();
 				}
 				else
 				{
@@ -1105,7 +1108,7 @@ void WantBuildManager::doLists()
 			addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 			if(!buildList.containsExpand())
 			{
-				wantExpand();
+				buildExpand();
 			}
 		}			
 		// reinforcements
@@ -1537,4 +1540,51 @@ BWAPI::Unit* WantBuildManager::nearestUnit(BWAPI::Position pos, UnitGroup ug)
 	}
 
 	return besteUnit;
+}
+
+void WantBuildManager::doExpand()
+{
+	log("doExpand\n");
+	BWAPI::TilePosition tilepos = this->hc->hatchery->getTilePosition();
+	std::set<BWTA::BaseLocation*> baselocations = BWTA::getBaseLocations();
+	std::map<BWAPI::Unit*, EnemyUnitData> enemies = this->eudm->getData();
+	int distance = -1;
+	for each(BWTA::BaseLocation* baselocation in baselocations)
+	{
+		bool enemyOpLocatie = false;
+		for each(std::pair<BWAPI::Unit*, EnemyUnitData> paar in enemies)
+		{
+			if(BWAPI::TilePosition(paar.second.position) == baselocation->getTilePosition())
+			{
+				enemyOpLocatie = true;
+			}
+		}
+		if(BWAPI::Broodwar->unitsOnTile(baselocation->getTilePosition().x(), baselocation->getTilePosition().y()).size() == 0)
+		{
+			if(enemyOpLocatie == false)
+			{
+				if(BWAPI::Broodwar->isExplored(baselocation->getTilePosition()))
+				{
+					if(distance == -1)
+					{
+						tilepos = baselocation->getTilePosition();
+						distance = this->hc->hatchery->getDistance(baselocation->getPosition());
+					}
+					else if(this->hc->hatchery->getDistance(baselocation->getPosition()) < distance)
+					{
+						tilepos = baselocation->getTilePosition();
+						distance = this->hc->hatchery->getDistance(baselocation->getPosition());
+					}
+				}
+			}
+		}
+	}
+	BWAPI::Unit* drone = pickBuildDrone(tilepos);
+	if(drone != NULL && tilepos != this->hc->hatchery->getTilePosition())
+	{
+		log("drone != NULL\n");
+		drone->build(tilepos, BWAPI::UnitTypes::Zerg_Hatchery);
+		BWAPI::Broodwar->drawTextMap(drone->getPosition().x(), drone->getPosition().y(), std::string("expand").c_str());
+		this->bouwdrones.insert(drone);
+	}
 }

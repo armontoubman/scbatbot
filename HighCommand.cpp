@@ -56,6 +56,8 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	log("\n");
 
 	this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery).begin();
+
+	BWAPI::Broodwar->setLocalSpeed(0);
 }
 
 HighCommand::~HighCommand() {
@@ -71,6 +73,8 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 {
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
 	this->enemyUnitDataManager->update(enemyUnits);
+
+	this->taskManager->update();
 
 	if(this->tick == 5)
 	{
@@ -104,13 +108,18 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 
 void HighCommand::onRemoveUnit(BWAPI::Unit* unit)
 {
+	log("HC onRemoveUnit\n");
 	if(unit->getPlayer() == BWAPI::Broodwar->self()) {
 		this->eigenUnitDataManager->onRemoveUnit(unit);
 		this->eigenUnitGroupManager->onRemoveUnit(unit);
 		if(unit->getType() == BWAPI::UnitTypes::Zerg_Drone)
 		{
 			log("drone verdwenen\n");
-			this->wantBuildManager->bouwdrones.erase(this->wantBuildManager->bouwdrones.find(unit));
+			if(this->wantBuildManager->bouwdrones.count(unit) > 0)
+			{
+				log("zat in bouwgroep\n");
+				this->wantBuildManager->bouwdrones.erase(this->wantBuildManager->bouwdrones.find(unit));
+			}
 		}
 	} else {
 		this->enemyUnitDataManager->onRemoveUnit(unit);

@@ -61,13 +61,12 @@ void EigenUnitDataManager::update(std::set<BWAPI::Unit*> units, std::set<BWAPI::
 
 void EigenUnitDataManager::onRemoveUnit(BWAPI::Unit* unit)
 {
-	std::map<BWAPI::Unit*, EigenUnitData>::iterator it = myUnitsMap.find(unit);
-	myUnitsMap.erase(it);
-
-	BWAPI::Broodwar->printf("onRemoveUnit");
-	log("onRemoveUnit: ");
+	log("EIUDM onRemoveUnit: ");
 	log(unit->getType().getName().c_str());
 	log("\n");
+	std::map<BWAPI::Unit*, EigenUnitData>::iterator it = myUnitsMap.find(unit);
+	myUnitsMap.erase(it);
+	log("EIUDM onRemoveUnit ok\n");
 }
 
 void EigenUnitDataManager::eventHitPointsChanged(BWAPI::Unit* unit, int difference)

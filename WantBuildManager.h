@@ -80,4 +80,5 @@ public:
 	std::string intToString(int i);
 
 	std::set<BWAPI::Unit*> bouwdrones;
+	void doExpand();
 };

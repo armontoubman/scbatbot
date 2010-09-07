@@ -26,6 +26,7 @@ public:
 
 	int supplyRequiredForTopThree();
 	int countUnits();
+	int countExpand();
 
 	std::list<BuildItem> buildlist;
 	void init();
