@@ -75,7 +75,7 @@ Task TaskManager::findTaskWithUnit(BWAPI::Unit* unit)
 
 void TaskManager::update()
 {
-	this->tasklist.clear();
+	/*this->tasklist.clear();
 
 	std::map<BWAPI::Unit*, EnemyUnitData> datamap = this->eudm->getData();
 
@@ -84,7 +84,7 @@ void TaskManager::update()
 		if(enemy.second.position == BWAPI::Positions::Unknown)
 		{
 		}
-	}
+	}*/
 }
 
 std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype)

@@ -125,14 +125,17 @@ void EigenUnitGroupManager::moveUnitBetweenGroups(UnitGroup* ug1, BWAPI::Unit* u
 
 void EigenUnitGroupManager::onRemoveUnit(BWAPI::Unit* unit)
 {
-	if(unit->getType() == BWAPI::UnitTypes::Zerg_Larva || unit->getType() == BWAPI::UnitTypes::Zerg_Egg || unit->getType().isBuilding())
-	{
-		return;
-	}
+	log("EUGM onRemoveUnit: ");
+	log(unit->getType().getName().c_str());
+	log("\n");
 	for(std::set<UnitGroup*>::iterator i=unitGroups.begin();i!=unitGroups.end();i++)
 	{
-		(*i)->erase((*i)->find(unit));
+		if((*i)->count(unit) > 0)
+		{
+			(*i)->erase((*i)->find(unit));
+		}
 	}
+	log("EUGM onRemoveUnit ok\n");
 }
 
 UnitGroup* EigenUnitGroupManager::findUnitGroupWithUnit(BWAPI::Unit* unit)

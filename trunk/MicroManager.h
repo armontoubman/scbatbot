@@ -68,7 +68,7 @@ public:
 	WantBuildManager* wbm;
 	
 	std::string intToString(int i);
-	void logx(std::string func, int id, std::string msg);
+	void logx(std::string func, BWAPI::Unit*, std::string msg);
 
 	double dist(int d);
 };

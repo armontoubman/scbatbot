@@ -176,3 +176,16 @@ int BuildList::countUnits()
 	}
 	return aantal;
 }
+
+int BuildList::countExpand()
+{
+	int aantal = 0;
+	for(std::list<BuildItem>::iterator it=buildlist.begin(); it!=buildlist.end(); it++)
+	{
+		if(it->typenr == 4)
+		{
+				aantal++;
+		}
+	}
+	return aantal;
+}
