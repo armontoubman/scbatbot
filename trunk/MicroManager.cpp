@@ -1217,12 +1217,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* DRONE */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Drone)
 				{
-					logx("\n\ndoMicro drone ", (*unitit), "\n");
+					/*logx("\n\ndoMicro drone ", (*unitit), "\n");
 					if(this->wbm->bouwdrones.count(*unitit) > 0)
 					{
 						logx("doMicro drone", (*unitit), " drone is aan het bouwen, skip\n");
 						continue;
-					}
+					}*/
 					if((*unitit)->isUnderStorm())
 					{
 						logx("doMicro drone ", (*unitit), " under storm moveAway\n");

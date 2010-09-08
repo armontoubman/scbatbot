@@ -4,8 +4,8 @@
 class Task {
 public:
 	Task();
-	Task(int t, int p, BWAPI::Position pos, UnitGroup* ug);
-	Task(int t, int p, BWAPI::Position pos, UnitGroup* ug, UnitGroup* e);
+	Task(int t, int p, BWAPI::Position pos);
+	Task(int t, int p, BWAPI::Position pos, UnitGroup* e);
 	int type;
 	/*
 	types:
@@ -16,8 +16,9 @@ public:
 	*/
 	int priority;
 	BWAPI::Position position;
-	UnitGroup* unitGroup;
 	UnitGroup* enemy;
 	bool operator==(const Task& param) const;
 	bool operator<(const Task& rhs) const;
+
+	UnitGroup* unitGroup; // FOUT MOET WEG MAAR COMPILET ANDERS NIET
 };

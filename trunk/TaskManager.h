@@ -24,4 +24,9 @@ public:
 	void update();
 
 	std::set<Task> tasklist;
+
+	// zelfde als overal
+	double dist(int d);
+	BWAPI::Unit* nearestUnit(BWAPI::Position pos, UnitGroup ug);
+	BWAPI::Position getCenterPosition(std::set<BWAPI::Position> posset);
 };
