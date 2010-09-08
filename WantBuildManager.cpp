@@ -313,6 +313,24 @@ void WantBuildManager::update()
 	if(buildList.size() > 0)
 	{
 		BuildItem b = buildList.top();
+
+		if(b.typenr == 1)
+		{
+			if(b.buildtype.isBuilding())
+			{
+				UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
+				// bezig kan size > 1 hebben
+				for each(BWAPI::Unit* lolgebouw in bezig)
+				{
+					if(b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
+					{
+						buildList.removeTop();
+						b = buildList.top();
+					}
+				}
+			}
+		}
+
 		log(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
 			if(b.typenr == 1)
 			{
@@ -1501,7 +1519,7 @@ void WantBuildManager::bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType un
 	{
 		log("drone != NULL\n");
 		drone->build(tilepos, unittype);
-		this->bouwdrones.insert(drone);
+		//this->bouwdrones.insert(drone);
 	}
 }
 
@@ -1610,8 +1628,26 @@ void WantBuildManager::doExpand()
 	if(drone != NULL && tilepos != this->hc->hatchery->getTilePosition())
 	{
 		log("drone != NULL\n");
-		drone->build(tilepos, BWAPI::UnitTypes::Zerg_Hatchery);
-		BWAPI::Broodwar->drawTextMap(drone->getPosition().x(), drone->getPosition().y(), std::string("expand").c_str());
-		this->bouwdrones.insert(drone);
+
+		UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery)(isBeingConstructed);
+		// bezig kan size > 1 hebben
+		bool underconstruction = false;
+		for each(BWAPI::Unit* lolgebouw in bezig)
+		{
+			if(lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() < 0.9)
+			{
+				underconstruction = true;
+			}
+		}
+		if(!underconstruction)
+		{
+			drone->build(tilepos, BWAPI::UnitTypes::Zerg_Hatchery);
+			BWAPI::Broodwar->drawTextMap(drone->getPosition().x(), drone->getPosition().y(), std::string("expand").c_str());
+		}
+		if(underconstruction)
+		{
+			drone->stop();
+		}
+		//this->bouwdrones.insert(drone);
 	}
 }
