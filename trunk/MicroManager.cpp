@@ -378,6 +378,32 @@ void MicroManager::gasWhere(BWAPI::Unit* unit)
 	}
 }
 
+void MicroManager::gatherWhere(BWAPI::Unit* unit)
+{
+	if ((unit->isGatheringGas()) || (unit->isMiningMinerals()))
+	{
+		//return unit->getTarget();
+	}
+	else
+	{
+		UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
+		UnitGroup result = extractors;
+		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
+		{
+			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone).inRadius(dist(6), (*it)->getPosition()).size()<3)
+			{
+				result.erase(*it); // ug met een unit ehh
+			}
+		}
+		result += MicroManager::getUnusedMineralsNearHatcheries();
+		if (result.empty())
+		{
+			unit->rightClick(this->hc->getNearestHatchery(unit->getPosition()));
+		}
+		unit->rightClick(nearestUnitInGroup(unit, result));
+	}
+}
+
 UnitGroup MicroManager::getHatcheriesWithMinerals()
 {
 	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
@@ -404,11 +430,15 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
 	for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
 	{
-		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
+		UnitGroup allies = allSelfUnits.inRadius(dist(10.00), eerste->getPosition());
+		if ((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10.00), 0)) < 5) || (allies.size()>2))
 		{
-			if((*it)->getDistance(*mit) <= dist(8.00) && !(*mit)->isBeingGathered())
+			for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 			{
-				result.insert(*mit);
+				if((*it)->getDistance(*mit) <= dist(13.00) && !(*mit)->isBeingGathered())
+				{
+					result.insert(*mit);
+				}
 			}
 		}
 	}
@@ -428,15 +458,28 @@ UnitGroup* MicroManager::inRadiusUnitGroup(double radius, UnitGroup* ug)
 
 UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut)
 {
+	// return a unitgroup of the specified unittype that is in radius of a unit of a unit group;
 	UnitGroup* result= new UnitGroup();
 	for(std::set<BWAPI::Unit*>::iterator it=ug->begin(); it!=ug->end(); it++)
 	{
 		UnitGroup newunits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(radius, (*it)->getPosition())(GetType, ut);
-		result->insert(newunits.begin(), newunits.end());
+		result->insert(newunits.begin(), newunits.end()); // kan meerdere keren tot dezelfde UG worden toegevoegd?
 	}
 	return result;
 }
 
+bool MicroManager::tooSplitUp(double radius, UnitGroup* ug)
+{
+	BWAPI::Position ugcenter = ug.getCenter();
+	for(std::set<BWAPI::Unit*>::iterator it=ug->begin(); it!=ug->end(); it++)
+	{
+		if ((*it)->getDistance(ugcenter) > 10)
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
 void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 {
@@ -556,7 +599,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			if((**it).size() == 1)
 			{
 				logx("doMicro zergling ", eerste, " group.size()=1\n");
-				if (amountCanAttackGround(enemiesInRange(eerste->getPosition(),dist(8),0))>1)
+				if (amountCanAttackGround(enemiesInRange(eerste->getPosition(),dist(8),0))>2)
 				{
 					logx("doMicro zergling ", eerste, " enemy in de buurt, moveToNearestBase\n");
 					moveToNearestBase(**it);
@@ -567,7 +610,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					if (currentTask.type == 1) // <-- deze
 					{
 						logx("doMicro zergling ", eerste, " task.type!=1\n");
-						if (eerste->getPosition().getDistance(currentTask.position) < dist(5))
+						if (eerste->getPosition().getDistance(currentTask.position) < dist(5) && !eerste->isMoving())
 						{
 							logx("doMicro zergling ", eerste, " dichtbij task, loop random\n");
 							int x = eerste->getPosition().x();
@@ -613,7 +656,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							logx("doMicro zergling ", eerste, " onder swarm, attack enemy\n"); // wat als geen enemy? null
+							logx("doMicro zergling ", eerste, " onder swarm, attack enemy\n"); // wat als geen enemy? nullpointer!
 							(**it).attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10.00), 1)));
 						}
 					}
@@ -627,35 +670,28 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							{
 								logx("doMicro zergling ", eerste, " enemy in de buurt\n");
 								BWAPI::Unit* nearest = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10.00), 1).not(isBuilding).not(isWorker));
-								if(true) // if between nearest ground enemy && UG geen wall bevindt (aka kan er naar toe bewegen enzo), een check voor wall vraagt om watvoor gebouw het is en of ernaast een cliff/gebouw bevindt. Wat ook kan is dat we het gewoon altijd wegbewege en juist mutalisks/hydra korte mette mee laten maken.
+								if(canAttackGround(enemiesInRange(eerste->getPosition(), dist(6.00), 2)))
 								{
-									if(canAttackGround(enemiesInRange(eerste->getPosition(), dist(6.00), 2)))
-									{
-										logx("doMicro zergling ", eerste, " air enemy in de buurt, moveaway\n");
-										moveAway(**it);
-									}
-									else
-									{
-										logx("doMicro zergling ", eerste, " geen air enemy\n");
-										BWAPI::Unit* enemy = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10.00), 1));
-										UnitGroup enemyUG = enemiesInRange(enemy->getPosition(), dist(6.00), 1);
-										BWAPI::Position center = enemyUG.getCenter();
-										BWAPI::Position eigencenter = (**it).getCenter();
-										if(enemyUG.size() > 0 && center.getDistance(eigencenter) < dist(3.00))
-										{
-											logx("doMicro zergling ", eerste, " attackMove center\n");
-											(*it)->attackMove(center);
-										}
-										else
-										{
-											logx("doMicro zergling ", eerste, " naar enemy position\n");
-											(*it)->rightClick(enemy->getPosition());
-										}
-									}
+									logx("doMicro zergling ", eerste, " air enemy in de buurt, moveaway\n");
+									moveAway(**it);
 								}
 								else
 								{
-									moveAway(**it);
+									logx("doMicro zergling ", eerste, " geen air enemy\n");
+									BWAPI::Unit* enemy = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10.00), 1));
+									UnitGroup enemyUG = enemiesInRange(enemy->getPosition(), dist(6.00), 1);
+									BWAPI::Position center = enemyUG.getCenter();
+									BWAPI::Position eigencenter = (**it).getCenter();
+									if(enemyUG.size() > 0 && center.getDistance(eigencenter) < dist(3.00))
+									{
+										logx("doMicro zergling ", eerste, " attackMove center\n");
+										(*it)->attackMove(center);
+									}
+									else
+									{
+										logx("doMicro zergling ", eerste, " naar enemy position\n");
+										(*it)->rightClick(enemy->getPosition());
+									}
 								}
 							}
 							else
@@ -690,8 +726,16 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										logx("doMicro zergling ", eerste, " move naar task\n");
-										(*it)->rightClick(this->tm->findTaskWithUnit(eerste).position);
+										if (tooSplitUp)
+										{
+											logx("doMicro zergling ", eerste, " breng zerg samen\n");
+											(*it)->rightClick((*it)->getCenter());
+										}
+										else
+										{
+											logx("doMicro zergling ", eerste, " move naar task\n");
+											(*it)->rightClick(this->tm->findTaskWithUnit(eerste).position);
+										}
 									}
 								}
 							}
@@ -737,8 +781,16 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										logx("doMicro zergling ", eerste, " move naar task\n");
-										(*it)->rightClick(this->tm->findTaskWithUnit(eerste).position);
+										if (tooSplitUp)
+										{
+											logx("doMicro zergling ", eerste, " breng zerg samen\n");
+											(*it)->rightClick((*it)->getCenter());
+										}
+										else
+										{
+											logx("doMicro zergling ", eerste, " move naar task\n");
+											(*it)->rightClick(this->tm->findTaskWithUnit(eerste).position);
+										}
 									}
 								}
 							}
@@ -1220,41 +1272,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							{
 								logx("doMicro drone ", (*unitit), " harvestcheck\n");
 								UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
-								UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringGas); // has Order gather gas moet er nog bij of juist ipv
-								UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
-								if (gasDrones.size() < extractors.size()*3)
+								if (mineralDrones.size()<5)
 								{
-									if (mineralDrones.size()<5)
-									{
-										if (mineralDrones.size()<3 || gasDrones.size() >= extractors.size()*2)
-										{
-											mineWhere(*unitit);
-										}
-										else
-										{
-											gasWhere(*unitit);
-										}
-									}
-									else
-									{
-										gasWhere(*unitit);
-									}
+									mineWhere(*unitit);
 								}
 								else
 								{
-									if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
-									{
-										if ((*unitit)->isCarryingGas())
-										{
-											moveToNearestBase(*unitit);
-										}
-										else
-										{
-											mineWhere(*unitit);
-										}
-										// return de gas terug enzo, rechtermuisklik op nearest hatchery
-										// mogelijke probleem hierbij is dat ze allemaal teruggaan, als carryinggas == returngas/gatheringGas
-									}
+									gatherWhere(*unitit);
 								}
 								logx("doMicro drone ", (*unitit), " harvestdone\n");							
 							}
@@ -1286,45 +1310,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					{
 						logx("doMicro drone ", (*unitit), " harvestcheckidle\n");
 						UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
-						UnitGroup gasDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringGas); // has Order gather gas moet er nog bij of juist ipv
-						UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
-						if (gasDrones.size() < extractors.size()*3)
+						if (mineralDrones.size()<5)
 						{
-							if (mineralDrones.size()<5)
-							{
-								if (mineralDrones.size()<3 || gasDrones.size() >= extractors.size()*2)
-								{
-									mineWhere(*unitit);
-								}
-								else
-								{
-									gasWhere(*unitit);
-								}
-							}
-							else
-							{
-								gasWhere(*unitit);
-							}
+							mineWhere(*unitit);
 						}
 						else
 						{
-							if (gasDrones.size() > extractors.size()*3) // teveel gas enzo
-							{
-								if ((*unitit)->isCarryingGas())
-								{
-									moveToNearestBase(*unitit);
-								}
-								else
-								{
-									mineWhere(*unitit);
-								}
-								// return de gas terug enzo, rechtermuisklik op nearest hatchery
-								// mogelijke probleem hierbij is dat ze allemaal teruggaan, als carryinggas == returngas/gatheringGas
-							}
-							else
-							{
-								mineWhere(*unitit);
-							}
+							gatherWhere(*unitit);
 						}
 						logx("doMicro drone ", (*unitit), " harvestdonewasidle\n");	
 					}
@@ -1491,12 +1483,20 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 
 void MicroManager::moveToNearestBase(BWAPI::Unit* unit)
 {
-	unit->rightClick(hc->getNearestHatchery(unit->getPosition())->getPosition());
+	Unit nearest = hc->getNearestHatchery(unit->getPosition())->getPosition();
+	if (unit->getPosition().getDistance(nearest.getPosition()) > 5) // voorkomt dat ze buggen
+	{
+		unit->rightClick(nearest);
+	}
 }
 
 void MicroManager::moveToNearestBase(std::set<BWAPI::Unit*> units)
 {
-	UnitGroup::getUnitGroup(units).rightClick(hc->getNearestHatchery((*units.begin())->getPosition())->getPosition());
+	Unit nearest = hc->getNearestHatchery((*units.getCenter())->getPosition())->getPosition();
+	if ((*units.getCenter())->getPosition().getDistance(nearest.getPosition()) > 5)
+	{
+		UnitGroup::getUnitGroup(units).rightClick(nearest);
+	}
 }
 
 bool MicroManager::isUnderDarkSwarm(BWAPI::Unit* unit)

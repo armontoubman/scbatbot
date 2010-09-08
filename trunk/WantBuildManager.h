@@ -1,10 +1,12 @@
 #pragma once
 #include <BWAPI.h>
+#include <UnitGroup.h>
 #include "BuildList.h"
 #include "EnemyUnitDataManager.h"
 #include "BuildOrderManager.h"
 #include "BaseManager.h"
 #include "HighCommand.h"
+#include "MicroManager.h"
 class WantBuildManager
 {
 	friend class HighCommand;
@@ -49,8 +51,8 @@ public:
 
 	bool photonCannonNearBase();
 	int countEggsMorphingInto(BWAPI::UnitType unittype);
+	int dronesRequiredAll();
 	UnitGroup getHatcheriesWithMinerals();
-	UnitGroup getUnusedMineralsNearHatcheries();
 	BWTA::BaseLocation* getNaturalExpansion();
 
 	bool requirementsSatisfied(BWAPI::UnitType unittype);
