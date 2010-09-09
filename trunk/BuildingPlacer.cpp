@@ -18,6 +18,10 @@ bool BuildingPlacer::canBuildHere(BWAPI::TilePosition position, BWAPI::UnitType 
 }
 bool BuildingPlacer::canBuildHereWithSpace(BWAPI::TilePosition position, BWAPI::UnitType type) const
 {
+  return canBuildHereWithSpace(position,type,this->buildDistance);
+}
+bool BuildingPlacer::canBuildHereWithSpace(BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const
+{
   //returns true if we can build this type of unit here with the specified amount of space.
   //space value is stored in this->buildDistance.
 
@@ -36,15 +40,15 @@ bool BuildingPlacer::canBuildHereWithSpace(BWAPI::TilePosition position, BWAPI::
   {
     width+=2;
   }
-  int startx = position.x() - buildDistance;
-  if (startx<0) startx=0;
-  int starty = position.y() - buildDistance;
-  if (starty<0) starty=0;
-  int endx = position.x() + width + buildDistance;
-  if (endx>BWAPI::Broodwar->mapWidth()) endx=BWAPI::Broodwar->mapWidth();
+  int startx = position.x() - buildDist;
+  if (startx<0) return false;
+  int starty = position.y() - buildDist;
+  if (starty<0) return false;
+  int endx = position.x() + width + buildDist;
+  if (endx>BWAPI::Broodwar->mapWidth()) return false;
   if (endx<position.x() + width) return false;
-  int endy = position.y() + height + buildDistance;
-  if (endy>BWAPI::Broodwar->mapHeight()) endy=BWAPI::Broodwar->mapHeight();
+  int endy = position.y() + height + buildDist;
+  if (endy>BWAPI::Broodwar->mapHeight()) return false;
 
   for(int x = startx; x < endx; x++)
     for(int y = starty; y < endy; y++)
@@ -90,6 +94,11 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocation(BWAPI::UnitType type) const
 
 BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(BWAPI::TilePosition position, BWAPI::UnitType type) const
 {
+  return getBuildLocationNear(position, type,this->buildDistance);
+}
+
+BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const
+{
   //returns a valid build location near the specified tile position.
   //searches outward in a spiral.
   int x      = position.x();
@@ -103,7 +112,7 @@ BWAPI::TilePosition BuildingPlacer::getBuildLocationNear(BWAPI::TilePosition pos
   {
     //if we can build here, return this tile position
     if (x >= 0 && x < BWAPI::Broodwar->mapWidth() && y >= 0 && y < BWAPI::Broodwar->mapHeight())
-      if (this->canBuildHereWithSpace(BWAPI::TilePosition(x, y), type))
+      if (this->canBuildHereWithSpace(BWAPI::TilePosition(x, y), type, buildDist))
         return BWAPI::TilePosition(x, y);
 
     //otherwise, move to another position

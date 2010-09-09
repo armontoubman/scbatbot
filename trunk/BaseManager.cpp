@@ -4,6 +4,8 @@
 BaseManager::BaseManager()
 {
   this->builder = NULL;
+  this->RefineryNeeded  = 1;
+  this->refineryBuildPriority = 0;
 }
 void BaseManager::setBuildOrderManager(BuildOrderManager* builder)
 {
@@ -42,10 +44,51 @@ void BaseManager::update()
         }
       }
     }
+
+    //Set Refinerys
+    if (!(*b)->isActiveGas() && (*b)->hasGas())
+    {
+      if ((*b)->getRefinery() == NULL)
+      {
+        std::set<BWAPI::Unit*> baseGeysers = (*b)->getBaseLocation()->getGeysers();
+
+        BWAPI::TilePosition geyserLocation;
+
+        //cycle through geysers & get tile location
+        for(std::set<BWAPI::Unit*>::iterator bg = baseGeysers.begin(); bg != baseGeysers.end(); bg++)
+        {
+          geyserLocation = (*bg)->getTilePosition();
+        }
+
+        //check for refinery already on geyser
+        std::set<BWAPI::Unit*> unitsOnGeyser = BWAPI::Broodwar->unitsOnTile(geyserLocation.x(),geyserLocation.y());
+        
+        for(std::set<BWAPI::Unit*>::iterator u = unitsOnGeyser.begin(); u != unitsOnGeyser.end(); u++)
+        {
+          if ((*u)->getPlayer() == BWAPI::Broodwar->self() && (*u)->getType().isRefinery())
+          {
+            (*b)->setRefinery(*u);
+            break;
+          }
+        }
+      }
+
+      if ((*b)->getRefinery() != NULL)
+      {
+        if ((*b)->getRefinery()->exists()==false)
+          (*b)->setResourceDepot(NULL);
+        else
+        {
+          if ((*b)->getRefinery()->isCompleted() || (*b)->getRefinery()->getRemainingBuildTime() < 250)
+            (*b)->setActiveGas(true);
+        }
+      }
+    }
   }
 
   //check to see if any new base locations need to be added
   for(std::set<BWTA::BaseLocation*>::const_iterator bl = BWTA::getBaseLocations().begin(); bl != BWTA::getBaseLocations().end(); bl++)
+  {
     if (location2base.find(*bl) == location2base.end())
     {
       BWAPI::TilePosition tile = (*bl)->getTilePosition();
@@ -54,6 +97,48 @@ void BaseManager::update()
         if ((*u)->getPlayer() == BWAPI::Broodwar->self() && (*u)->getType().isResourceDepot())
           addBase(*bl);
     }
+  }
+
+  if(BWAPI::Broodwar->getFrameCount() % 500 == 0 && BWAPI::Broodwar->getFrameCount() >= 3000)
+    updateRefineries();
+
+}
+
+
+void BaseManager::updateRefineries()
+{
+    //if refinerys needed, build ONE refinery.
+    if (this->isRefineryNeeded())
+    {
+      std::set<Base*> gasBases = this->getAllBasesWithGas();
+
+      for(std::set<Base*>::iterator b = gasBases.begin(); b != gasBases.end(); b++)
+      {
+        BWTA::BaseLocation* location = (*b)->getBaseLocation();
+        if (!this->hasRefinery(location))
+        {
+           this->builder->buildAdditional(1,BWAPI::Broodwar->self()->getRace().getRefinery(),refineryBuildPriority,(*b)->getBaseLocation()->getTilePosition());
+           break;
+        }
+      }
+    }
+
+
+}
+
+bool BaseManager::isRefineryNeeded()
+{
+  return (this->RefineryNeeded > this->builder->getPlannedCount(BWAPI::Broodwar->self()->getRace().getRefinery()));
+}
+
+void BaseManager::setRefineryBuildPriority(int priority)
+{
+  this->refineryBuildPriority = priority;
+}
+
+int BaseManager::getRefineryBuildPriority()
+{
+  return this->refineryBuildPriority;
 }
 
 void BaseManager::addBase(BWTA::BaseLocation* location)
@@ -62,6 +147,13 @@ void BaseManager::addBase(BWTA::BaseLocation* location)
   allBases.insert(newBase);
   this->location2base[location] = newBase;
   this->borderManager->addMyBase(location);
+}
+void BaseManager::removeBase(BWTA::BaseLocation* location)
+{
+  std::map<BWTA::BaseLocation*,Base*>::iterator removebase;
+
+  removebase = this->location2base.find(location);
+  this->location2base.erase(removebase);
 }
 Base* BaseManager::getBase(BWTA::BaseLocation* location)
 {
@@ -97,6 +189,14 @@ void BaseManager::expand(BWTA::BaseLocation* location, int priority)
     return;
   addBase(location);
   this->builder->buildAdditional(1,BWAPI::Broodwar->self()->getRace().getCenter(),priority,location->getTilePosition());
+
+  if(!(location->isMineralOnly()))  
+  {
+    this->RefineryNeeded+=1;
+
+    if (!(this->hasRefinery(location)))
+      this->builder->buildAdditional(1,BWAPI::Broodwar->self()->getRace().getRefinery(),priority,location->getTilePosition());
+  }
 }
 
 
@@ -115,6 +215,19 @@ std::set<Base*> BaseManager::getAllBases() const
     allBases.insert(*b);
   return allBases;
 }
+
+std::set<Base*> BaseManager::getAllBasesWithGas()
+{
+  std::set<Base*> allBasesWithGas;
+
+  for(std::set<Base*>::iterator b = this->allBases.begin(); b != this->allBases.end(); b++)
+    if ((*b)->hasGas())
+    {
+      allBasesWithGas.insert(*b);
+    }
+  return allBasesWithGas;
+}
+
 std::string BaseManager::getName()
 {
   return "Base Manager";
@@ -128,11 +241,57 @@ void BaseManager::onRemoveUnit(BWAPI::Unit* unit)
       if (unit->isCompleted())
       {
         this->borderManager->removeMyBase((*b)->getBaseLocation());
+        
+        BWTA::BaseLocation* blocation  = (*b)->getBaseLocation();
+        removeBase(blocation);
         allBases.erase(b);
       }
       else
         (*b)->setResourceDepot(NULL);
       break;
     }
+    else if((*b)->getRefinery() == unit)
+    {
+      (*b)->setRefinery(NULL);
+      (*b)->setActiveGas(false);
+      break;
+    }
   }
+}
+
+
+bool BaseManager::hasRefinery(BWTA::BaseLocation* location)
+{
+  bool refinery = false;
+
+  //if base has gas
+  if(!(location->isMineralOnly()))
+  {
+    std::set<BWAPI::Unit*> basegeysers = location->getGeysers();
+
+    BWAPI::TilePosition geyserlocation;
+
+    //cycle through geysers & get tile location
+    for(std::set<BWAPI::Unit*>::iterator bg = basegeysers.begin(); bg != basegeysers.end(); bg++)
+    {
+      geyserlocation = (*bg)->getInitialTilePosition();
+    }
+     
+    //check for refinery already on geyser
+
+    //get units on geyser
+    std::set<BWAPI::Unit*> unitsOnGeyser = BWAPI::Broodwar->unitsOnTile(geyserlocation.x(),geyserlocation.y());
+      
+    //cycle through units on geyser
+    for(std::set<BWAPI::Unit*>::iterator u = unitsOnGeyser.begin(); u != unitsOnGeyser.end(); u++)
+    {
+      //if unit is a refinery
+      if ((*u)->getType().isRefinery())
+      {
+        refinery = true;
+      }
+    }
+  }
+  
+  return refinery;
 }

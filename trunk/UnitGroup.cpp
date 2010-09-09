@@ -755,9 +755,6 @@ Unit* getUnit(Unit* u,FilterAttributeUnit a)
     case GetBuildUnit:
       return u->getBuildUnit();
     break;
-    case GetChild:
-      return u->getChild();
-    break;
     case GetTransport:
       return u->getTransport();
     break;
@@ -773,47 +770,25 @@ Unit* getUnit(Unit* u,FilterAttributeUnit a)
 UnitGroup UnitGroup::operator+(const UnitGroup& other) const
 {
   UnitGroup result=*this;
-  for(set<Unit*>::const_iterator i=other.begin();i!=other.end();i++)
-  {
-    result.insert(*i);
-  }
+  result+=other;
   return result;
 }
 UnitGroup UnitGroup::operator*(const UnitGroup& other) const
 {
   UnitGroup result=*this;
-  set<Unit*>::iterator i2;
-  for(set<Unit*>::iterator i=result.begin();i!=result.end();i=i2)
-  {
-    i2=i;
-    i2++;
-    if (other.find(*i)==other.end())
-      result.erase(*i);
-  }
+  result*=other;
   return result;
 }
 UnitGroup UnitGroup::operator^(const UnitGroup& other) const
 {
   UnitGroup result=*this;
-  set<Unit*>::const_iterator i2;
-  for(set<Unit*>::const_iterator i=other.begin();i!=other.end();i=i2)
-  {
-    i2=i;
-    i2++;
-    if (result.find(*i)==result.end())
-      result.insert(*i);
-    else
-      result.erase(*i);
-  }
+  result^=other;
   return result;
 }
 UnitGroup UnitGroup::operator-(const UnitGroup& other) const
 {
   UnitGroup result=*this;
-  for(set<Unit*>::const_iterator i=other.begin();i!=other.end();i++)
-  {
-    result.erase(*i);
-  }
+  result-=other;
   return result;
 }
 
@@ -1270,32 +1245,6 @@ UnitGroup UnitGroup::not(FilterAttributeTilePosition a, BWAPI::TilePosition posi
   return result;
 }
 
-Position UnitGroup::getCenter() const
-{
-  if (this->empty())
-    return Positions::None;
-  if (this->size()==1)
-    return ((*this->begin())->getPosition());
-  int count=0;
-  double x=0;
-  double y=0;
-  for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
-  {
-    Position p((*i)->getPosition());
-    if (p!=Positions::None && p!=Positions::Unknown)
-    {
-      count++;
-      x+=p.x();
-      y+=p.y();
-    }
-  }
-  if (count==0)
-  {
-    return Positions::None;
-  }
-  return Position((int)(x/count),(int)(y/count));
-}
-
 UnitGroup UnitGroup::inRadius(double radius,BWAPI::Position position) const
 {
   UnitGroup result;
@@ -1348,6 +1297,94 @@ UnitGroup UnitGroup::onlyNearestUnwalkablePolygon(BWTA::Polygon* polygon) const
   }
   return result;
 }
+
+UnitGroup& UnitGroup::operator+=(const UnitGroup& other)
+{
+  for(set<Unit*>::const_iterator i=other.begin();i!=other.end();i++)
+    this->insert(*i);
+  return *this;
+}
+UnitGroup& UnitGroup::operator*=(const UnitGroup& other)
+{
+  set<Unit*>::iterator i2;
+  for(set<Unit*>::iterator i=this->begin();i!=this->end();i=i2)
+  {
+    i2=i;
+    i2++;
+    if (!other.contains(*i))
+      this->erase(*i);
+  }
+  return *this;
+}
+UnitGroup& UnitGroup::operator^=(const UnitGroup& other)
+{
+  UnitGroup result=*this;
+  for(set<Unit*>::const_iterator i=other.begin();i!=other.end();i++)
+  {
+    if (this->contains(*i))
+      this->erase(*i);
+    else
+      this->insert(*i);
+  }
+  return *this;
+}
+UnitGroup& UnitGroup::operator-=(const UnitGroup& other)
+{
+  for(set<Unit*>::const_iterator i=other.begin();i!=other.end();i++)
+    this->erase(*i);
+  return *this;
+}
+
+BWAPI::Unit* UnitGroup::getNearest(BWAPI::Position position) const
+{
+  if (this->empty()) return NULL;
+  set<Unit*>::const_iterator i=this->begin();
+  Unit* result=*i;
+  double d=(*i)->getDistance(position);
+  i++;
+  for(;i!=this->end();i++)
+  {
+    double d2=(*i)->getDistance(position);
+    if (d2<d)
+    {
+      d=d2;
+      result=*i;
+    }
+  }
+  return result;
+}
+
+bool UnitGroup::contains(BWAPI::Unit* u) const
+{
+  return this->find(u)!=this->end();
+}
+
+Position UnitGroup::getCenter() const
+{
+  if (this->empty())
+    return Positions::None;
+  if (this->size()==1)
+    return ((*this->begin())->getPosition());
+  int count=0;
+  double x=0;
+  double y=0;
+  for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
+  {
+    Position p((*i)->getPosition());
+    if (p!=Positions::None && p!=Positions::Unknown)
+    {
+      count++;
+      x+=p.x();
+      y+=p.y();
+    }
+  }
+  if (count==0)
+  {
+    return Positions::None;
+  }
+  return Position((int)(x/count),(int)(y/count));
+}
+
 bool UnitGroup::attackMove(Position position) const
 {
   bool retval=true;

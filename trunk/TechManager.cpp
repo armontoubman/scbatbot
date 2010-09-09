@@ -72,8 +72,8 @@ void TechManager::update()
     {
       if (BWAPI::Broodwar->self()->hasResearched(i->second)) //if we have researched the given tech, we are done
       {
-        researchingUnits.erase(i);
         arbitrator->removeBid(this, i->first);
+        researchingUnits.erase(i);
       }
       else //if we haven't researched the given tech, we need to order this unit to research it
       {

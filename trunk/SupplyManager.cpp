@@ -5,6 +5,7 @@ SupplyManager::SupplyManager()
   this->buildManager      = NULL;
   this->buildOrderManager = NULL;
   this->lastFrameCheck    = 0;
+  this->seedPosition      = BWAPI::TilePositions::None;
 }
 
 void SupplyManager::setBuildManager(BuildManager* buildManager)
@@ -43,7 +44,7 @@ void SupplyManager::update()
     }
     if (getPlannedSupply() <= BWAPI::Broodwar->self()->supplyUsed() + productionCapacity)
     {
-      this->buildOrderManager->buildAdditional(1,BWAPI::Broodwar->self()->getRace().getSupplyProvider(),1000);
+      this->buildOrderManager->buildAdditional(1,BWAPI::Broodwar->self()->getRace().getSupplyProvider(),1000,seedPosition);
     }
   }
 }
@@ -95,4 +96,9 @@ int SupplyManager::getSupplyTime(int supplyCount) const
       return time;
   }
   return -1;
+}
+
+void SupplyManager::setSeedPosition(BWAPI::TilePosition p)
+{
+  this->seedPosition = p;
 }

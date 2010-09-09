@@ -2,8 +2,8 @@
 #include <BaseManager.h>
 #include <RectangleArray.h>
 #include <BuildOrderManager.h>
-#include "Util.h"
 #include <algorithm>
+#include "Util.h"
 using namespace BWAPI;
 using namespace std;
 using namespace Util;
@@ -141,7 +141,7 @@ void WorkerManager::rebalanceWorkers()
   currentWorkers.clear();
   resourceBase.clear();
   int remainingWorkers = this->workers.size();
-  int optimalWorkerCount = 0;
+  optimalWorkerCount = 0;
   
   // iterate over all the resources of each active base
   for(set<Base*>::iterator b = this->basesCache.begin(); b != this->basesCache.end(); b++)
@@ -167,6 +167,10 @@ void WorkerManager::rebalanceWorkers()
       optimalWorkerCount+=3;
       resourceBase[*g] = *b;
       desiredWorkerCount[*g]=0;
+
+      if(remainingWorkers < 4)//always save some workers for minerals
+        continue;
+
       if ((*g)->getType().isRefinery() && (*g)->getPlayer()==Broodwar->self() && (*g)->isCompleted())
       {
         for(int w=0;w<this->WorkersPerGas && remainingWorkers>0;w++)
@@ -314,6 +318,10 @@ double WorkerManager::getMineralRate() const
 double WorkerManager::getGasRate() const
 {
   return this->gasRate;
+}
+int WorkerManager::getOptimalWorkerCount() const
+{
+  return this->optimalWorkerCount;
 }
 void WorkerManager::enableAutoBuild()
 {
