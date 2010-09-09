@@ -152,16 +152,16 @@ void MorphManager::update()
       //if the unit is completed and is the right type, we are done
       if (i->first->getType()==i->second.type)
       {
-        morphingUnits.erase(i);
         arbitrator->removeBid(this, i->first);
         plannedCount[i->second.type]--;
         startedCount[i->second.type]--;
+        morphingUnits.erase(i);
       }
       else //if the unit is not the right type, tell it to morph into the right type
         if (BWAPI::Broodwar->canMake(NULL,i->second.type))
           i->first->morph(i->second.type);
     }
-    if (i->first->isMorphing())
+    else if (i->first->isMorphing())
     {
       //if the unit is morphing, note that we have started it in the startedCount
       if (!i->second.started)

@@ -194,6 +194,8 @@ void ConstructionManager::update()
                     this->placer->freeTiles(b->tilePosition, 4,3);
                     this->placer->freeTiles(b->tilePosition+BWAPI::TilePosition(4,1), 2,2);
                     b->tilePosition=placer->getBuildLocationNear(b->tilePosition,b->type.whatBuilds().first);
+                    if (b->tilePosition == BWAPI::TilePositions::None)
+                      b->tilePosition=placer->getBuildLocationNear(b->tilePosition,b->type.whatBuilds().first,0);
                     this->placer->reserveTiles(b->tilePosition, 4,3);
                     this->placer->reserveTiles(b->tilePosition+BWAPI::TilePosition(4,1), 2,2);
                   }

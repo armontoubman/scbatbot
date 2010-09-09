@@ -84,8 +84,8 @@ void UpgradeManager::update()
     {
       if (BWAPI::Broodwar->self()->getUpgradeLevel(i->second.type)>=i->second.level) //if we have reached the desired upgrade level, we are done
       {
-        upgradingUnits.erase(i);
         arbitrator->removeBid(this, i->first);
+        upgradingUnits.erase(i);
       }
       else //otherwise, we need to tell this unit to upgrade
       {

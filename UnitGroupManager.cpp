@@ -11,7 +11,7 @@ UnitGroupManager::UnitGroupManager()
 {
   for(std::set<BWAPI::Unit*>::iterator i=BWAPI::Broodwar->getAllUnits().begin();i!=BWAPI::Broodwar->getAllUnits().end();i++)
   {
-    onUnitShow(*i);
+    onUnitDiscover(*i);
   }
   neutral=NULL;
   for(std::set<BWAPI::Player*>::iterator i=BWAPI::Broodwar->getPlayers().begin();i!=BWAPI::Broodwar->getPlayers().end();i++)
@@ -20,7 +20,7 @@ UnitGroupManager::UnitGroupManager()
       neutral=*i;
   }
 }
-void UnitGroupManager::onUnitShow(BWAPI::Unit* unit)
+void UnitGroupManager::onUnitDiscover(BWAPI::Unit* unit)
 {
   unitOwner[unit]=unit->getPlayer();
   unitType[unit]=unit->getType();
@@ -28,7 +28,7 @@ void UnitGroupManager::onUnitShow(BWAPI::Unit* unit)
   allOwnedUnits[unit->getPlayer()].insert(unit);
   allUnits.insert(unit);
 }
-void UnitGroupManager::onUnitHide(BWAPI::Unit* unit)
+void UnitGroupManager::onUnitEvade(BWAPI::Unit* unit)
 {
   unitOwner[unit]=unit->getPlayer();
   unitType[unit]=unit->getType();

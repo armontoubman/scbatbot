@@ -1,44 +1,63 @@
 #include <InformationManager.h>
 #include "Util.h"
+using namespace std;
+using namespace BWAPI;
 InformationManager::InformationManager()
 {
-  buildTime[BWAPI::Broodwar->enemy()->getRace().getCenter()]=0;
-  buildTime[BWAPI::Broodwar->enemy()->getRace().getWorker()]=0;
-  if (BWAPI::Broodwar->enemy()->getRace()==BWAPI::Races::Zerg)
+  buildTime[Broodwar->enemy()->getRace().getCenter()]=0;
+  buildTime[Broodwar->enemy()->getRace().getWorker()]=0;
+  if (Broodwar->enemy()->getRace()==Races::Zerg)
   {
-    buildTime[BWAPI::UnitTypes::Zerg_Larva]=0;
-    buildTime[BWAPI::UnitTypes::Zerg_Overlord]=0;
+    buildTime[UnitTypes::Zerg_Larva]=0;
+    buildTime[UnitTypes::Zerg_Overlord]=0;
+  }
+  startLocationCouldContainEnemy = BWTA::getStartLocations();
+  startLocationCouldContainEnemy.erase(BWTA::getStartLocation(Broodwar->self()));
+  scoutedAnEnemyBase = false;
+  if (startLocationCouldContainEnemy.size()==1)
+  {
+    enemyBases.insert(*startLocationCouldContainEnemy.begin());
+    scoutedAnEnemyBase = true;
   }
 }
-void InformationManager::onUnitShow(BWAPI::Unit* unit)
+void InformationManager::onUnitDiscover(Unit* unit)
 {
-  savedData[unit].exists=true;
-  if (!BWAPI::Broodwar->self()->isEnemy(unit->getPlayer())) return;
-  int time=BWAPI::Broodwar->getFrameCount();
-  BWAPI::UnitType type=unit->getType();
+  savedData[unit].exists = true;
+  int test2=0;
+  if (!Broodwar->self()->isEnemy(unit->getPlayer())) return;
+  int time=Broodwar->getFrameCount();
+  UnitType type=unit->getType();
   updateBuildTime(type,time-type.buildTime());
+  if (scoutedAnEnemyBase == false && unit->getType().isBuilding())
+  {
+    BWTA::Region* r=BWTA::getRegion(unit->getTilePosition());
+    if (r->getBaseLocations().size()==1)
+    {
+      BWTA::BaseLocation* b = *(r->getBaseLocations().begin());
+      enemyBases.insert(b);
+      scoutedAnEnemyBase = true;
+    }
+  }
   if (unit->getType().isResourceDepot())
   {
     BWTA::BaseLocation* b=BWTA::getNearestBaseLocation(unit->getTilePosition());
     enemyBases.insert(b);
     enemyBaseCenters[b]=unit;
+    scoutedAnEnemyBase = true;
   }
 }
-void InformationManager::onUnitHide(BWAPI::Unit* unit)
+void InformationManager::onUnitEvade(Unit* unit)
 {
   savedData[unit].player=unit->getPlayer();
   savedData[unit].type=unit->getType();
   savedData[unit].position=unit->getPosition();
-  savedData[unit].lastSeenTime=BWAPI::Broodwar->getFrameCount();
+  savedData[unit].lastSeenTime=Broodwar->getFrameCount();
 }
-void InformationManager::onUnitDestroy(BWAPI::Unit* unit)
+void InformationManager::onUnitDestroy(Unit* unit)
 {
+  this->onUnitEvade(unit);
   savedData[unit].exists=false;
-  savedData[unit].player=unit->getPlayer();
-  savedData[unit].type=unit->getType();
-  savedData[unit].position=unit->getPosition();
-  savedData[unit].lastSeenTime=BWAPI::Broodwar->getFrameCount();
-  if (!BWAPI::Broodwar->self()->isEnemy(unit->getPlayer())) return;
+  if (!Broodwar->self()->isEnemy(unit->getPlayer())) return;
   if (unit->getType().isResourceDepot())
   {
     BWTA::BaseLocation* b=BWTA::getNearestBaseLocation(unit->getTilePosition());
@@ -50,81 +69,91 @@ void InformationManager::onUnitDestroy(BWAPI::Unit* unit)
   }
 }
 
-BWAPI::Player* InformationManager::getPlayer(BWAPI::Unit* unit) const
+Player* InformationManager::getPlayer(Unit* unit) const
 {
   if (unit->exists())
     return unit->getPlayer();
-  std::map<BWAPI::Unit*,UnitData>::const_iterator i=savedData.find(unit);
+  map<Unit*,UnitData>::const_iterator i=savedData.find(unit);
   if (i==savedData.end())
     return NULL;
   return (*i).second.player;
 }
 
-BWAPI::UnitType InformationManager::getType(BWAPI::Unit* unit) const
+UnitType InformationManager::getType(Unit* unit) const
 {
   if (unit->exists())
     return unit->getType();
-  std::map<BWAPI::Unit*,UnitData>::const_iterator i=savedData.find(unit);
+  map<Unit*,UnitData>::const_iterator i=savedData.find(unit);
   if (i==savedData.end())
-    return BWAPI::UnitTypes::None;
+    return UnitTypes::None;
   return (*i).second.type;
 }
 
-BWAPI::Position InformationManager::getLastPosition(BWAPI::Unit* unit) const
+Position InformationManager::getLastPosition(Unit* unit) const
 {
   if (unit->exists())
     return unit->getPosition();
-  std::map<BWAPI::Unit*,UnitData>::const_iterator i=savedData.find(unit);
+  map<Unit*,UnitData>::const_iterator i=savedData.find(unit);
   if (i==savedData.end())
-    return BWAPI::Positions::None;
+    return Positions::None;
   return (*i).second.position;
 }
 
-int InformationManager::getLastSeenTime(BWAPI::Unit* unit) const
+int InformationManager::getLastSeenTime(Unit* unit) const
 {
   if (unit->exists())
-    return BWAPI::Broodwar->getFrameCount();
-  std::map<BWAPI::Unit*,UnitData>::const_iterator i=savedData.find(unit);
+    return Broodwar->getFrameCount();
+  map<Unit*,UnitData>::const_iterator i=savedData.find(unit);
   if (i==savedData.end())
     return -1;
   return (*i).second.lastSeenTime;
 }
 
-bool InformationManager::exists(BWAPI::Unit* unit) const
+bool InformationManager::exists(Unit* unit) const
 {
   if (unit->exists())
     return true;
-  std::map<BWAPI::Unit*,UnitData>::const_iterator i=savedData.find(unit);
+  map<Unit*,UnitData>::const_iterator i=savedData.find(unit);
   if (i==savedData.end())
     return false;
   return (*i).second.exists;
 }
 
-bool InformationManager::enemyHasBuilt(BWAPI::UnitType type) const
+bool InformationManager::enemyHasBuilt(UnitType type) const
 {
   return (buildTime.find(type)!=buildTime.end());
 }
 
-int InformationManager::getBuildTime(BWAPI::UnitType type) const
+int InformationManager::getBuildTime(UnitType type) const
 {
-  std::map<BWAPI::UnitType, int>::const_iterator i=buildTime.find(type);
+  map<UnitType, int>::const_iterator i=buildTime.find(type);
   if (i==buildTime.end())
     return -1;
   return i->second;
 }
 
-const std::set<BWTA::BaseLocation*>& InformationManager::getEnemyBases() const
+const set<BWTA::BaseLocation*>& InformationManager::getEnemyBases() const
 {
   return this->enemyBases;
 }
 
-void InformationManager::updateBuildTime(BWAPI::UnitType type, int time)
+void InformationManager::setBaseEmpty(BWTA::BaseLocation* base)
 {
-  std::map<BWAPI::UnitType, int>::iterator i=buildTime.find(type);
+  this->startLocationCouldContainEnemy.erase(base);
+  if (startLocationCouldContainEnemy.size()==1)
+  {
+    enemyBases.insert(*startLocationCouldContainEnemy.begin());
+    scoutedAnEnemyBase = true;
+  }
+}
+
+void InformationManager::updateBuildTime(UnitType type, int time)
+{
+  map<UnitType, int>::iterator i=buildTime.find(type);
   if (i!=buildTime.end() && (i->second<=time || i->second==0)) return;
   buildTime[type]=time;
   if (time<0) return;
-  for(std::map< BWAPI::UnitType,int>::const_iterator i=type.requiredUnits().begin();i!=type.requiredUnits().end();i++)
+  for(map< UnitType,int>::const_iterator i=type.requiredUnits().begin();i!=type.requiredUnits().end();i++)
   {
     updateBuildTime(i->first,time-i->first.buildTime());
   }
@@ -132,7 +161,9 @@ void InformationManager::updateBuildTime(BWAPI::UnitType type, int time)
 
 InformationManager::UnitData::UnitData()
 {
-  position=BWAPI::Positions::Unknown;
-  type=BWAPI::UnitTypes::Unknown;
-  player=NULL;
+  position     = Positions::Unknown;
+  type         = UnitTypes::Unknown;
+  player       = NULL;
+  lastSeenTime = -1;
+  exists       = false;
 }

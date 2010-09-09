@@ -124,7 +124,7 @@ int BuildOrderManager::nextFreeTime(const MetaUnit* unit, UnitType t)
       return -1;
     if (ntime>time)
       time=ntime;
-    if (i->first.isAddon() && !unit->hasAddon())
+    if (i->first.isAddon() && i->first.whatBuilds().first==unit->getType() && !unit->hasAddon())
       return -1;
   }
   return time;
@@ -686,9 +686,7 @@ void BuildOrderManager::updatePlan()
             {
               UnitType refinery=Broodwar->self()->getRace().getRefinery();
               if (this->getPlannedCount(refinery)==0)
-              {
                 this->build(1,refinery,l->first);
-              }
             }
           }
         }
@@ -714,6 +712,11 @@ void BuildOrderManager::build(int count, BWAPI::UnitType t, int priority, BWAPI:
   if (t == BWAPI::UnitTypes::None || t == BWAPI::UnitTypes::Unknown) return;
   if (seedPosition == BWAPI::TilePositions::None || seedPosition == BWAPI::TilePositions::Unknown)
     seedPosition=BWAPI::Broodwar->self()->getStartLocation();
+  if (t==UnitTypes::Protoss_Pylon && this->getPlannedCount(t)==0)
+  {
+    if (!this->buildManager->getBuildingPlacer()->canBuildHereWithSpace(seedPosition, t, 3))
+      seedPosition = this->buildManager->getBuildingPlacer()->getBuildLocationNear(seedPosition, t, 3);
+  }
   if (items[priority].units[t.whatBuilds().first].find(t)==items[priority].units[t.whatBuilds().first].end())
     items[priority].units[t.whatBuilds().first].insert(make_pair(t,UnitItem(t)));
   items[priority].units[t.whatBuilds().first][t].setNonAdditional(count,seedPosition);
@@ -839,6 +842,38 @@ int BuildOrderManager::getPlannedCount(BWAPI::UnitType t)
   //sum all the remaining units for every priority level
   for(map<int, PriorityLevel>::iterator p=items.begin();p!=items.end();p++)
   {
+    map<BWAPI::UnitType, map<BWAPI::UnitType, UnitItem > >* units=&(p->second.units);
+    map<BWAPI::UnitType, map<BWAPI::UnitType, UnitItem > >::iterator i=units->find(builder);
+
+    if (i!=units->end())
+    {
+      map<BWAPI::UnitType, UnitItem >* units2=&(i->second);
+      map<BWAPI::UnitType, UnitItem >::iterator j=units2->find(t);
+      if (j!=units2->end())
+      {
+        c+=j->second.getRemainingCount(c);
+      }
+    }
+  }
+  if (t==UnitTypes::Zerg_Hatchery)
+    c+=this->getPlannedCount(UnitTypes::Zerg_Lair);
+  if (t==UnitTypes::Zerg_Lair)
+    c+=this->getPlannedCount(UnitTypes::Zerg_Hive);
+  return c;
+}
+
+//returns the BuildOrderManager's planned count of units for this type
+int BuildOrderManager::getPlannedCount(BWAPI::UnitType t, int minPriority)
+{
+  //builder unit type
+  UnitType builder=t.whatBuilds().first;
+
+  int c=this->buildManager->getPlannedCount(t);
+
+  //sum all the remaining units for every priority level
+  for(map<int, PriorityLevel>::iterator p=items.begin();p!=items.end();p++)
+  {
+    if (p->first<minPriority) continue; //don't consider planned units below min priority
     map<BWAPI::UnitType, map<BWAPI::UnitType, UnitItem > >* units=&(p->second.units);
     map<BWAPI::UnitType, map<BWAPI::UnitType, UnitItem > >::iterator i=units->find(builder);
 
