@@ -22,7 +22,7 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->enemyUnitDataManager = new EnemyUnitDataManager(im);
 	this->eigenUnitGroupManager = new EigenUnitGroupManager(this, this->eigenUnitDataManager, this->taskManager);
 	this->taskManager = new TaskManager(this->eigenUnitGroupManager, this->enemyUnitDataManager);
-	this->wantBuildManager = new WantBuildManager(this->enemyUnitDataManager, bom, ba, this);
+	this->wantBuildManager = new WantBuildManager(this->enemyUnitDataManager, bom, ba, this, this->microManager);
 	this->microManager = new MicroManager(bom, this->enemyUnitDataManager, this->taskManager, this, this->eigenUnitDataManager, this->wantBuildManager);
 	this->thisAlgorithmBecomingSkynetCost = 999999999;
 	this->tick = 1;

@@ -35,7 +35,7 @@ public:
 	bool alliesCanAttack(BWAPI::Position p, UnitGroup ug);
 	void mineWhere(BWAPI::Unit* unit);
 	void gasWhere(BWAPI::Unit* unit);
-	void MicroManager::gatherWhere(BWAPI::Unit* unit)
+	void gatherWhere(BWAPI::Unit* unit);
 	void moveToNearestBase(BWAPI::Unit* unit);
 	void moveToNearestBase(std::set<BWAPI::Unit*> units);
 	bool isUnderDarkSwarm(BWAPI::Unit* unit);
@@ -43,7 +43,7 @@ public:
 	bool canAttackAir(std::set<BWAPI::Unit*> units);
 	bool canAttackGround(BWAPI::Unit* unit);
 	bool canAttackGround(std::set<BWAPI::Unit*> units);
-	bool MicroManager::tooSplitUp(double radius, UnitGroup* ug)
+	bool tooSplitUp(double radius, UnitGroup* ug);
 	int amountCanAttackAir(std::set<BWAPI::Unit*> units);
 	int amountCanAttackGround(std::set<BWAPI::Unit*> units);
 	double minimalDistanceToGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units);
@@ -52,10 +52,11 @@ public:
 	BWAPI::Unit* nearestNonBuildingEnemy(BWAPI::Unit* unit);
 	BWAPI::Unit* nearestSwarm(BWAPI::Unit* unit);
 	BWAPI::Unit* nearestEnemyNotUnderDarkSwarm(BWAPI::Unit* unit);
-	BWAPI::Position splitup(BWAPI::Unit* unit);
-	void MicroManager::splitUp(std::set<BWAPI::Unit*> units);
-	UnitGroup* MicroManager::inRadiusUnitGroup(double radius, UnitGroup* ug);
-	UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut);
+	BWAPI::Position splitUp(BWAPI::Unit* unit);
+	void splitUp(std::set<BWAPI::Unit*> units);
+	UnitGroup* inRadiusUnitGroup(double radius, UnitGroup* ug);
+	UnitGroup* inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut);
+	BWAPI::Position getCenterPositionFromEnemyMap(std::map<BWAPI::Unit*, EnemyUnitData> data);
 
 	void doMicro(std::set<UnitGroup*> listUG);
 
