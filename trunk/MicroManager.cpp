@@ -33,75 +33,14 @@ BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit, double radius)
 {
 	// huidige positie van de unit die gaat moven
 	BWAPI::Position current = unit->getPosition();
-	// aanliggende posities van de huidige posities
-	std::set<BWAPI::Position> mogelijkePosities = sanitizePositions(getAdjacentPositions(current));
-	// geen mogelijkheden? return huidige positie
-	if(mogelijkePosities.empty()) { return unit->getPosition(); }
-
-	// lijstje position->int om de scores bij te houden en daaruit de beste positie te kiezen
-	std::map<BWAPI::Position, int> telling;
+	
 	// alle enemies in de gekozen radius
-	UnitGroup enemies = this->eudm->getUG().inRadius(radius, unit->getPosition());
-
-	UnitGroup buildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding);
-
-	// enemies bekijken en scores toewijzen aan de mogelijke posities
-	// voor alle mogelijke posities
-	for(std::set<BWAPI::Position>::iterator it = mogelijkePosities.begin(); it != mogelijkePosities.end(); it++)
-	{
-		// aantal enemies waarvoor iets telt (of unit geraakt kan worden op deze positie)
-		int aantal = 0;
-
-		// voor alle enemies in de radius
-		for(std::set<BWAPI::Unit*>::iterator iten = enemies.begin(); iten != enemies.end(); iten++)
-		{
-			int range = 0;
-			// als de huidige unit een flyer is
-			if(unit->getType().isFlyer()) {
-				// range is de range van het airweapon van de enemy
-				range = (*iten)->getType().airWeapon().maxRange();
-			} else {
-				// anders van de groundweapon
-				range = (*iten)->getType().groundWeapon().maxRange();
-			}
-			// als deze positie tot een grotere afstand leidt dan de huidige afstand
-			if((*iten)->getDistance(*it) > (*iten)->getDistance(current))
-			{
-				// score van deze positie omhoog
-				aantal++;
-			}
-			// als de afstand van de enemy tot de positie die nu bekeken wordt buiten de range van zijn wapen valt
-			if((*iten)->getDistance(*it) > range)
-			{
-				// bonus
-				aantal++;
-			}
-
-			// bonuspunten voor positie richting nearest building
-			BWAPI::Unit* nearestbuilding = nearestUnit(unit->getPosition(), buildings);
-			if(unit->getDistance(nearestbuilding) > (*it).getDistance(nearestbuilding->getPosition()))
-			{
-				aantal++;
-			}
-		}
-
-		telling.insert(std::pair<BWAPI::Position, int>(BWAPI::Position(it->x(), it->y()), aantal));
-	}
-
-	// positie met hoogste aantal eruit vissen
-
-	int besteAantal = -1;
-	BWAPI::Position bestePositie = unit->getPosition();
-
-	for(std::map<BWAPI::Position, int>::iterator itlol = telling.begin(); itlol != telling.end(); itlol++)
-	{
-		if(itlol->second >= besteAantal)
-		{
-			besteAantal = itlol->second;
-			bestePositie = itlol->first;
-		}
-	}
-	return bestePositie;
+	BWAPI::Position enemiescenter = this->eudm->getUG().inRadius(radius, unit->getPosition()).getCenter();
+	
+	int newx = current.x() - (enemiescenter.x() - current.x());
+	int newy = current.y() - (enemiescenter.y() - current.y());
+	// mogelijk een verdere afstand als de onderlinge afstand klein is. Maar wellicht vuurt dit vaak genoeg.
+	return BWAPI::Position(newx, newy);
 }
 
 BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit)
@@ -114,6 +53,30 @@ void MicroManager::moveAway(std::set<BWAPI::Unit*> units)
 	for(std::set<BWAPI::Unit*>::iterator it=units.begin(); it!=units.end(); it++)
 	{
 		(*it)->rightClick(moveAway((*it)));
+	}
+}
+
+BWAPI::Position MicroManager::splitUp(BWAPI::Unit* unit)
+{
+	// huidige positie van de unit die gaat moven
+	BWAPI::Position current = unit->getPosition();
+	
+	// alle enemies in de gekozen radius
+	UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(4), current);
+	allies.erase(unit);
+	BWAPI::Position alliescenter = allies.getCenter()
+	
+	int newx = current.x() - (alliescenter.x() - current.x());
+	int newy = current.y() - (alliescenter.y() - current.y());
+	// mogelijk een verdere afstand als de onderlinge afstand klein is. Maar wellicht vuurt dit vaak genoeg.
+	return BWAPI::Position(newx, newy);
+}
+
+void MicroManager::splitUp(std::set<BWAPI::Unit*> units)
+{
+	for(std::set<BWAPI::Unit*>::iterator it=units.begin(); it!=units.end(); it++)
+	{
+		(*it)->rightClick(splitUp((*it)));
 	}
 }
 
@@ -1680,55 +1643,6 @@ BWAPI::Unit* MicroManager::nearestEnemyNotUnderDarkSwarm(BWAPI::Unit* unit)
 	}
 	UnitGroup notunderswarm = enemies - UnitGroup::getUnitGroup(underswarm);
 	return nearestUnit(unit->getPosition(), notunderswarm);
-}
-
-// stuitert
-BWAPI::Position MicroManager::splitup(BWAPI::Unit* unit)
-{
-	BWAPI::Position current = unit->getPosition();
-	std::set<BWAPI::Position> mogelijkePosities = sanitizePositions(getAdjacentPositions(current));
-	if(mogelijkePosities.empty()) { return unit->getPosition(); }
-	std::map<BWAPI::Position, int> telling;
-	UnitGroup enemies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unit->getType()).inRadius(dist(13), unit->getPosition());
-	if(enemies.size() == 0)
-	{
-		int x = current.x();
-		int y = current.y();
-		int factor = dist(20);
-		int newx = x + (((rand() % 30)-15)*factor);
-		int newy = y + (((rand() % 30)-15)*factor);
-		return BWAPI::Position(newx, newy);
-	}
-	// van set naar map
-	for(std::set<BWAPI::Position>::iterator it = mogelijkePosities.begin(); it != mogelijkePosities.end(); it++)
-	{
-		// aantal enemies waarvoor iets telt
-		int aantal = 0;
-
-		for(std::set<BWAPI::Unit*>::iterator iten = enemies.begin(); iten != enemies.end(); iten++)
-		{
-			if((*iten)->getDistance(*it) > (*iten)->getDistance(unit->getPosition()))
-			{
-				aantal++;
-			}
-		}
-
-		telling.insert(std::pair<BWAPI::Position, int>(BWAPI::Position(it->x(), it->y()), aantal));
-	}
-	// positie met hoogste aantal eruit vissen
-
-	int besteAantal = -1;
-	BWAPI::Position bestePositie = unit->getPosition();
-
-	for(std::map<BWAPI::Position, int>::iterator itlol = telling.begin(); itlol != telling.end(); itlol++)
-	{
-		if(itlol->second >= besteAantal)
-		{
-			besteAantal = itlol->second;
-			bestePositie = itlol->first;
-		}
-	}
-	return bestePositie;
 }
 
 std::string MicroManager::intToString(int i) {
