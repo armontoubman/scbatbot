@@ -1155,7 +1155,16 @@ void WantBuildManager::doLists()
 			}
 		}			
 		// reinforcements
-		if( nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0)
+		UnitGroup completedspires = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Spire);
+		bool atleastonecompletedspire = false;
+		for each(BWAPI::Unit* spire in completedspires)
+		{
+			if(spire->isCompleted())
+			{
+				atleastonecompletedspire = true;
+			}
+		}
+		if( nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 && atleastonecompletedspire)
 		{
 			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)<5) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 6) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Sunken_Colony) <1)) && (BWAPI::Broodwar->self()->gas() < 70) && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3)
 			{

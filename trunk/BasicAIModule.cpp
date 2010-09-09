@@ -185,8 +185,12 @@ void BasicAIModule::onUnitRenegade(BWAPI::Unit* unit)
 
 void BasicAIModule::onSendText(std::string text)
 {
-  if (Broodwar->isReplay()) return;;
-  UnitType type=UnitTypes::getUnitType(text);
+  if (Broodwar->isReplay())
+  {
+    Broodwar->sendText("%s",text.c_str());
+    return;
+  }
+  /*UnitType type=UnitTypes::getUnitType(text);
   if (text=="debug")
   {
     if (this->showManagerAssignments==false)
@@ -201,11 +205,14 @@ void BasicAIModule::onSendText(std::string text)
       this->buildOrderManager->setDebugMode(false);
       this->scoutManager->setDebugMode(false);
     }
+    Broodwar->printf("%s",text.c_str());
     return;
   }
   if (text=="expand")
   {
     this->baseManager->expand();
+    Broodwar->printf("%s",text.c_str());
+    return;
   }
   if (type!=UnitTypes::Unknown)
   {
@@ -228,6 +235,6 @@ void BasicAIModule::onSendText(std::string text)
       else
         Broodwar->printf("You typed '%s'!",text.c_str());
     }
-  }
-  return;
+  }*/
+  Broodwar->sendText("%s",text.c_str());
 }
