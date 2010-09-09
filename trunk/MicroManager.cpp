@@ -137,14 +137,30 @@ bool MicroManager::enemyInRange(BWAPI::Position p)
 
 UnitGroup MicroManager::enemiesInRange(BWAPI::Position p, double radius, int type) // 0 beide, 1 ground, 2 flyer
 {
-	UnitGroup enemies = this->eudm->getUG().inRadius(radius, p);
-	if(type == 1) {
-		enemies = enemies - enemies(isFlyer);
+	std::map<BWAPI::Unit*, EnemyUnitData> enemies = this->eudm->getEnemyUnitsInRadius(radius, p);
+	UnitGroup result;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in enemies)
+	{
+		if(type == 0)
+		{
+			result.insert(enemy.first);
+		}
+		if(type == 1)
+		{
+			if(!enemy.second.unitType.isFlyer())
+			{
+				result.insert(enemy.first);
+			}
+		}
+		if(type == 2)
+		{
+			if(enemy.second.unitType.isFlyer())
+			{
+				result.insert(enemy.first);
+			}
+		}
 	}
-	if(type == 2) {
-		enemies = enemies(isFlyer);
-	}
-	return enemies;
+	return result;
 }
 
 bool MicroManager::containsDetector(UnitGroup ug)
