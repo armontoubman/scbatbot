@@ -237,17 +237,19 @@ int WantBuildManager::dronesRequiredAll()
 {
 	int amount = 0;
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
-	log(std::String("dronesreq mins: ").append(intToString(minerals.size())).append("\n").c_str());
+	log(std::string("dronesreq mins: ").append(intToString(minerals.size())).append("\n").c_str());
 	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
-	log(std::String("dronesreq hatch: ").append(intToString(hatcheries.size())).append("\n").c_str());
+	log(std::string("dronesreq hatch: ").append(intToString(hatcheries.size())).append("\n").c_str());
 
 	// minerals per basis
 	for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 	{
 		for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
 		{
+			// CRASH HIER
 			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10.00), (*it)->getPosition());
-			if ((this->mm->amountCanAttackGround(this->mm->enemiesInRange((*it)->getPosition(), dist(10.00), 0)) < 5) || (allies.size()>2))
+			UnitGroup enemiesinrange = this->mm->enemiesInRange((*it)->getPosition(), dist(10.00), 0);
+			if ((enemiesinrange.size() > 0 && this->mm->amountCanAttackGround(enemiesinrange) < 5) || (allies.size()>2))
 			{
 				if((*it)->getDistance(*mit) <= dist(10.00))
 				{
@@ -257,13 +259,13 @@ int WantBuildManager::dronesRequiredAll()
 			}
 		}
 	}
-	log(std::String("minsperbasis: ").append(intToString(amount)).append("\n").c_str());
+	log(std::string("minsperbasis: ").append(intToString(amount)).append("\n").c_str());
 	// extractors
 	amount += (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted).size()*3);
-	log(std::String("plusextractors: ").append(intToString(amount)).append("\n").c_str());
+	log(std::string("plusextractors: ").append(intToString(amount)).append("\n").c_str());
 	// aantal workers al aan de slag
 	amount -= UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isWorker).not(isMorphing).not(isConstructing).size();
-	log(std::String("minus workers: ").append(intToString(amount)).append("\n").c_str());
+	log(std::string("minus workers: ").append(intToString(amount)).append("\n").c_str());
 	if (amount < 0)
 	{
 		return 0;
@@ -1384,7 +1386,7 @@ void WantBuildManager::doLists()
 
 	// vangnetten/algemeen
 	log("dl v start\n");
-	log(std::String("overlord eggs: ").append(intToString(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))).append("\n").c_str());
+	log(std::string("overlord eggs: ").append(intToString(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))).append("\n").c_str());
 	if( BWAPI::Broodwar->self()->supplyUsed() >= (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))) 
 		&& (buildList.top().typenr == 1 && buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord) && (BWAPI::Broodwar->self()->supplyTotal() < 400)) // voorkomt dat het overlords spamt als het al op max bevindt
 	{
@@ -1471,7 +1473,7 @@ void WantBuildManager::doLists()
 			if(wantAantal < buildAantal+hebAantal)
 			{
 				log("dl generiek buildenunit\n");
-				log(b.buildtype.getName().append("\n").c_str());
+				log((*it).buildtype.getName().append("\n").c_str());
 				addBuild((*it).buildtype);
 			}
 		}
