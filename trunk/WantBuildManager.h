@@ -7,12 +7,13 @@
 #include "BaseManager.h"
 #include "HighCommand.h"
 #include "MicroManager.h"
+class MicroManager;
 class WantBuildManager
 {
 	friend class HighCommand;
 public:
 	WantBuildManager();
-	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba, HighCommand* h);
+	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba, HighCommand* h, MicroManager* m);
 
 	void update();
 
@@ -73,6 +74,7 @@ public:
 	BuildOrderManager* bom;
 	BaseManager* bm;
 	HighCommand* hc;
+	MicroManager* mm;
 
 	// zelfde als in MicroManager
 	BWAPI::Unit* nearestUnit(BWAPI::Position pos, UnitGroup ug);
