@@ -53,6 +53,7 @@ public:
 	BWAPI::Unit* nearestSwarm(BWAPI::Unit* unit);
 	BWAPI::Unit* nearestEnemyNotUnderDarkSwarm(BWAPI::Unit* unit);
 	BWAPI::Position splitup(BWAPI::Unit* unit);
+	void MicroManager::splitUp(std::set<BWAPI::Unit*> units);
 	UnitGroup* MicroManager::inRadiusUnitGroup(double radius, UnitGroup* ug);
 	UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut);
 
