@@ -142,14 +142,14 @@ bool WantBuildManager::photonCannonNearBase()
 {
 	bool result = false;
 	std::map<BWAPI::Unit*,EnemyUnitData> data = this->eudm->getData();
-	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Hatchery, BWAPI::UnitTypes::Zerg_Lair, BWAPI::UnitTypes::Zerg_Hive);
 	for(std::map<BWAPI::Unit*,EnemyUnitData>::iterator it=data.begin(); it!=data.end(); it++)
 	{
 		if(it->first->getType() == BWAPI::UnitTypes::Protoss_Photon_Cannon)
 		{
 			for(std::set<BWAPI::Unit*>::iterator hit=hatcheries.begin(); hit!=hatcheries.end(); hit++)
 			{
-				if(it->first->getDistance(*hit) < dist(15.00))
+				if(it->first->getDistance(*hit) < dist(15))
 				{
 					return true;
 				}
@@ -162,7 +162,7 @@ bool WantBuildManager::photonCannonNearBase()
 int WantBuildManager::countEggsMorphingInto(BWAPI::UnitType unittype)
 {
 	int totaal = 0;
-	UnitGroup eggs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Egg);
+	UnitGroup eggs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Egg);
 	for(std::set<BWAPI::Unit*>::iterator it=eggs.begin(); it!=eggs.end(); it++)
 	{
 		if((*it)->getBuildType() == unittype)
@@ -171,6 +171,7 @@ int WantBuildManager::countEggsMorphingInto(BWAPI::UnitType unittype)
 		}
 	}
 	return totaal;
+	// dit shit is hoogstwaarschijnlijk bugged
 }
 
 bool WantBuildManager::wantListIsCompleted()
@@ -215,7 +216,7 @@ bool WantBuildManager::wantListIsCompleted()
 
 UnitGroup WantBuildManager::getHatcheriesWithMinerals()
 {
-	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Hatchery, BWAPI::UnitTypes::Zerg_Lair, BWAPI::UnitTypes::Zerg_Hive);
 	UnitGroup result = UnitGroup();
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
 	for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
@@ -223,7 +224,7 @@ UnitGroup WantBuildManager::getHatcheriesWithMinerals()
 		if((*it)
 		for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)  // stond eerst it!=minerals.end(), lijkt me beetje raar als de rest mit staat? ***
 		{
-			if((*it)->getDistance(*mit) <= dist(8.00))
+			if((*it)->getDistance(*mit) <= dist(8))
 			{
 				result.insert(*it);
 				break;
@@ -237,17 +238,17 @@ int WantBuildManager::dronesRequiredAll()
 {
 	int amount = 0;
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
-	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Hatchery, BWAPI::UnitTypes::Zerg_Lair, BWAPI::UnitTypes::Zerg_Hive);
 
 	// minerals per basis
 	for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 	{
 		for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
 		{
-			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10.00), (*it)->getPosition());
-			if ((MicroManager::amountCanAttackGround(MicroManager::enemiesInRange((*it)->getPosition(), dist(10.00), 0)) < 5) || (allies.size()>2))
+			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition());
+			if ((MicroManager::amountCanAttackGround(MicroManager::enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>2))
 			{
-				if((*it)->getDistance(*mit) <= dist(10.00))
+				if((*it)->getDistance(*mit) <= dist(10))
 				{
 					amount++;
 					break;
@@ -256,7 +257,7 @@ int WantBuildManager::dronesRequiredAll()
 		}
 	}
 	// extractors
-	amount += (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted).size()*3);
+	amount += (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Extractor)(isCompleted).size()*3);
 
 	// aantal workers al aan de slag
 	amount -= UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isWorker).not(isMorphing).not(isConstructing).size();
@@ -334,7 +335,7 @@ void WantBuildManager::update()
 		log(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
 			if(b.typenr == 1)
 			{
-				if(!requirementsSatisfied(b.buildtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+				if(!requirementsSatisfied(b.buildtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Drone)(isGatheringGas).size() == 0))
 				{
 					log("can't make\n\t");
 					log(b.buildtype.getName().append("\n").c_str());
@@ -349,7 +350,7 @@ void WantBuildManager::update()
 					{
 						log("can make\n\t");
 						log(b.buildtype.getName().append("\n").c_str());
-						(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
+						(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Larva).begin())->morph(b.buildtype);
 						buildList.removeTop();
 						log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 						return;
@@ -370,7 +371,7 @@ void WantBuildManager::update()
 							}
 							else
 							{
-								UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
+								UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Hatchery, BWAPI::UnitTypes::Zerg_Lair, BWAPI::UnitTypes::Zerg_Hive);
 								if(hatcheries.size() == 0)
 								{
 									log("kan geen lair maken, geen hatcheries\n");
@@ -398,7 +399,7 @@ void WantBuildManager::update()
 							}
 							else
 							{
-								UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
+								UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Lair);
 								if(lairs.size() == 0)
 								{
 									log("kan geen hive maken, geen lairs\n");
@@ -447,7 +448,7 @@ void WantBuildManager::update()
 			}
 			if(b.typenr == 2)
 			{
-				if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+				if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Drone)(isGatheringGas).size() == 0))
 				{
 					buildList.removeTop();
 					return;
@@ -461,7 +462,7 @@ void WantBuildManager::update()
 			}
 			if(b.typenr == 3)
 			{
-				if(!requirementsSatisfied(b.upgradetype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+				if(!requirementsSatisfied(b.upgradetype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Drone)(isGatheringGas).size() == 0))
 				{
 					buildList.removeTop();
 					return;
@@ -993,9 +994,16 @@ void WantBuildManager::doLists()
 				}
 				else
 				{
-					if (buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<2)
+					if (buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<2 && nrOfOwn(BWAPI::UnitTypes::Zerg_Spire)>0 )
 					{
 						addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
+					}
+					else
+					{
+						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3 && nrOfOwn(BWAPI::UnitTypes::Zerg_Spawning_Pool)>0)
+						{
+							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
+						}
 					}
 				}
 			}
@@ -1173,10 +1181,10 @@ void WantBuildManager::doLists()
 		{
 			bool spireExists = false;
 			BWAPI::Unit* lolspire = NULL;
-			if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Spire).size() > 0)
+			if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Spire).size() > 0)
 			{
 				spireExists = true;
-				lolspire = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Spire).begin();
+				lolspire = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Spire).begin();
 			}
 			if (spireExists && lolspire->isBeingConstructed())
 			{
@@ -1236,7 +1244,7 @@ void WantBuildManager::doLists()
 	// upgrades
 
 	int zerglingtotaal = this->buildList.count(BWAPI::UnitTypes::Zerg_Zergling);
-	zerglingtotaal += UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Zergling).size();
+	zerglingtotaal += UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Zergling).size();
 	zerglingtotaal += countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Zergling);
 	if (zerglingtotaal > 10)
 	{
@@ -1332,12 +1340,12 @@ void WantBuildManager::doLists()
 		addBuild(BWAPI::UnitTypes::Zerg_Drone);
 	}
 	
-	UnitGroup hatcheries = getHatcheriesWithMinerals();
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isCompleted)(BWAPI::UnitTypes::Zerg_Hatchery, BWAPI::UnitTypes::Zerg_Lair, BWAPI::UnitTypes::Zerg_Hive);
 	UnitGroup geysers = UnitGroup::getUnitGroup(BWAPI::Broodwar->getGeysers());
-	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor);
-	for(std::set<BWAPI::Unit*>::iterator hit=hatcheries.begin(); hit!=hatcheries.end(); hit++)
+	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Extractor);
+	for(std::set<BWAPI::Unit*>::iterator git=geysers.begin(); git!=geysers.end(); git++)
 	{
-		if(geysers.inRadius(dist(10.00), (*hit)->getPosition()).size() > 0 && extractors.inRadius(dist(10.00), (*hit)->getPosition()).size() == 0 && buildList.count(BWAPI::UnitTypes::Zerg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
+		if(hatcheries.inRadius(dist(13), (*git)->getPosition()).size() > 0 && extractors.inRadius(dist(2), (*git)->getPosition()).size() == 0 && buildList.count(BWAPI::UnitTypes::ZErg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
 		{
 			addBuild(BWAPI::UnitTypes::Zerg_Extractor);
 		}
@@ -1347,7 +1355,7 @@ void WantBuildManager::doLists()
 	int enemiesNearNatural = 0;
 	if(natural != NULL)
 	{
-		enemiesNearNatural = this->eudm->getUG().inRadius(dist(10.00), natural->getPosition()).size();
+		enemiesNearNatural = this->eudm->getUG().inRadius(dist(10), natural->getPosition()).size();
 	}
 
 	if( (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Protoss || BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Terran)
@@ -1526,7 +1534,7 @@ void WantBuildManager::bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType un
 BWAPI::Unit* WantBuildManager::pickBuildDrone(BWAPI::TilePosition tilepos)
 {
 	log("pickBuildDrone\n");
-	UnitGroup alldrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone);
+	UnitGroup alldrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(BWAPI::UnitTypes::Zerg_Drone);
 	UnitGroup idledrones = alldrones(isIdle);
 	if(idledrones.size() == 0)
 	{
@@ -1629,7 +1637,7 @@ void WantBuildManager::doExpand()
 	{
 		log("drone != NULL\n");
 
-		UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery)(isBeingConstructed);
+		UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBeingConstructed)(BWAPI::UnitTypes::Zerg_Hatchery, BWAPI::UnitTypes::Zerg_Lair, BWAPI::UnitTypes::Zerg_Hive);
 		// bezig kan size > 1 hebben
 		bool underconstruction = false;
 		for each(BWAPI::Unit* lolgebouw in bezig)
