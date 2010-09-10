@@ -462,3 +462,16 @@ void EigenUnitGroupManager::splitGroup(UnitGroup* ug)
 	addUG(nieuwe1);
 	addUG(nieuwe2);
 }
+
+bool EigenUnitGroupManager::groupContainsType(std::set<BWAPI::Unit*>* ug, BWAPI::UnitType unittype)
+{
+	bool result = false;
+	for(std::set<BWAPI::Unit*>::iterator it = ug->begin(); it != ug->end(); it++)
+	{
+		if((*it)->getType() == unittype)
+		{
+			result = true;
+		}
+	}
+	return result;
+}

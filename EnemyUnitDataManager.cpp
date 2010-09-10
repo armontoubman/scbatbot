@@ -114,3 +114,96 @@ std::map<BWAPI::Unit*, EnemyUnitData> EnemyUnitDataManager::getEnemyUnitsInRadiu
 	}
 	return result;
 }
+
+int EnemyUnitDataManager::nrMilitaryUnits(std::set<BWAPI::Unit*> ug)
+{
+	int count = 0;
+	for each(BWAPI::Unit* unit in ug)
+	{
+		EnemyUnitData data = getEnemyUnitData(unit);
+		if(isMilitary(data.unitType))
+		{
+			count++;
+		}
+	}
+	return count;
+}
+
+bool EnemyUnitDataManager::isMilitary(BWAPI::UnitType unittype)
+{
+	return !unittype.isBuilding() && unittype != BWAPI::UnitTypes::Zerg_Overlord
+		&& unittype != BWAPI::UnitTypes::Zerg_Drone && unittype != BWAPI::UnitTypes::Terran_SCV
+		&& unittype != BWAPI::UnitTypes::Protoss_Probe && unittype != BWAPI::UnitTypes::Protoss_Observer;
+}
+
+std::map<BWAPI::Unit*, EnemyUnitData> EnemyUnitDataManager::getMapFromUG(UnitGroup* ug)
+{
+	std::map<BWAPI::Unit*, EnemyUnitData> result;
+	for(std::set<BWAPI::Unit*>::iterator it=ug->begin(); it!=ug->end(); it++)
+	{
+		result.insert(std::pair<BWAPI::Unit*, EnemyUnitData>(*it, getEnemyUnitData(*it)));
+	}
+	return result;
+}
+
+bool EnemyUnitDataManager::onlyAirUnits(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	bool result = true;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(!enemy.second.unitType.isFlyer())
+		{
+			result = false;
+		}
+	}
+	return result;
+}
+
+bool EnemyUnitDataManager::onlyGroundUnits(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	bool result = true;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(enemy.second.unitType.isFlyer())
+		{
+			result = false;
+		}
+	}
+	return result;
+}
+
+bool EnemyUnitDataManager::canAttackAir(BWAPI::UnitType unittype)
+{
+	return unittype.airWeapon().targetsAir();
+}
+
+bool EnemyUnitDataManager::canAttackGround(BWAPI::UnitType unittype)
+{
+	return unittype.groundWeapon().targetsGround();
+}
+
+bool EnemyUnitDataManager::canAttackAir(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	bool result = true;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(!canAttackAir(enemy.second.unitType))
+		{
+			result = false;
+		}
+	}
+	return result;
+}
+
+bool EnemyUnitDataManager::canAttackGround(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	bool result = true;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(!canAttackGround(enemy.second.unitType))
+		{
+			result = false;
+		}
+	}
+	return result;
+}

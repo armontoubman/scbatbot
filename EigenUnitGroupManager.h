@@ -31,12 +31,14 @@ public:
 
 	void splitGroup(UnitGroup* ug);
 
+	bool groupContainsType(std::set<BWAPI::Unit*>* ug, BWAPI::UnitType unittype);
+
 	// zelfde als in micromanager
 	BWAPI::Unit* nearestUnitInGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units);
 
 	void update();
 
-private:
+
 	std::set<UnitGroup*> unitGroups;
 	HighCommand* highCommand;
 	EigenUnitDataManager* eiudm;

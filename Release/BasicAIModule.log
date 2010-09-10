@@ -1,26 +1,10 @@
-﻿Build started 9-9-2010 21:57:06.
+﻿Build started 11-9-2010 0:41:13.
      1>Project "C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\BasicAIModule\BasicAIModule.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
-         Creating "Release\BasicAIModule.unsuccessfulbuild" because "AlwaysCreate" was specified.
+         Touching "Release\BasicAIModule.unsuccessfulbuild".
        ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\CL.exe /c /I../../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc90.pdb" /Gd /TP /analyze- /errorReport:prompt MicroManager.cpp WantBuildManager.cpp
-         MicroManager.cpp
-     1>MicroManager.cpp(87): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(597): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-     1>MicroManager.cpp(1176): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
-         WantBuildManager.cpp
-     1>WantBuildManager.cpp(153): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(193): warning C4018: '<' : signed/unsigned mismatch
-     1>WantBuildManager.cpp(226): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(249): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(250): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(253): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1414): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1414): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1414): warning C4018: '<' : signed/unsigned mismatch
-     1>WantBuildManager.cpp(1425): warning C4244: 'argument' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1701): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
-     1>WantBuildManager.cpp(1706): warning C4244: '=' : conversion from 'double' to 'int', possible loss of data
+         C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\CL.exe /c /I../../include /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc90.pdb" /Gd /TP /analyze- /errorReport:prompt TaskManager.cpp
+         TaskManager.cpp
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.dll" /NOLOGO ../../lib/BWAPI.lib ../../lib/BWTA.lib "../../lib/CGAL-vc90-mt.lib" "../../lib/gmp-vc90-mt.lib" "../../lib/libboost_thread-vc90-mt-1_40.lib" "../../lib/mpfr-vc90-mt.lib" ../../lib/tinyxml.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:libcmt /MANIFEST /ManifestFile:"Release\BasicAIModule.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.lib" /MACHINE:X86 /DLL Release\Assignment.obj
          Release\BasicAIModule.obj
@@ -36,7 +20,7 @@
          Release\EnhancedUI.obj
          Release\HighCommand.obj
          Release\MicroManager.obj
-         Release\PlanManager.obj
+         Release\PlanAssigner.obj
          Release\Task.obj
          Release\TaskManager.obj
          Release\Util.obj
@@ -63,7 +47,7 @@
          Release\BorderManager.obj
             Creating library C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.lib and object C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.exp
          Generating code
-     1>c:\users\armon\documents\bwsal_0.9.8\basicaimodule\basicaimodule\wantbuildmanager.cpp(1597): warning C4715: 'WantBuildManager::placeFound' : not all control paths return a value
+     1>c:\users\armon\documents\bwsal_0.9.8\basicaimodule\basicaimodule\wantbuildmanager.cpp(1598): warning C4715: 'WantBuildManager::placeFound' : not all control paths return a value
          Finished generating code
          BasicAIModule.vcxproj -> C:\Users\Armon\Documents\BWSAL_0.9.8\BasicAIModule\Release\BasicAIModule.dll
        Manifest:
@@ -75,4 +59,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:19.09
+Time Elapsed 00:00:18.74
