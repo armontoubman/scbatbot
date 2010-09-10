@@ -12,6 +12,7 @@
 #include "TaskManager.h"
 #include "WantBuildManager.h"
 #include "MicroManager.h"
+#include "PlanAssigner.h"
 #include "Task.h"
 #include <time.h>
 #include <BWTA.h>
@@ -21,9 +22,10 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->eigenUnitDataManager = new EigenUnitDataManager();
 	this->enemyUnitDataManager = new EnemyUnitDataManager(im);
 	this->eigenUnitGroupManager = new EigenUnitGroupManager(this, this->eigenUnitDataManager, this->taskManager);
-	this->taskManager = new TaskManager(this->eigenUnitGroupManager, this->enemyUnitDataManager);
+	this->taskManager = new TaskManager(this->eigenUnitGroupManager, this->enemyUnitDataManager, this);
 	this->wantBuildManager = new WantBuildManager(this->enemyUnitDataManager, bom, ba, this, this->microManager);
 	this->microManager = new MicroManager(bom, this->enemyUnitDataManager, this->taskManager, this, this->eigenUnitDataManager, this->wantBuildManager);
+	this->planAssigner = new PlanAssigner(this, this->taskManager, this->eigenUnitGroupManager, this->enemyUnitDataManager, this->microManager);
 	this->thisAlgorithmBecomingSkynetCost = 999999999;
 	this->tick = 1;
 	this->wantBuildManager->doLists();
@@ -52,10 +54,13 @@ HighCommand::~HighCommand() {
 	delete this->taskManager;
 	delete this->wantBuildManager;
 	delete this->microManager;
+	delete this->planAssigner;
 }
 
 void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits)
 {
+	this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
+
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
 	this->enemyUnitDataManager->update(enemyUnits);
 
@@ -83,12 +88,12 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		this->tick = 0;
 	}
 
-	log("bouwdrones: ");
+	/*log("bouwdrones: ");
 	for each(BWAPI::Unit* drone in this->wantBuildManager->bouwdrones)
 	{
 		log(this->wantBuildManager->intToString(drone->getID()).append(" ").c_str());
 	}
-	log("\n");
+	log("\n");*/
 }
 
 void HighCommand::onRemoveUnit(BWAPI::Unit* unit)

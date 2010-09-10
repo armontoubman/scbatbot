@@ -99,7 +99,7 @@
     <ClCompile Include="EnhancedUI.cpp" />
     <ClCompile Include="HighCommand.cpp" />
     <ClCompile Include="MicroManager.cpp" />
-    <ClCompile Include="PlanManager.cpp" />
+    <ClCompile Include="PlanAssigner.cpp" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="TaskManager.cpp" />
     <ClCompile Include="Util.cpp" />
@@ -138,7 +138,7 @@
     <ClInclude Include="..\..\include\EnhancedUI.h" />
     <ClInclude Include="HighCommand.h" />
     <ClInclude Include="MicroManager.h" />
-    <ClInclude Include="PlanManager.h" />
+    <ClInclude Include="PlanAssigner.h" />
     <ClInclude Include="..\..\include\RectangleArray.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskManager.h" />

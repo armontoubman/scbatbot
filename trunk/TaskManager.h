@@ -4,14 +4,16 @@
 #include "EnemyUnitDataManager.h"
 #include <BWAPI.h>
 #include <list>
+#include "HighCommand.h"
 class EigenUnitGroupManager;
 class TaskManager {
 	friend class HighCommand;
 public:
 	TaskManager();
-	TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu);
+	TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu, HighCommand* h);
 	EigenUnitGroupManager* eugm;
 	EnemyUnitDataManager* eudm;
+	HighCommand* hc;
 
 	void insertTask(Task t);
 	void removeTask(Task t);
@@ -20,6 +22,10 @@ public:
 	Task findTaskWithUnit(BWAPI::Unit* unit);
 	std::set<Task> findTasksWithUnitType(BWAPI::UnitType unittype);
 	std::set<Task> findTasksWithType(int t);
+	BWAPI::Position frontlineBuilding(std::set<BWAPI::Position> posset);
+	bool existsTaskWithType(int type);
+	bool existsTaskWithPriority(int priority);
+	Task nearestTask(UnitGroup* ug, std::set<Task> tasks);
 
 	void update();
 

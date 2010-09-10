@@ -8,16 +8,18 @@
 #include <algorithm>
 #include "Task.h"
 #include "Util.h"
+#include "HighCommand.h"
 class Task;
 class EigenUnitGroupManager;
 TaskManager::TaskManager()
 {
 }
 
-TaskManager::TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu)
+TaskManager::TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu, HighCommand* h)
 {
 	this->eugm = e;
 	this->eudm = eu;
+	this->hc = h;
 }
 
 void TaskManager::insertTask(Task t)
@@ -217,29 +219,40 @@ void TaskManager::update()
 		}
 	}
 
-	/*
-
-	//
-	add task(defend, 3, nearestalliedstructuretoanenemystructureGebruikGroundDistance, UG=null); // idee is dat de dichtsbijzijnde expansie voor de enemy ook gedekt wordt.	
-
-	// gegarandeerd scouten:
-	if numberofEnemyUnits <15 (zover wij weten dus!)
-		add task(scout,1,positiedienognietbekekenis*,UG=null); // *=checke hoe bwsal dit doet, die stuurt de scout gewoon van ene naar de andere basis zonder dezelfde te herhalen enzo.
+	std::map<BWAPI::Unit*, EnemyUnitData> buildingdata = this->eudm->getData();
+	std::set<BWAPI::Position> posset;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in buildingdata)
+	{
+		if(enemy.second.unitType.isBuilding())
+		{
+			posset.insert(enemy.second.lastKnownPosition);
+		}
+	}
+	if(posset.size() > 0)
+	{
+		UnitGroup eigenbuildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding);	
+		BWAPI::Position frontline = frontlineBuilding(posset);
+		insertTask(Task(5, 3, frontline));
 	}
 
-	// add scout task dichtbij de rand van de map die het dichts bij onze enemy is en die van ons.
-	***check 4 posities diens gezamenlijke afstand tot de enemy/ally.
-	add task(scout,1,mapheight*32,mapwidth*16, UG=null);
-	add task(scout,1,mapheight, mapwidth*16, UG=null);
-	add task(scout,1,mapheight*16, mapwidth, UG=null);
-	add task(scout,1,mapheight*16, mapwidth*32, UG=null);
+	std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
 
+	if(this->eudm->getData().size() < 15)
+	{
+		std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
+		for each(BWTA::BaseLocation* baseloc in baselocs)
+		{
+			if(!BWAPI::Broodwar->isExplored(baseloc->getPosition()))
+			{
+				insertTask(Task(1, 1, baseloc->getPosition()));
+			}
+		}
+	}
 
-	// check of er een expansion is gemaakt:
-	add task(scout, 1, nearestExpansionToEnemy, UG=null);
-	add task(scout, 1, pick random expansion where no allied/enemy units have been built, UG=null);
-
-	*/
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*32, BWAPI::Broodwar->mapWidth()*16).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight(), BWAPI::Broodwar->mapWidth()*16).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*16, BWAPI::Broodwar->mapWidth()).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*16, BWAPI::Broodwar->mapWidth()*32).makeValid()));	
 
 }
 
@@ -321,4 +334,80 @@ BWAPI::Unit* TaskManager::nearestUnit(BWAPI::Position pos, UnitGroup ug)
 	}
 
 	return besteUnit;
+}
+
+BWAPI::Position TaskManager::frontlineBuilding(std::set<BWAPI::Position> posset)
+{
+	UnitGroup eigenbuildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	BWAPI::Position nearest;
+
+	double distance = -1;
+
+	if(posset.size() == 0)
+	{
+		return this->hc->hatchery->getPosition();
+	}
+
+	for(std::set<BWAPI::Unit*>::iterator it=eigenbuildings.begin(); it!=eigenbuildings.end(); it++)
+	{
+		double currentDistance = (*posset.begin()).getDistance((*it)->getPosition());
+		if(distance == -1)
+		{
+			nearest = (*it)->getPosition();
+			distance = currentDistance;
+		}
+		else if(currentDistance < distance)
+		{
+			nearest = (*it)->getPosition();
+			distance = currentDistance;
+		}
+	}
+	return nearest;
+}
+
+bool TaskManager::existsTaskWithType(int type)
+{
+	for each(Task t in this->tasklist)
+	{
+		if(t.type == type)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool TaskManager::existsTaskWithPriority(int priority)
+{
+	for each(Task t in this->tasklist)
+	{
+		if(t.priority == priority)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+Task TaskManager::nearestTask(UnitGroup* ug, std::set<Task> tasks)
+{
+	Task nearest;
+	double distance = -1;
+	BWAPI::Position center = ug->getCenter();
+
+	for(std::set<Task>::iterator it=tasks.begin(); it!=tasks.end(); it++)
+	{
+		double currentDistance = center.getDistance((*it).position);
+		if(distance == -1)
+		{
+			nearest = (*it);
+			distance = currentDistance;
+		}
+		else if(currentDistance < distance)
+		{
+			nearest = (*it);
+			distance = currentDistance;
+		}
+	}
+	return nearest;
 }

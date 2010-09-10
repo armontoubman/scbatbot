@@ -7,12 +7,14 @@
 #include "TaskManager.h"
 #include "WantBuildManager.h"
 #include "MicroManager.h"
+#include "PlanAssigner.h"
 class EigenUnitDataManager;
 class EnemyUnitDataManager;
 class EigenUnitGroupManager;
 class TaskManager;
 class WantBuildManager;
 class MicroManager;
+class PlanAssigner;
 class HighCommand
 {
 public:
@@ -32,6 +34,7 @@ private:
 	TaskManager* taskManager;
 	WantBuildManager* wantBuildManager;
 	MicroManager* microManager;
+	PlanAssigner* planAssigner;
 
 	int tick;
 	int thisAlgorithmBecomingSkynetCost;
