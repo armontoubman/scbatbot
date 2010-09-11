@@ -38,4 +38,6 @@ public:
 
 	int tick;
 	int thisAlgorithmBecomingSkynetCost;
+
+	std::map<UnitGroup*, Task> hcplan;
 };

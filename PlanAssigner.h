@@ -34,5 +34,6 @@ public:
 	std::map<UnitGroup*, Task> plan;
 	void update();
 	Task vindTask(UnitGroup* ug);
+	Task vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug);
 };
 

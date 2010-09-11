@@ -48,7 +48,7 @@ void TaskManager::insertTask(Task t)
 		this->tasklist.insert(this->tasklist.end(), t);
 	}
 
-	BWAPI::Broodwar->printf("%s %d", "Task gemaakt met type", t.type);
+	//BWAPI::Broodwar->printf("%s %d", "Task gemaakt met type", t.type);
 }
 
 void TaskManager::removeTask(Task t)
