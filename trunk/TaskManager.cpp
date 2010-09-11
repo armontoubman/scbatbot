@@ -269,14 +269,7 @@ std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype) // v
 
 std::set<Task> TaskManager::findTasksWithType(int t)
 {
-	std::set<Task> result;
-	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
-	{
-		if(i->type == t) {
-			result.insert(*i);
-		}
-	}
-	return result;
+	return this->hc->planAssigner->findTasksWithType(this->hc->hcplan, t);
 }
 
 double TaskManager::dist(int d)

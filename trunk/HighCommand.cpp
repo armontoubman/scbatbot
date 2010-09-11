@@ -32,7 +32,7 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 
 	this->eigenUnitDataManager = new EigenUnitDataManager();
 	this->enemyUnitDataManager = new EnemyUnitDataManager(im);
-	this->eigenUnitGroupManager = new EigenUnitGroupManager(this, this->eigenUnitDataManager, this->taskManager);
+	this->eigenUnitGroupManager = new EigenUnitGroupManager(this, this->eigenUnitDataManager, this->taskManager, this->planAssigner);
 	this->taskManager = new TaskManager(this->eigenUnitGroupManager, this->enemyUnitDataManager, this, this->planAssigner);
 	this->wantBuildManager = new WantBuildManager(this->enemyUnitDataManager, bom, ba, this, this->microManager);
 	this->microManager = new MicroManager(bom, this->enemyUnitDataManager, this->taskManager, this, this->eigenUnitDataManager, this->wantBuildManager);
