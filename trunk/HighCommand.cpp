@@ -19,6 +19,17 @@
 
 HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseManager* ba)
 {
+	log("\n\n\n\nNEW GAME\n\n\n\n");
+
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+	log("\n");
+	log(asctime(timeinfo));
+	log("\n");
+
 	this->eigenUnitDataManager = new EigenUnitDataManager();
 	this->enemyUnitDataManager = new EnemyUnitDataManager(im);
 	this->eigenUnitGroupManager = new EigenUnitGroupManager(this, this->eigenUnitDataManager, this->taskManager);
@@ -30,18 +41,8 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->tick = 1;
 	this->wantBuildManager->doLists();
 	this->taskManager->update();
-	this->planAssigner->update();
-
-	log("\n\n\n\nNEW GAME\n\n\n\n");
-
-	time_t rawtime;
-	struct tm * timeinfo;
-
-	time ( &rawtime );
-	timeinfo = localtime ( &rawtime );
-	log("\n");
-	log(asctime(timeinfo));
-	log("\n");
+	//this->planAssigner->update();
+	this->hcplan = this->planAssigner->maakPlan();
 
 	this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery).begin();
 
@@ -72,7 +73,8 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		this->taskManager->update();
 		log("HC::update planAssigner\n");
 		log(this->wantBuildManager->intToString(this->planAssigner->plan.size()).append("\n").c_str());
-		this->planAssigner->update();
+		//this->planAssigner->update();
+		this->hcplan = this->planAssigner->maakPlan();
 		log(this->wantBuildManager->intToString(this->planAssigner->plan.size()).append("\n").c_str());
 	}
 

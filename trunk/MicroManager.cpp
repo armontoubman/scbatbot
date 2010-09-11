@@ -784,8 +784,11 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			for(std::set<BWAPI::Unit*>::iterator unitit=(*it)->begin(); unitit!=(*it)->end(); unitit++)
 			{
 				log("for unit iterator findtaskwithunit\n");
+				log((*unitit)->getType().getName().c_str());
+				log("\n");
 				log(this->hc->wantBuildManager->intToString(this->hc->planAssigner->plan.size()).append("\n").c_str());
-				Task currentTask = this->tm->findTaskWithUnit(*unitit);
+				//Task currentTask = this->tm->findTaskWithUnit(*unitit);
+				Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(*unitit));
 				log("na findtaskwithunit\n");
 
 				/* ULTRALISK */
@@ -1038,56 +1041,56 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* OVERLORD */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 				{
-					//logx("\n\ndoMicro overlord ", (*unitit), "\n"); 
+					logx("\n\ndoMicro overlord ", (*unitit), "\n"); 
 					if((*unitit)->isUnderStorm())
 					{
-						//logx("doMicro overlord ", (*unitit), " under storm moveAway\n");
+						logx("doMicro overlord ", (*unitit), " under storm moveAway\n");
 						(*unitit)->move(moveAway(*unitit));
 					}
 					else
 					{
 						Task t = currentTask;
 						
-						//logx("doMicro overlord ", (*unitit), std::string(" task.type=").append(intToString(t.type)).append("\n").c_str());
+						logx("doMicro overlord ", (*unitit), std::string(" task.type=").append(intToString(t.type)).append("\n").c_str());
 						if(t.type == 1 || t.type == 4)
 						{
-							//logx("doMicro overlord ", (*unitit), " type=1||4\n");
+							logx("doMicro overlord ", (*unitit), " type=1||4\n");
 							BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
 							// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
 							if(nearAir != NULL && (*unitit)->getPosition().getDistance(nearAir->getPosition()) < dist(8) && t.type == 1)
 							{
-								//logx("doMicro overlord ", (*unitit), " air enemy dichtbij\n");
+								logx("doMicro overlord ", (*unitit), " air enemy dichtbij\n");
 								if(overlordSupplyProvidedSoon())
 								{
 									
-									//logx("doMicro overlord ", (*unitit), " overlordSupplySoon");
+									logx("doMicro overlord ", (*unitit), " overlordSupplySoon");
 									UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(dist(8), t.position);
 									if(buildings.size() == 0)
 									{
-										//logx("doMicro overlord ", (*unitit), " geen buildings");
+										logx("doMicro overlord ", (*unitit), " geen buildings");
 										(*unitit)->move(moveAway(*unitit));
 									}
 									else
 									{
 										
-										//logx("doMicro overlord ", (*unitit), " wel buildings\n");
+										logx("doMicro overlord ", (*unitit), " wel buildings\n");
 										if((*unitit)->getPosition().getDistance(t.position) < dist(2))
 										{
 											
-											//logx("doMicro overlord ", (*unitit), " moveAway\n");
+											logx("doMicro overlord ", (*unitit), " moveAway\n");
 											(*unitit)->move(moveAway(*unitit));
 										}
 										else
 										{
 											
-											//logx("doMicro overlord ", (*unitit), " move naar task\n");
+											logx("doMicro overlord ", (*unitit), " move naar task\n");
 											(*unitit)->move(t.position);
 										}
 									}
 								}
 								else
 								{
-									//logx("doMicro overlord ", (*unitit), " moveAway\n");
+									logx("doMicro overlord ", (*unitit), " moveAway\n");
 									(*unitit)->move(moveAway(*unitit));
 								}
 							}
@@ -1098,7 +1101,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								if(neareststealth != NULL)
 								{
 										
-									//logx("doMicro overlord ", (*unitit), " stealth gezien\n");
+									logx("doMicro overlord ", (*unitit), " stealth gezien\n");
 									(*unitit)->rightClick(neareststealth->getPosition());
 								}
 								else
@@ -1108,13 +1111,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									if(dropships.size() > 0)
 									{
 											
-										//logx("doMicro overlord ", (*unitit), " dropship gezien\n");
+										logx("doMicro overlord ", (*unitit), " dropship gezien\n");
 										(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
 									}
 									else
 									{
 											
-										//logx("doMicro overlord ", (*unitit), " geen dropship, move naar task\n");
+										logx("doMicro overlord ", (*unitit), " geen dropship, move naar task\n");
 										(*unitit)->move(t.position);
 									}
 								}
@@ -1122,7 +1125,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							//logx("doMicro overlord ", (*unitit), " hydratask deel\n");
+							/*logx("doMicro overlord ", (*unitit), " hydratask deel\n");
 							std::set<Task> hydratasks = this->tm->findTasksWithUnitType(BWAPI::UnitTypes::Zerg_Hydralisk);
 							Task* hydratask = NULL;
 							for(std::set<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
@@ -1137,28 +1140,28 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							if(hydratask != NULL)
 							{
 								
-								//logx("doMicro overlord ", (*unitit), " hydratask\n");
+								logx("doMicro overlord ", (*unitit), " hydratask\n");
 								BWAPI::Unit* volghydra = *(hydratask->unitGroup->begin());
 								(*unitit)->rightClick(volghydra->getPosition());
 							}
-							else
+							else*/
 							{
 								UnitGroup overlordsnearby = allSelfUnits(Overlord).inRadius(dist(10), (*unitit)->getPosition());
 								if(overlordsnearby.size() > 1)
 								{
 									
-									//logx("doMicro overlord ", (*unitit), " andere overlord\n");
+									logx("doMicro overlord ", (*unitit), " andere overlord\n");
 									if(canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(8), 0)))
 									{
 										
-										//logx("doMicro overlord ", (*unitit), " canAttackAir moveAway\n");
+										logx("doMicro overlord ", (*unitit), " canAttackAir moveAway\n");
 										(*unitit)->move(moveAway(*unitit));
 									}
 									else
 									{
 										if (!(*unitit)->isMoving())
 										{
-											//logx("doMicro overlord ", (*unitit), " splitUp\n");
+											logx("doMicro overlord ", (*unitit), " splitUp\n");
 											(*unitit)->move(splitUp(*unitit));
 										}
 									}
@@ -1170,7 +1173,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										if (!(*unitit)->isMoving())
 										{
-											//logx("doMicro overlord ", (*unitit), " building random\n");
+											logx("doMicro overlord ", (*unitit), " building random\n");
 											// als dit elk frame gebeurt, krijgt hij elk frame een nieuwe positie -> stuiterbal
 											int x = (*unitit)->getPosition().x();
 											int y = (*unitit)->getPosition().y();
@@ -1183,7 +1186,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									else
 									{
 										
-										//logx("doMicro overlord ", (*unitit), " eigen building\n");
+										logx("doMicro overlord ", (*unitit), " eigen building\n");
 										BWAPI::Unit* nearestbuilding = nearestUnit((*unitit)->getPosition(), allSelfUnits(isBuilding));
 										(*unitit)->move(nearestbuilding->getPosition());
 									}

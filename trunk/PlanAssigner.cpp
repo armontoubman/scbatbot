@@ -28,6 +28,10 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 
 	for each(UnitGroup* ug in unitgroupset)
 	{
+		if(ug == this->eiugm->droneUG)
+		{
+			continue;
+		}
 		log("PA for each\n");
 		if(ug->size()<2 && ug != this->eiugm->defendlingUG && ug != this->eiugm->defendgroepUG)
 		{
@@ -35,7 +39,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Overlord)) // nieuwe functie
 			{
 				log("PA if if\n");
-				currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 1, currentPlan)));
+				currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 1, currentPlan)));
 			}
 			else
 			{
@@ -46,18 +50,18 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 					if(this->tm->existsTaskWithType(4)) // nieuwe functie
 					{
 						log("PA if else if if\n");
-						currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 4, currentPlan)));
+						currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 4, currentPlan)));
 					}
 					else
 					{
 						log("PA if else if else\n");
-						currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 1, currentPlan)));
+						currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 1, currentPlan)));
 					}
 				}
 				else
 				{
 					log("PA if else else\n");
-					currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 5, currentPlan, true)));
+					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
 				}
 			}
 		}
@@ -67,7 +71,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 			if(ug == this->eiugm->defendgroepUG || ug == this->eiugm->defendlingUG || ug == this->eiugm->defendmutaUG)
 			{
 				log("PA else if\n");
-				currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 5, currentPlan, true)));
+				currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
 			}
 			else
 			{
@@ -75,12 +79,12 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 				if(this->tm->existsTaskWithPriority(5))
 				{
 					log("PA else else if\n");
-					currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 5, currentPlan, true)));
+					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
 				}
 				else
 				{
 					log("PA else else else\n");
-					currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 0, currentPlan, true)));
+					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 0, currentPlan, true)));
 				}
 			}
 		}
@@ -376,7 +380,8 @@ void PlanAssigner::update()
 {
 	log("PA:update()\n");
 	log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
-	this->plan = maakPlan();
+	//this->plan = maakPlan();
+	maakPlan();
 	log("PA:update() eind\n");
 	log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
 }
@@ -384,14 +389,12 @@ void PlanAssigner::update()
 Task PlanAssigner::vindTask(UnitGroup* ug)
 {
 	log("PA::vindTask()\n");
-	int lolsize = this->hc->planAssigner->plan.size();
+	int lolsize = this->hc->hcplan.size();
 	log("PAlolololool\n");
 	log(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
 	if(lolsize == 0) { log("plan is leeg...\n"); }
-	log("lolprint1\n");
 	if(lolsize > 0) { log("plan is niet leeg\n"); }
-	log("lolprint2\n");
-	for each(std::pair<UnitGroup*, Task> paar in this->plan)
+	/*for each(std::pair<UnitGroup*, Task> paar in this->plan)
 	{
 		log("plan iteratie\n");
 		if(paar.first == ug)
@@ -399,7 +402,34 @@ Task PlanAssigner::vindTask(UnitGroup* ug)
 			log("PA::vindTask() bijbehorende task gevonden\n");
 			return paar.second;
 		}
-	}
+	}*/
+
 	log("PA::vindTask() geen task gevonden, geef defend hatchery\n");
-	return Task(5, 1, this->hc->hatchery->getPosition());
+
+	return this->hc->hcplan[ug];
+
+	//return Task(-1, 1, this->hc->hatchery->getPosition());
+}
+
+Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
+{
+	log("PA::vindTask2()\n");
+	int lolsize = lijst.size();
+	log("PAlolololool\n");
+	log(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
+	if(lolsize == 0) { log("plan is leeg...\n"); }
+	if(lolsize > 0) { log("plan is niet leeg\n"); }
+	for each(std::pair<UnitGroup*, Task> paar in lijst)
+	{
+		log("plan iteratie\n");
+		if(paar.first == ug)
+		{
+			log("PA::vindTask2() bijbehorende task gevonden\n");
+			return paar.second;
+		}
+	}
+
+	log("PA::vindTask() geen task gevonden, geef defend hatchery\n");
+
+	return Task(-1, 1, this->hc->hatchery->getPosition());
 }
