@@ -326,7 +326,7 @@ void MicroManager::mineWhere(BWAPI::Unit* unit)
 		UnitGroup minerals = getUnusedMineralsNearHatcheries(); // pak alle unused minerals die in de nabijheid van een hatchery bevinden
 		if(minerals.empty()) // voor als het vol is enzo
 		{
-			unit->move(this->hc->getNearestHatchery(unit->getPosition()));
+			unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
 		}
 		unit->gather(nearestUnitInGroup(unit, minerals));
 	}
@@ -351,7 +351,7 @@ void MicroManager::gasWhere(BWAPI::Unit* unit)
 		}
 		if (result.empty())
 		{
-			unit->move(this->hc->getNearestHatchery(unit->getPosition()));
+			unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
 		}
 		unit->gather(nearestUnitInGroup(unit, result));
 	}
@@ -377,7 +377,7 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 		result = result + getUnusedMineralsNearHatcheries();
 		if (result.empty())
 		{
-			unit->move(this->hc->getNearestHatchery(unit->getPosition()));
+			unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
 		}
 		unit->gather(nearestUnitInGroup(unit, result));
 	}
@@ -477,7 +477,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			UnitGroup allenemies = enemiesInRange(eerste->getPosition(), dist(7), 0);
 			if(eerste->isUnderStorm() || canAttackAir(allenemies) && airenemies.size() == 0)
 			{
-				(*it)->move(this->hc->getNearestHatchery(eerste->getPosition())->getPosition());
+				(*it)->move(this->hc->getNearestHatchery(eerste->getPosition())->getPosition()); // move
 			}
 			else
 			{
@@ -523,7 +523,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				{
 					if(canAttackAir(enemiesInRange(eerste->getPosition(), dist(7), 0)))
 					{
-						(*it)->move(moveAway(eerste));
+						(*it)->move(moveAway(eerste)); // move
 					}
 					else
 					{
@@ -533,7 +533,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							(*it)->move(this->tm->findTaskWithUnit(eerste).position);	
+							(*it)->move(this->tm->findTaskWithUnit(eerste).position);	 // move
 						}
 					}
 				}
@@ -601,7 +601,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						else
 						{
 							logx("doMicro zergling ", eerste, " move naar task\n");
-							(*it)->move(this->tm->findTaskWithUnit(eerste).position);
+							(*it)->move(this->tm->findTaskWithUnit(eerste).position); // move
 						}
 					}
 					else
@@ -630,7 +630,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						if(!isUnderDarkSwarm(eerste))
 						{
 							logx("doMicro zergling ", eerste, " naar swarm\n");
-							(**it).move(swarm->getPosition());
+							(**it).move(swarm->getPosition()); // move
 						}
 						else
 						{
@@ -668,7 +668,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									else
 									{
 										logx("doMicro zergling ", eerste, " naar enemy position\n");
-										(*it)->move(enemy->getPosition());
+										(*it)->move(enemy->getPosition()); // move
 									}
 								}
 							}
@@ -707,12 +707,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										if (tooSplitUp(dist(10), *it))
 										{
 											logx("doMicro zergling ", eerste, " breng zerg samen\n");
-											(*it)->move((*it)->getCenter());
+											(*it)->move((*it)->getCenter()); // move
 										}
 										else
 										{
 											logx("doMicro zergling ", eerste, " move naar task\n");
-											(*it)->move(this->tm->findTaskWithUnit(eerste).position);
+											(*it)->move(this->tm->findTaskWithUnit(eerste).position); // move
 										}
 									}
 								}
@@ -762,12 +762,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										if (tooSplitUp(dist(10), *it))
 										{
 											logx("doMicro zergling ", eerste, " breng zerg samen\n");
-											(*it)->move((*it)->getCenter());
+											(*it)->move((*it)->getCenter()); // move
 										}
 										else
 										{
 											logx("doMicro zergling ", eerste, " move naar task\n");
-											(*it)->move(this->tm->findTaskWithUnit(eerste).position);
+											(*it)->move(this->tm->findTaskWithUnit(eerste).position); // move
 										}
 									}
 								}
@@ -783,8 +783,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		{
 			for(std::set<BWAPI::Unit*>::iterator unitit=(*it)->begin(); unitit!=(*it)->end(); unitit++)
 			{
-
+				log("for unit iterator findtaskwithunit\n");
+				log(this->hc->wantBuildManager->intToString(this->hc->planAssigner->plan.size()).append("\n").c_str());
 				Task currentTask = this->tm->findTaskWithUnit(*unitit);
+				log("na findtaskwithunit\n");
 
 				/* ULTRALISK */
 				if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Ultralisk)
@@ -1450,7 +1452,7 @@ void MicroManager::moveToNearestBase(BWAPI::Unit* unit)
 	BWAPI::Unit* nearest = hc->getNearestHatchery(unit->getPosition());
 	if (unit->getPosition().getDistance(nearest->getPosition()) > dist(5)) // voorkomt dat ze buggen
 	{
-		unit->move(nearest);
+		unit->move(nearest->getPosition());
 	}
 }
 
@@ -1459,7 +1461,7 @@ void MicroManager::moveToNearestBase(std::set<BWAPI::Unit*> units)
 	BWAPI::Unit* nearest = hc->getNearestHatchery(UnitGroup::getUnitGroup(units).getCenter());
 	if (UnitGroup::getUnitGroup(units).getCenter().getDistance(nearest->getPosition()) > dist(5))
 	{
-		UnitGroup::getUnitGroup(units).move(nearest);
+		UnitGroup::getUnitGroup(units).move(nearest->getPosition()); // move
 	}
 }
 

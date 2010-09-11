@@ -13,6 +13,7 @@ public:
 	2 combat
 	3 prepare
 	4 detector
+	5 defend
 	*/
 	int priority;
 	BWAPI::Position position;
