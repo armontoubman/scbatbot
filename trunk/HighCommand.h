@@ -26,7 +26,7 @@ public:
 	BWAPI::Unit* getNearestHatchery(BWAPI::Position pos);
 
 	BWAPI::Unit* hatchery;
-private:
+//private:
 	std::string intToString(int i);
 	EigenUnitDataManager* eigenUnitDataManager;
 	EnemyUnitDataManager* enemyUnitDataManager;

@@ -29,6 +29,8 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->thisAlgorithmBecomingSkynetCost = 999999999;
 	this->tick = 1;
 	this->wantBuildManager->doLists();
+	this->taskManager->update();
+	this->planAssigner->update();
 
 	log("\n\n\n\nNEW GAME\n\n\n\n");
 
@@ -63,15 +65,17 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
 	log("HC::update enemyUnitDataManager\n");
 	this->enemyUnitDataManager->update(enemyUnits);
-	log("HC::update taskManager\n");
-	this->taskManager->update();
-	log("HC::update planAssigner\n");
-	this->planAssigner->update();
 
 	if(this->tick == 5)
 	{
+		log("HC::update taskManager\n");
+		this->taskManager->update();
+		log("HC::update planAssigner\n");
+		log(this->wantBuildManager->intToString(this->planAssigner->plan.size()).append("\n").c_str());
+		this->planAssigner->update();
+		log(this->wantBuildManager->intToString(this->planAssigner->plan.size()).append("\n").c_str());
 	}
-	
+
 	log("HC::update doMicro\n");
 	this->microManager->doMicro(this->eigenUnitGroupManager->unitGroups);
 	log("HC::update wantBuildManager\n");

@@ -1745,3 +1745,14 @@ bool UnitGroup::useTech(TechType tech, Unit* target) const
   }
   return retval;
 }
+
+// Armon 11-9-2010
+bool UnitGroup::move(Position target) const
+{
+  bool retval=true;
+  for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
+  {
+    retval = retval && (*i)->move(target);
+  }
+  return retval;
+}

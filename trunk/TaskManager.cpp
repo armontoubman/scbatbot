@@ -68,7 +68,9 @@ Task TaskManager::findTaskWithUnitGroup(UnitGroup* ug)
 
 Task TaskManager::findTaskWithUnit(BWAPI::Unit* unit)
 {
-	return this->pa->vindTask(this->eugm->findUnitGroupWithUnit(unit));
+	UnitGroup* group = this->eugm->findUnitGroupWithUnit(unit);
+	if(group==NULL) log("TM:fTWU group==NULL\n");
+	return this->pa->vindTask(group);
 }
 
 void TaskManager::update()

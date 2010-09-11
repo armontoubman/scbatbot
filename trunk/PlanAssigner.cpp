@@ -2,6 +2,13 @@
 #include <BWAPI.h>
 #include <map>
 #include "Util.h"
+#include "HighCommand.h"
+#include "TaskManager.h"
+#include "EigenUnitGroupManager.h"
+#include "EnemyUnitDataManager.h"
+#include "MicroManager.h"
+#include "UnitGroup.h"
+#include "Task.h"
 
 PlanAssigner::PlanAssigner(HighCommand* h, TaskManager* t, EigenUnitGroupManager* e, EnemyUnitDataManager* ed, MicroManager* m)
 {
@@ -28,7 +35,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Overlord)) // nieuwe functie
 			{
 				log("PA if if\n");
-				addAssignment(ug, mostAppropriate(ug, 1, currentPlan), &currentPlan);
+				currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 1, currentPlan)));
 			}
 			else
 			{
@@ -39,18 +46,18 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 					if(this->tm->existsTaskWithType(4)) // nieuwe functie
 					{
 						log("PA if else if if\n");
-						addAssignment(ug, mostAppropriate(ug, 4, currentPlan), &currentPlan);
+						currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 4, currentPlan)));
 					}
 					else
 					{
 						log("PA if else if else\n");
-						addAssignment(ug, mostAppropriate(ug, 1, currentPlan), &currentPlan);
+						currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 1, currentPlan)));
 					}
 				}
 				else
 				{
 					log("PA if else else\n");
-					addAssignment(ug, mostAppropriate(ug, 5, currentPlan, true), &currentPlan);
+					currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 5, currentPlan, true)));
 				}
 			}
 		}
@@ -60,7 +67,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 			if(ug == this->eiugm->defendgroepUG || ug == this->eiugm->defendlingUG || ug == this->eiugm->defendmutaUG)
 			{
 				log("PA else if\n");
-				addAssignment(ug, mostAppropriate(ug, 5, currentPlan, true), &currentPlan);
+				currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 5, currentPlan, true)));
 			}
 			else
 			{
@@ -68,12 +75,12 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 				if(this->tm->existsTaskWithPriority(5))
 				{
 					log("PA else else if\n");
-					addAssignment(ug, mostAppropriate(ug, 5, currentPlan, true), &currentPlan);
+					currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 5, currentPlan, true)));
 				}
 				else
 				{
 					log("PA else else else\n");
-					addAssignment(ug, mostAppropriate(ug, 0, currentPlan, true), &currentPlan);
+					currentPlan.insert(std::pair<UnitGroup*, Task>(ug, mostAppropriate(ug, 0, currentPlan, true)));
 				}
 			}
 		}
@@ -352,11 +359,6 @@ bool PlanAssigner::containsTask(std::map<UnitGroup*, Task> plan, Task t)
 	return false;
 }
 
-void PlanAssigner::addAssignment(UnitGroup* ug, Task t, std::map<UnitGroup*, Task>* plan)
-{
-	plan->insert(std::pair<UnitGroup*, Task>(ug, t));
-}
-
 double PlanAssigner::logicaldistance(UnitGroup* ug, BWAPI::Position pos)
 {
 	BWAPI::Position center = ug->getCenter();
@@ -372,17 +374,32 @@ double PlanAssigner::logicaldistance(UnitGroup* ug, BWAPI::Position pos)
 
 void PlanAssigner::update()
 {
+	log("PA:update()\n");
+	log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
 	this->plan = maakPlan();
+	log("PA:update() eind\n");
+	log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
 }
 
 Task PlanAssigner::vindTask(UnitGroup* ug)
 {
+	log("PA::vindTask()\n");
+	int lolsize = this->hc->planAssigner->plan.size();
+	log("PAlolololool\n");
+	log(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
+	if(lolsize == 0) { log("plan is leeg...\n"); }
+	log("lolprint1\n");
+	if(lolsize > 0) { log("plan is niet leeg\n"); }
+	log("lolprint2\n");
 	for each(std::pair<UnitGroup*, Task> paar in this->plan)
 	{
+		log("plan iteratie\n");
 		if(paar.first == ug)
 		{
+			log("PA::vindTask() bijbehorende task gevonden\n");
 			return paar.second;
 		}
 	}
+	log("PA::vindTask() geen task gevonden, geef defend hatchery\n");
 	return Task(5, 1, this->hc->hatchery->getPosition());
 }
