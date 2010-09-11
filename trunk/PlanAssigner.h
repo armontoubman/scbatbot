@@ -28,5 +28,9 @@ public:
 	bool containsTask(std::map<UnitGroup*, Task> plan, Task t);
 	void addAssignment(UnitGroup* ug, Task t, std::map<UnitGroup*, Task>* plan);
 	double logicaldistance(UnitGroup* ug, BWAPI::Position pos);
+	
+	std::map<UnitGroup*, Task> plan;
+	void update();
+	Task vindTask(UnitGroup* ug);
 };
 

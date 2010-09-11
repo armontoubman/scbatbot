@@ -86,6 +86,7 @@ int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2)
 			{
 				return 1;
 			}
+			return 0;
 		}
 	}
 	else
@@ -102,6 +103,7 @@ int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2)
 			{
 				return 1;
 			}
+			return 0;
 		}
 	}
 }
@@ -293,4 +295,21 @@ double PlanAssigner::logicaldistance(UnitGroup* ug, BWAPI::Position pos)
 	{
 		return BWTA::getGroundDistance(BWAPI::TilePosition(center), BWAPI::TilePosition(pos));
 	}
+}
+
+void PlanAssigner::update()
+{
+	this->plan = maakPlan();
+}
+
+Task PlanAssigner::vindTask(UnitGroup* ug)
+{
+	for each(std::pair<UnitGroup*, Task> paar in this->plan)
+	{
+		if(paar.first == ug)
+		{
+			return paar.second;
+		}
+	}
+	return Task(5, 1, this->hc->hatchery->getPosition());
 }
