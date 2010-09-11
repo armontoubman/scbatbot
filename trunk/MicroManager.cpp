@@ -359,7 +359,7 @@ void MicroManager::gasWhere(BWAPI::Unit* unit)
 
 void MicroManager::gatherWhere(BWAPI::Unit* unit)
 {
-	if ((unit->isGatheringGas()) || (unit->isGatheringMinerals()))
+	if ((unit->isGatheringGas()) || (unit->isGatheringMinerals()) || (unit->isConstructing()))
 	{
 		//return unit->getTarget();
 	}

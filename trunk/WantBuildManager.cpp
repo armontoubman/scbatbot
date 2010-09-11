@@ -247,7 +247,7 @@ int WantBuildManager::dronesRequiredAll()
 		for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
 		{
 			// CRASH HIER
-			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10.00), (*it)->getPosition());
+			//UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10.00), (*it)->getPosition());
 			//UnitGroup enemiesinrange = this->mm->enemiesInRange((*it)->getPosition(), dist(10.00), 0);
 			//if ((enemiesinrange.size() > 0 && this->mm->amountCanAttackGround(enemiesinrange) < 5) || (allies.size()>2))
 			{
@@ -510,8 +510,8 @@ void WantBuildManager::doLists()
 		if(	stap == 1 && (buildListIsEmpty()) && (wantListIsEmpty())) 
 		{
 			log("doLists stap 1 lege lijsten\n");
-			addBuild(BWAPI::UnitTypes::Zerg_Drone, 4);
-			addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
+			addBuild(BWAPI::UnitTypes::Zerg_Drone, 5);
+			//addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
 			addBuild(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 2); // *7*
@@ -558,7 +558,7 @@ void WantBuildManager::doLists()
 					log("dl p 1-5\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
-					addWant(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
+					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
 					stap = 3;
 				}
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0))
@@ -571,7 +571,7 @@ void WantBuildManager::doLists()
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) > 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon) > 3)) // *7*fix
 				{
 					log("dl p 1-7\n");
-					addWant(BWAPI::UnitTypes::Zerg_Zergling, 20);
+					addBuild(BWAPI::UnitTypes::Zerg_Zergling, 20);
 					if(	(((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))+wantList.count(BWAPI::UnitTypes::Zerg_Hatchery)+wantList.count(BWAPI::UnitTypes::Zerg_Lair)+wantList.count(BWAPI::UnitTypes::Zerg_Hive)) < 2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den)==0)) // *7*
 					{
 						log("dl p 1-7-1\n");
@@ -612,12 +612,12 @@ void WantBuildManager::doLists()
 			if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Templar_Archives) > 0) || ((nrOfEnemy(BWAPI::UnitTypes::Protoss_Citadel_of_Adun) > 0) && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) > 7)) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Arbiter_Tribunal) > 0))
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Spire);
-				addWant(BWAPI::UnitTypes::Zerg_Mutalisk, 11);
+				addBuild(BWAPI::UnitTypes::Zerg_Mutalisk, 11);
 			}
 			if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 9 )
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
-				addWant(BWAPI::UnitTypes::Zerg_Hydralisk, 20);
+				addBuild(BWAPI::UnitTypes::Zerg_Hydralisk, 20);
 			}
 			if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot)+nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon)) > 13)
 			{
@@ -869,8 +869,8 @@ void WantBuildManager::doLists()
 	{
 		if(	stap == 1 && (buildListIsEmpty()) && (wantListIsEmpty())) 
 		{
-			addBuild(BWAPI::UnitTypes::Zerg_Drone, 4);
-			addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
+			addBuild(BWAPI::UnitTypes::Zerg_Drone, 5);
+			//addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
 			addBuild(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 2);
@@ -1141,8 +1141,8 @@ void WantBuildManager::doLists()
 	{
 		if(	stap == 1 && (buildListIsEmpty()) && (wantListIsEmpty())) 
 		{
-			addBuild(BWAPI::UnitTypes::Zerg_Drone, 4);
-			addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
+			addBuild(BWAPI::UnitTypes::Zerg_Drone, 5);
+			//addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
 			addBuild(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 2);
