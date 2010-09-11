@@ -437,12 +437,12 @@ void WantBuildManager::update()
 								log("bouwen maar\n");
 								BWAPI::TilePosition lokatie = placeFound(b.buildtype);
 								bouwStruc(lokatie, b.buildtype);
-								buildList.removeTop();
+								//buildList.removeTop(); // crash
 								log("bouwen gelukt\n");
 							}
 							else
 							{
-								buildList.removeTop();
+								//buildList.removeTop(); // crash
 								log("wordt al gemaakt\n");
 							}
 							log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());

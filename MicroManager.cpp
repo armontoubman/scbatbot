@@ -493,7 +493,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 				}
 				else {
-					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(9))
+					if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position) < dist(9))
 					{
 						for(std::set<BWAPI::Unit*>::iterator scourgeit=(*it)->begin(); scourgeit!=(*it)->end(); scourgeit++)
 						{
@@ -502,7 +502,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					else
 					{
-						(*it)->attackMove(this->tm->findTaskWithUnit(eerste).position);
+						(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position);
 					}
 				}
 			}
@@ -527,19 +527,19 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					else
 					{
-						if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(9))
+						if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position) < dist(9))
 						{
 							moveToNearestBase(**it);
 						}
 						else
 						{
-							(*it)->move(this->tm->findTaskWithUnit(eerste).position);	 // move
+							(*it)->move(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position);	 // move
 						}
 					}
 				}
 				else
 				{
-					if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(9))
+					if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position) < dist(9))
 					{
 						BWAPI::Unit* nearestAirEnemy = nearestEnemyThatCanAttackAir(eerste);
 						double distanceAE = eerste->getPosition().getDistance(nearestAirEnemy->getPosition());
@@ -563,7 +563,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					else
 					{
-						(*it)->attackMove(this->tm->findTaskWithUnit(eerste).position);
+						(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position);
 					}
 				}
 			}
@@ -584,7 +584,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				}
 				else
 				{
-					Task currentTask = this->tm->findTaskWithUnit(eerste);
+					Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)); // was this-> tm->findTaskWithUnit(eerste)
 					if (currentTask.type == 1) // <-- deze
 					{
 						logx("doMicro zergling ", eerste, " task.type!=1\n");
@@ -601,7 +601,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						else
 						{
 							logx("doMicro zergling ", eerste, " move naar task\n");
-							(*it)->move(this->tm->findTaskWithUnit(eerste).position); // move
+							(*it)->move(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position); // move
 						}
 					}
 					else
@@ -694,7 +694,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								else
 								{
 									logx("doMicro zergling ", eerste, " geen buildings\n");
-									if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(6))
+									if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position) < dist(6))
 									{
 										logx("doMicro zergling ", eerste, " task in de buurt, splitUp\n");
 										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
@@ -712,7 +712,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										else
 										{
 											logx("doMicro zergling ", eerste, " move naar task\n");
-											(*it)->move(this->tm->findTaskWithUnit(eerste).position); // move
+											(*it)->move(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position); // move
 										}
 									}
 								}
@@ -749,7 +749,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								else
 								{
 									logx("doMicro zergling ", eerste, " geen buildings\n");
-									if(eerste->getDistance(this->tm->findTaskWithUnit(eerste).position) < dist(6))
+									if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position) < dist(6))
 									{
 										logx("doMicro zergling ", eerste, " in de buurt van task, splitUp\n");
 										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
@@ -767,7 +767,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										else
 										{
 											logx("doMicro zergling ", eerste, " move naar task\n");
-											(*it)->move(this->tm->findTaskWithUnit(eerste).position); // move
+											(*it)->move(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position); // move
 										}
 									}
 								}

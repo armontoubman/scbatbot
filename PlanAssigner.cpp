@@ -444,3 +444,16 @@ Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 
 	return Task(-1, 1, this->hc->hatchery->getPosition());
 }
+
+std::set<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst, int t)
+{
+	std::set<Task> result;
+	for each(std::pair<UnitGroup*, Task> paar in this->plan)
+	{
+		if(paar.second.type == t)
+		{
+			result.insert(paar.second);
+		}
+	}
+	return result;
+}

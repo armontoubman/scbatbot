@@ -10,7 +10,7 @@ class EigenUnitGroupManager
 {
 	friend class HighCommand;
 public:
-	EigenUnitGroupManager(HighCommand* hc, EigenUnitDataManager* e, TaskManager* t);
+	EigenUnitGroupManager(HighCommand* hc, EigenUnitDataManager* e, TaskManager* t, PlanAssigner* p);
 	bool canAttackAir(UnitGroup unitGroup);
 	bool canAttackGround(UnitGroup unitGroup);
 	bool onlyAirUnits(UnitGroup unitGroup);
@@ -43,6 +43,7 @@ public:
 	HighCommand* highCommand;
 	EigenUnitDataManager* eiudm;
 	TaskManager* tm;
+	PlanAssigner* pa;
 
 	UnitGroup* defendlingUG;
 	UnitGroup* overlordUG;
