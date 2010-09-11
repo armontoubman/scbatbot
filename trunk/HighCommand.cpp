@@ -66,7 +66,7 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
 	log("HC::update enemyUnitDataManager\n");
 	this->enemyUnitDataManager->update(enemyUnits);
-	log("HC::update enemyUnitDataManager\n");
+	log("HC::update eigenUnitGroupManager\n");
 	this->eigenUnitGroupManager->update();
 
 	if(this->tick == 5)
