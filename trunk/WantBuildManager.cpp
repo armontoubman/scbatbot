@@ -623,7 +623,7 @@ void WantBuildManager::doLists()
 			{
 				addWant(BWAPI::TechTypes::Lurker_Aspect);
 			}
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 15) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 40)) && wantListContains(BWAPI::UnitTypes::Zerg_Spire) && wantListContains(BWAPI::UnitTypes::Zerg_Hydralisk_Den) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)  > (3*(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)))))
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 15) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 40) && wantListContains(BWAPI::UnitTypes::Zerg_Spire) && wantListContains(BWAPI::UnitTypes::Zerg_Hydralisk_Den) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)  > (3*(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)))))
 			{
 				stap = 4;
 			}
