@@ -175,6 +175,8 @@ void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
 	else if(type == BWAPI::UnitTypes::Zerg_Overlord)
 	{
 		this->overlordUG->insert(unit);
+		log("overlordUG size: ");
+		log(this->highCommand->wantBuildManager->intToString(overlordUG->size()).append("\n").c_str());
 	}
 	else if(type == BWAPI::UnitTypes::Zerg_Drone)
 	{
@@ -300,8 +302,8 @@ void EigenUnitGroupManager::update()
 	int aantaloverlords = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Overlord).size();
 	if(aantaloverlords/2 < overlordUG->size())
 	{
-		log("new overlord groep");
-		BWAPI::Unit* firstoverlord = *(*overlordUG)(Overlord).end();
+		log("new overlord groep\n");
+		BWAPI::Unit* firstoverlord = *(*overlordUG)(Overlord).begin();
 		UnitGroup* newoverlordgroep = new UnitGroup();
 		moveUnitBetweenGroups(overlordUG, firstoverlord, newoverlordgroep);
 		addUG(newoverlordgroep);
@@ -329,6 +331,7 @@ void EigenUnitGroupManager::update()
 		UnitGroup* nogeenlurkergroep;
 		for(std::set<UnitGroup*>::iterator zit=unitGroups.begin(); zit!=unitGroups.end(); zit++)
 		{
+			log("for zit\n");
 			if((**zit)(Zergling).size() > 0 && (**zit).size() > 1)
 			{
 				zerglingmergeconditie = true;
