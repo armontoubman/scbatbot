@@ -248,8 +248,8 @@ int WantBuildManager::dronesRequiredAll()
 		{
 			// CRASH HIER
 			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10.00), (*it)->getPosition());
-			UnitGroup enemiesinrange = this->mm->enemiesInRange((*it)->getPosition(), dist(10.00), 0);
-			if ((enemiesinrange.size() > 0 && this->mm->amountCanAttackGround(enemiesinrange) < 5) || (allies.size()>2))
+			//UnitGroup enemiesinrange = this->mm->enemiesInRange((*it)->getPosition(), dist(10.00), 0);
+			//if ((enemiesinrange.size() > 0 && this->mm->amountCanAttackGround(enemiesinrange) < 5) || (allies.size()>2))
 			{
 				if((*it)->getDistance(*mit) <= dist(10.00))
 				{

@@ -5,15 +5,18 @@
 #include <BWAPI.h>
 #include <list>
 #include "HighCommand.h"
+#include "PlanAssigner.h"
+class PlanAssigner;
 class EigenUnitGroupManager;
 class TaskManager {
 	friend class HighCommand;
 public:
 	TaskManager();
-	TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu, HighCommand* h);
+	TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu, HighCommand* h, PlanAssigner* p);
 	EigenUnitGroupManager* eugm;
 	EnemyUnitDataManager* eudm;
 	HighCommand* hc;
+	PlanAssigner* pa;
 
 	void insertTask(Task t);
 	void removeTask(Task t);

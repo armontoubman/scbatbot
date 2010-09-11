@@ -22,7 +22,7 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	this->eigenUnitDataManager = new EigenUnitDataManager();
 	this->enemyUnitDataManager = new EnemyUnitDataManager(im);
 	this->eigenUnitGroupManager = new EigenUnitGroupManager(this, this->eigenUnitDataManager, this->taskManager);
-	this->taskManager = new TaskManager(this->eigenUnitGroupManager, this->enemyUnitDataManager, this);
+	this->taskManager = new TaskManager(this->eigenUnitGroupManager, this->enemyUnitDataManager, this, this->planAssigner);
 	this->wantBuildManager = new WantBuildManager(this->enemyUnitDataManager, bom, ba, this, this->microManager);
 	this->microManager = new MicroManager(bom, this->enemyUnitDataManager, this->taskManager, this, this->eigenUnitDataManager, this->wantBuildManager);
 	this->planAssigner = new PlanAssigner(this, this->taskManager, this->eigenUnitGroupManager, this->enemyUnitDataManager, this->microManager);
@@ -41,7 +41,6 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	log(asctime(timeinfo));
 	log("\n");
 
-	// crasht als ie wordt gesloopt (getinitialtileposition?)
 	this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery).begin();
 
 	BWAPI::Broodwar->setLocalSpeed(0);
@@ -60,21 +59,27 @@ HighCommand::~HighCommand() {
 void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits)
 {
 	this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
-
+	log("HC::update eigenUnitDataManager\n");
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
+	log("HC::update enemyUnitDataManager\n");
 	this->enemyUnitDataManager->update(enemyUnits);
-
+	log("HC::update taskManager\n");
 	this->taskManager->update();
+	log("HC::update planAssigner\n");
+	this->planAssigner->update();
 
 	if(this->tick == 5)
 	{
 	}
-
+	
+	log("HC::update doMicro\n");
 	this->microManager->doMicro(this->eigenUnitGroupManager->unitGroups);
+	log("HC::update wantBuildManager\n");
 	this->wantBuildManager->update();
 
 	if(this->tick == 5)
 	{
+		log("HC::update doLists\n");
 		this->wantBuildManager->doLists();
 	}
 

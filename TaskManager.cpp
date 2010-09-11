@@ -9,17 +9,19 @@
 #include "Task.h"
 #include "Util.h"
 #include "HighCommand.h"
+#include "PlanAssigner.h"
 class Task;
 class EigenUnitGroupManager;
 TaskManager::TaskManager()
 {
 }
 
-TaskManager::TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu, HighCommand* h)
+TaskManager::TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu, HighCommand* h, PlanAssigner* p)
 {
 	this->eugm = e;
 	this->eudm = eu;
 	this->hc = h;
+	this->pa = p;
 }
 
 void TaskManager::insertTask(Task t)
@@ -59,20 +61,14 @@ Task TaskManager::highestPriorityTask()
 	return *this->tasklist.end();
 }
 
-Task TaskManager::findTaskWithUnitGroup(UnitGroup* ug) // moet via plan
+Task TaskManager::findTaskWithUnitGroup(UnitGroup* ug)
 {
-	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
-	{
-		if((i->unitGroup) == ug) {
-			return *i;
-		}
-	}
-	return Task(-1, 1, (*ug->begin())->getPosition(), ug);
+	return this->pa->vindTask(ug);
 }
 
-Task TaskManager::findTaskWithUnit(BWAPI::Unit* unit) // via plan
+Task TaskManager::findTaskWithUnit(BWAPI::Unit* unit)
 {
-	return this->findTaskWithUnitGroup(this->eugm->findUnitGroupWithUnit(unit));
+	return this->pa->vindTask(this->eugm->findUnitGroupWithUnit(unit));
 }
 
 void TaskManager::update()
