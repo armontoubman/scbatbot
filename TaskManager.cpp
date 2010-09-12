@@ -132,11 +132,14 @@ void TaskManager::update()
 					}
 					else
 					{
+						log("tm1\n");
 						UnitGroup eigenInRange = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding).inRadius(dist(10), enemy.second.position);
+						log("tm2\n");
 						if(eigenInRange.size() > 0)
 						{
 							UnitGroup enemyUG2;
 							std::map<BWAPI::Unit*, EnemyUnitData> enemyInRange = this->eudm->getEnemyUnitsInRadius(dist(10), enemy.second.position);
+							log("tm3\n");
 							std::set<BWAPI::Position> posset;
 							for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemypair in enemyInRange)
 							{
