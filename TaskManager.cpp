@@ -95,7 +95,7 @@ void TaskManager::update()
 		if(enemy.second.position != BWAPI::Positions::Unknown)
 		{
 			std::map<BWAPI::Unit*, EnemyUnitData> inrange = this->eudm->getEnemyUnitsInRadius(10*32, enemy.second.position);
-			if(!enemy.first->getType().isBuilding())
+			if(!enemy.second.unitType.isBuilding())
 			{
 				if(BWAPI::Broodwar->getFrameCount() - enemy.second.lastSeen > 10*24)
 				{
