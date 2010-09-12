@@ -112,7 +112,22 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	for each(BWAPI::Unit* unit in allUnits)
 	{
-		BWAPI::Broodwar->drawTextMap(unit->getPosition().x(), unit->getPosition().y(), unit->getOrder().getName().c_str());
+		std::string unitmsg;
+
+		//order
+		//unitmsg = unit->getOrder().getName()
+
+		//UG
+		UnitGroup* group = this->eigenUnitGroupManager->findUnitGroupWithUnit(unit);
+		if(group == this->eigenUnitGroupManager->defendlingUG) { unitmsg = "defendlingUG"; }
+		else if(group == this->eigenUnitGroupManager->overlordUG) { unitmsg = "overlordUG"; }
+		else if(group == this->eigenUnitGroupManager->droneUG) { unitmsg = "droneUG"; }
+		else if(group == this->eigenUnitGroupManager->defendmutaUG) { unitmsg = "defendmutaUG"; }
+		else if(group == this->eigenUnitGroupManager->defendgroepUG) { unitmsg = "defendgroepUG"; }
+		else if(group == this->eigenUnitGroupManager->lurkergroepUG) { unitmsg = "lurkergroepUG"; }
+		else { unitmsg = this->wantBuildManager->intToString((int) group); }
+
+		BWAPI::Broodwar->drawTextMap(unit->getPosition().x(), unit->getPosition().y(), unitmsg.c_str());
 	}
 }
 

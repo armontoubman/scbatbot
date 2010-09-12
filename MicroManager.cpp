@@ -375,7 +375,8 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 		UnitGroup result = extractors;
 		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 		{
-			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()>=3)
+			//if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()>=3)
+			if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *it).size() > 2)
 			{
 				log("erase extractor\n");
 				result.erase(*it); // ug met een unit ehh
@@ -432,7 +433,8 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition());
 			if ((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>2))
 			{
-				if((*it)->getDistance(*mit) <= dist(13) && !(*mit)->isBeingGathered())
+				//if((*it)->getDistance(*mit) <= dist(13) && !(*mit)->isBeingGathered())
+				if((*it)->getDistance(*mit) <= dist(13) && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *mit).size() == 0)
 				{
 					result.insert(*mit);
 				}

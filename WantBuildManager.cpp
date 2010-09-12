@@ -330,6 +330,21 @@ void WantBuildManager::update()
 			if(b.buildtype.isBuilding() || b.typenr == 4)
 			{
 				UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
+				if(b.typenr == 4)
+				{
+					std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
+					UnitGroup exps = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery)(isBeingConstructed);
+					for each(BWAPI::Unit* exp in exps)
+					{
+						for each(BWTA::BaseLocation* baseloc in baselocs)
+						{
+							if(baseloc->getTilePosition() == exp->getTilePosition())
+							{
+								bezig.insert(exp);
+							}
+						}
+					}
+				}
 				// bezig kan size > 1 hebben
 				for each(BWAPI::Unit* lolgebouw in bezig)
 				{
@@ -599,7 +614,7 @@ void WantBuildManager::doLists()
 					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
 					stap = 3;
 				}
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0)) // deze was gecomment
+				//if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0)) // deze was gecomment
 				{
 					log("dl p 1-6\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
@@ -1494,7 +1509,11 @@ void WantBuildManager::doLists()
 	if( BWAPI::Broodwar->self()->minerals() > 300 && wantList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den) == 0 && wantList.count(BWAPI::UnitTypes::Zerg_Spire) == 0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) >10) // toegevoegd
 	{
 		log("dl v expand 3\n");
-		buildExpand();
+		if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery)(isBeingConstructed).size() + UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery,Lair,Hive).size() <3)
+		{
+			log("dl v expand 3.1\n");
+			buildExpand();
+		}
 	}
 
 	//emergency
@@ -1724,9 +1743,15 @@ void WantBuildManager::doExpand()
 	std::set<BWTA::BaseLocation*> baselocations = BWTA::getBaseLocations();
 	std::map<BWAPI::Unit*, EnemyUnitData> enemies = this->eudm->getData();
 	int distance = -1;
+	
+	std::set<BWTA::BaseLocation*> kandidaten;
 	for each(BWTA::BaseLocation* baselocation in baselocations)
 	{
+		bool isConnected = false;
 		bool enemyOpLocatie = false;
+		bool friendlyOpLocatie = false;
+
+		// enemy op deze lokatie?
 		for each(std::pair<BWAPI::Unit*, EnemyUnitData> paar in enemies)
 		{
 			if(BWAPI::TilePosition(paar.second.position) == baselocation->getTilePosition())
@@ -1734,26 +1759,40 @@ void WantBuildManager::doExpand()
 				enemyOpLocatie = true;
 			}
 		}
-		if(BWAPI::Broodwar->unitsOnTile(baselocation->getTilePosition().x(), baselocation->getTilePosition().y()).size() == 0)
+
+		// friendly op deze lokatie?
+		if(BWAPI::Broodwar->unitsOnTile(baselocation->getTilePosition().x(), baselocation->getTilePosition().y()).size() > 0)
 		{
-			if(enemyOpLocatie == false)
-			{
-				if(BWAPI::Broodwar->isExplored(baselocation->getTilePosition()))
-				{
-					if(distance == -1)
-					{
-						tilepos = baselocation->getTilePosition();
-						distance = this->hc->hatchery->getDistance(baselocation->getPosition());
-					}
-					else if(this->hc->hatchery->getDistance(baselocation->getPosition()) < distance)
-					{
-						tilepos = baselocation->getTilePosition();
-						distance = this->hc->hatchery->getDistance(baselocation->getPosition());
-					}
-				}
-			}
+			friendlyOpLocatie = true;
+		}
+
+		isConnected = BWTA::isConnected(this->hc->hatchery->getTilePosition(), baselocation->getTilePosition());
+
+		if(isConnected && !enemyOpLocatie && !friendlyOpLocatie)
+		{
+			kandidaten.insert(baselocation);
 		}
 	}
+	BWTA::BaseLocation* dichtstbijzijnde = NULL;
+	for each(BWTA::BaseLocation* kandidaat in kandidaten)
+	{
+		if(distance == -1)
+		{
+			dichtstbijzijnde = kandidaat;
+			distance = this->hc->hatchery->getDistance(kandidaat->getPosition());
+		}
+		else if(this->hc->hatchery->getDistance(kandidaat->getPosition()) < distance)
+		{
+			dichtstbijzijnde = kandidaat;
+			distance = this->hc->hatchery->getDistance(kandidaat->getPosition());
+		}
+	}
+	if(dichtstbijzijnde != NULL)
+	{
+		tilepos = dichtstbijzijnde->getTilePosition();
+	}
+	// else { nog steeds hatchery locatie, zie begin }
+	
 	BWAPI::Unit* drone = pickBuildDrone(tilepos);
 	if(drone != NULL && tilepos != this->hc->hatchery->getTilePosition() && BWTA::isConnected(drone->getTilePosition(), tilepos))
 	{
@@ -1773,16 +1812,19 @@ void WantBuildManager::doExpand()
 		{
 			if(!BWAPI::Broodwar->isVisible(tilepos))
 			{
+				log("expand plek niet visible, move\n");
 				drone->move(BWAPI::Position(tilepos));
 			}
 			else
 			{
+				log("expand plek visible, build\n");
 				drone->build(tilepos, BWAPI::UnitTypes::Zerg_Hatchery);
 			}
 			BWAPI::Broodwar->drawTextMap(drone->getPosition().x(), drone->getPosition().y(), std::string("\nexpand").c_str());
 		}
 		if(underconstruction)
 		{
+			log("wordt al een hatchery gebouwd, stop\n");
 			drone->stop();
 		}
 		//this->bouwdrones.insert(drone);
