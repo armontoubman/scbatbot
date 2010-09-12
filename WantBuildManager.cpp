@@ -314,6 +314,7 @@ int WantBuildManager::nrOfEnemyBases()
 void WantBuildManager::update()
 {
 	log("WantBuildManager::update()\n");
+	logBuildList(this->buildList);
 	// Actual building of items
 	if(buildList.size() > 0)
 	{
@@ -427,9 +428,10 @@ void WantBuildManager::update()
 							bool albezig = false;
 							for each(BWAPI::Unit* drone in drones)
 							{
+								//if(drone->getOrder() == BWAPI::Orders::PlaceBuilding)
 								if(drone->getBuildType() == b.buildtype)
 								{
-									albezig = false;
+									albezig = true;
 								}
 							}
 							if(albezig == false)
@@ -1601,15 +1603,18 @@ BWAPI::TilePosition WantBuildManager::placeFoundExtractor()
 	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive);
 	for each(BWAPI::Unit* hatchery in hatcheries)
 	{
-		std::set<BWAPI::Unit*> extrageysers = BWTA::getNearestBaseLocation(hatchery->getTilePosition())->getGeysers();
+		//std::set<BWAPI::Unit*> extrageysers = BWTA::getNearestBaseLocation(hatchery->getTilePosition())->getGeysers();
+		std::set<BWAPI::Unit*> extrageysers = UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits())(Vespene_Geyser).inRadius(dist(9), hatchery->getPosition());
 		geysers.insert(extrageysers.begin(), extrageysers.end());
 	}
 	if(geysers.size() > 0)
 	{
+		log("geysers gevonden\n");
 		return (*geysers.begin())->getTilePosition();
 	}
 	else
 	{
+		log("geen geysers gevonden\n");
 		return (*hatcheries.begin())->getTilePosition();
 	}
 }
@@ -1744,8 +1749,15 @@ void WantBuildManager::doExpand()
 		}
 		if(!underconstruction)
 		{
-			drone->build(tilepos, BWAPI::UnitTypes::Zerg_Hatchery);
-			BWAPI::Broodwar->drawTextMap(drone->getPosition().x(), drone->getPosition().y(), std::string("expand").c_str());
+			if(!BWAPI::Broodwar->isVisible(tilepos))
+			{
+				drone->move(BWAPI::Position(tilepos));
+			}
+			else
+			{
+				drone->build(tilepos, BWAPI::UnitTypes::Zerg_Hatchery);
+			}
+			BWAPI::Broodwar->drawTextMap(drone->getPosition().x(), drone->getPosition().y(), std::string("\nexpand").c_str());
 		}
 		if(underconstruction)
 		{
@@ -1753,4 +1765,31 @@ void WantBuildManager::doExpand()
 		}
 		//this->bouwdrones.insert(drone);
 	}
+}
+
+void WantBuildManager::logBuildList(BuildList bl)
+{
+	log("BUILDLIST: ");
+	for each(BuildItem bi in bl.buildlist)
+	{
+		log("[");
+		if(bi.typenr == 1)
+		{
+			log(bi.buildtype.getName().c_str());
+		}
+		if(bi.typenr == 2)
+		{
+			log(bi.upgradetype.getName().c_str());
+		}
+		if(bi.typenr == 3)
+		{
+			log(bi.researchtype.getName().c_str());
+		}
+		if(bi.typenr == 4)
+		{
+			log("expand");
+		}
+		log("]");
+	}
+	log("\n");
 }

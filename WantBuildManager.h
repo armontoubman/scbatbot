@@ -88,4 +88,6 @@ public:
 
 	std::set<BWAPI::Unit*> bouwdrones;
 	void doExpand();
+
+	void logBuildList(BuildList bl);
 };

@@ -107,6 +107,12 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		log(this->wantBuildManager->intToString(drone->getID()).append(" ").c_str());
 	}
 	log("\n");*/
+
+	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	for each(BWAPI::Unit* unit in allUnits)
+	{
+		BWAPI::Broodwar->drawTextMap(unit->getPosition().x(), unit->getPosition().y(), unit->getOrder().getName().c_str());
+	}
 }
 
 void HighCommand::onRemoveUnit(BWAPI::Unit* unit)
