@@ -79,7 +79,6 @@ void WantBuildManager::addWant(BWAPI::UpgradeType upgradetype)
 void WantBuildManager::addBuild(BWAPI::UnitType unittype)
 {
 	addBuild(unittype, 1);
-	log(std::string("addBuild ").append(unittype.getName()).append("\n").c_str());
 }
 
 void WantBuildManager::addBuild(BWAPI::UnitType unittype, int amount)
@@ -600,7 +599,7 @@ void WantBuildManager::doLists()
 					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
 					stap = 3;
 				}
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0))
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0)) // deze was gecomment
 				{
 					log("dl p 1-6\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
@@ -1342,41 +1341,41 @@ void WantBuildManager::doLists()
 	if (zerglingtotaal > 10)
 	{
 		log("dl g zlingtotal satis\n");
-		addBuild(BWAPI::UpgradeTypes::Metabolic_Boost);
+		addWant(BWAPI::UpgradeTypes::Metabolic_Boost);
 	}
 	
 	if( ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) + nrOfOwn(BWAPI::UnitTypes::Zerg_Lurker)) * 2) >47 && buildList.count(BWAPI::UpgradeTypes::Zerg_Missile_Attacks)<1 )
 	{
 		log("dl upgr missile\n");
-		addBuild(BWAPI::UpgradeTypes::Zerg_Missile_Attacks); // research ranged ground dmg
+		addWant(BWAPI::UpgradeTypes::Zerg_Missile_Attacks); // research ranged ground dmg
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 11 && buildList.count(BWAPI::UpgradeTypes::Muscular_Augments)<1 )
 	{
 		log("dl upgr muscu\n");
-		addBuild(BWAPI::UpgradeTypes::Muscular_Augments); // research hydralisk speed
+		addWant(BWAPI::UpgradeTypes::Muscular_Augments); // research hydralisk speed
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 	log("dl upgr muscu->spines\n");
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 19 && buildList.count(BWAPI::UpgradeTypes::Grooved_Spines)<1 )
 	{
 		log("dl upgr spines\n");
-		addBuild(BWAPI::UpgradeTypes::Grooved_Spines); // research range
+		addWant(BWAPI::UpgradeTypes::Grooved_Spines); // research range
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 
 	if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling)+nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk)) > 39 && buildList.count(BWAPI::UpgradeTypes::Zerg_Melee_Attacks)<1 )
 	{
 		log("dl upgr melee\n");
-		addBuild(BWAPI::UpgradeTypes::Zerg_Melee_Attacks); // research melee ground damage
+		addWant(BWAPI::UpgradeTypes::Zerg_Melee_Attacks); // research melee ground damage
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 
 	if( BWAPI::Broodwar->self()->supplyUsed() > 180 && buildList.count(BWAPI::UpgradeTypes::Zerg_Carapace)<1 ) // >90 supply required (dubbel vanwege werking API)
 	{
 		log("dl upgr cara\n");
-		addBuild(BWAPI::UpgradeTypes::Zerg_Carapace); // upgrade ground armor
+		addWant(BWAPI::UpgradeTypes::Zerg_Carapace); // upgrade ground armor
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 	log("dl upgr cara->burrow\n");
@@ -1384,7 +1383,7 @@ void WantBuildManager::doLists()
 	if( BWAPI::Broodwar->self()->supplyUsed() > 90 && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 15 || nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 20) && buildList.count(BWAPI::TechTypes::Burrowing)<1 )
 	{
 		log("dl upgr burrow\n");
-		addBuild(BWAPI::TechTypes::Burrowing);
+		addWant(BWAPI::TechTypes::Burrowing);
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hive) > 0 )
@@ -1392,35 +1391,35 @@ void WantBuildManager::doLists()
 		log("dl hive tech\n");
 		if (buildList.count(BWAPI::UpgradeTypes::Zerg_Melee_Attacks)<1)
 		{
-			addBuild(BWAPI::UpgradeTypes::Zerg_Melee_Attacks); // upgrade melee ground damage
+			addWant(BWAPI::UpgradeTypes::Zerg_Melee_Attacks); // upgrade melee ground damage
 			addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 		}
 		if (buildList.count(BWAPI::UpgradeTypes::Zerg_Carapace)<1)
 		{
-			addBuild(BWAPI::UpgradeTypes::Zerg_Carapace); // upgrade ground armor
+			addWant(BWAPI::UpgradeTypes::Zerg_Carapace); // upgrade ground armor
 			addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 		}
 		if (buildList.count(BWAPI::UpgradeTypes::Adrenal_Glands)<1)
 		{
-			addBuild(BWAPI::UpgradeTypes::Adrenal_Glands); // upgrade ground armor
+			addWant(BWAPI::UpgradeTypes::Adrenal_Glands); // upgrade ground armor
 			addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 		}
 		if( nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk_Cavern) > 0 )
 		{
 			if (buildList.count(BWAPI::UpgradeTypes::Anabolic_Synthesis)<1)
 			{
-				addBuild(BWAPI::UpgradeTypes::Anabolic_Synthesis); // research ultralisk speed
+				addWant(BWAPI::UpgradeTypes::Anabolic_Synthesis); // research ultralisk speed
 			}
 			if (buildList.count(BWAPI::UpgradeTypes::Chitinous_Plating)<1)
 			{
-				addBuild(BWAPI::UpgradeTypes::Chitinous_Plating); // research ultralisk armor
+				addWant(BWAPI::UpgradeTypes::Chitinous_Plating); // research ultralisk armor
 			}
 		}
 		if( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0 )
 		{
 			if (buildList.count(BWAPI::TechTypes::Consume)<1)
 			{
-				addBuild(BWAPI::TechTypes::Consume); // research sacrifice geval
+				addWant(BWAPI::TechTypes::Consume); // research sacrifice geval
 			}
 		}
 	}
@@ -1485,7 +1484,7 @@ void WantBuildManager::doLists()
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
 	}
 
-	if(wantList.count(BWAPI::UnitTypes::Zerg_Spire) || wantList.count(BWAPI::TechTypes::Lurker_Aspect)) // toegevoegd
+	if(wantList.count(BWAPI::UnitTypes::Zerg_Spire) == 1 || wantList.count(BWAPI::TechTypes::Lurker_Aspect) == 1) // toegevoegd
 	{
 		log("dl v lair want\n");
 		addWant(BWAPI::UnitTypes::Zerg_Extractor);
@@ -1503,6 +1502,10 @@ void WantBuildManager::doLists()
 
 	//Generieke rule:
 	log("dl start generiek\n");
+	log("wantlist size: ");
+	log(this->intToString(wantList.size()).append("\n").c_str());
+	log("buildlist size: ");
+	log(this->intToString(buildList.size()).append("\n").c_str());
 	for(std::list<BuildItem>::iterator it=wantList.buildlist.begin(); it!=wantList.buildlist.end(); it++)
 	{
 		if((*it).typenr == 1)
@@ -1510,12 +1513,15 @@ void WantBuildManager::doLists()
 			int wantAantal = wantList.count((*it).buildtype);
 			int buildAantal = buildList.count((*it).buildtype);
 			int hebAantal = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType,(*it).buildtype).size();
-			if(wantAantal < buildAantal+hebAantal)
+			log("for wantlist type==1\n");
+			if(wantAantal > (buildAantal+hebAantal))
 			{
 				log("dl generiek buildenunit\n");
 				log((*it).buildtype.getName().append("\n").c_str());
 				addBuild((*it).buildtype);
+				log("na de addbuild\n");
 			}
+			log("na de if\n");
 		}
 		if((*it).typenr == 2)
 		{
@@ -1749,7 +1755,7 @@ void WantBuildManager::doExpand()
 		}
 	}
 	BWAPI::Unit* drone = pickBuildDrone(tilepos);
-	if(drone != NULL && tilepos != this->hc->hatchery->getTilePosition())
+	if(drone != NULL && tilepos != this->hc->hatchery->getTilePosition() && BWTA::isConnected(drone->getTilePosition(), tilepos))
 	{
 		log("drone != NULL\n");
 

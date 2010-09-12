@@ -359,7 +359,7 @@ void MicroManager::gasWhere(BWAPI::Unit* unit)
 
 void MicroManager::gatherWhere(BWAPI::Unit* unit)
 {
-	if ((unit->isGatheringGas()) || (unit->isConstructing()) || ((unit->isMoving()) && (!unit->isGatheringMinerals())) )
+	if ((unit->isGatheringGas()) || (unit->isConstructing()) || ((unit->isMoving()) && (!unit->isCarryingMinerals())) )
 	{
 		/*if (unit->isGatheringGas())
 		{
@@ -804,7 +804,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				log("for unit iterator findtaskwithunit\n");
 				log((*unitit)->getType().getName().c_str());
 				log("\n");
-				log(this->hc->wantBuildManager->intToString(this->hc->planAssigner->plan.size()).append("\n").c_str());
+				//log(this->hc->wantBuildManager->intToString(this->hc->planAssigner->plan.size()).append("\n").c_str());
 				//Task currentTask = this->tm->findTaskWithUnit(*unitit);
 				Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(*unitit));
 				log("na findtaskwithunit\n");
