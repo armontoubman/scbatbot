@@ -239,9 +239,13 @@ void TaskManager::update()
 		insertTask(Task(5, 3, frontline));
 	}
 
-	std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
+	//BWTA::BaseLocation* enemystart = BWTA::getStartLocation(BWAPI::Broodwar->enemy());
 
-	if(this->eudm->getData().size() < 15)
+	/*if(!BWAPI::Broodwar->isExplored(enemystart->getPosition()))
+	{
+		insertTask(Task(1, 1, enemystart->getPosition()));
+	}
+	else*/ if(this->eudm->getData().size() < 15)
 	{
 		std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
 		for each(BWTA::BaseLocation* baseloc in baselocs)
@@ -257,6 +261,8 @@ void TaskManager::update()
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*0).makeValid()));
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*1).makeValid()));	
+
+	insertTask(Task(5, 3, this->hc->hatchery->getPosition()));
 
 }
 
