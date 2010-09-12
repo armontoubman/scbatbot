@@ -435,10 +435,31 @@ void WantBuildManager::update()
 							if(albezig == false)
 							{
 								log("bouwen maar\n");
-								BWAPI::TilePosition lokatie = placeFound(b.buildtype);
-								bouwStruc(lokatie, b.buildtype);
-								//buildList.removeTop(); // crash
-								log("bouwen gelukt\n");
+								bool gogo = false;
+								BWAPI::TilePosition lokatie;
+								if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
+								{
+									lokatie = placeFoundExtractor();
+									if(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()).size() == 0)
+									{
+										gogo = true;
+									}
+								}
+								else
+								{
+									lokatie = placeFound(b.buildtype);
+									gogo = true;
+								}
+								if(gogo)
+								{
+									bouwStruc(lokatie, b.buildtype);
+									//buildList.removeTop(); // crash
+									log("bouwen gelukt\n");
+								}
+								else
+								{
+									log("bouwen mislukt, geen locatie\n");
+								}
 							}
 							else
 							{
@@ -1571,30 +1592,25 @@ bool WantBuildManager::requirementsSatisfied(BWAPI::UpgradeType upgradetype)
 BWAPI::TilePosition WantBuildManager::placeFound(BWAPI::UnitType unittype)
 {
 	log("placeFound\n");
-	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	if(unittype == BWAPI::UnitTypes::Zerg_Extractor)
+	return BuildingPlacer().getBuildLocationNear(this->hc->hatchery->getTilePosition(), unittype);
+}
+
+BWAPI::TilePosition WantBuildManager::placeFoundExtractor()
+{
+	std::set<BWAPI::Unit*> geysers;
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive);
+	for each(BWAPI::Unit* hatchery in hatcheries)
 	{
-		log("extractor\n");
-		UnitGroup geysers;
-		UnitGroup hatcheries = allUnits(Hatchery);
-		for each(BWAPI::Unit* hatchery in hatcheries)
-		{
-			geysers = geysers + UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits())(Vespene_Geyser).inRadius(dist(20), hatchery->getPosition());
-		}
-		BWAPI::Unit* geyser = *geysers.begin();
-		if(geyser != NULL)
-		{
-			return geyser->getTilePosition();
-		}
-		else
-		{
-			log("FATAL ERROR, GEEN GEYSERS");
-		}
+		std::set<BWAPI::Unit*> extrageysers = BWTA::getNearestBaseLocation(hatchery->getTilePosition())->getGeysers();
+		geysers.insert(extrageysers.begin(), extrageysers.end());
+	}
+	if(geysers.size() > 0)
+	{
+		return (*geysers.begin())->getTilePosition();
 	}
 	else
 	{
-		log("geen extractor\n");
-		return BuildingPlacer().getBuildLocationNear(this->hc->hatchery->getTilePosition(), unittype);
+		return (*hatcheries.begin())->getTilePosition();
 	}
 }
 
