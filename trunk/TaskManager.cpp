@@ -250,10 +250,10 @@ void TaskManager::update()
 		}
 	}
 
-	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*32, BWAPI::Broodwar->mapWidth()*16).makeValid()));
-	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight(), BWAPI::Broodwar->mapWidth()*16).makeValid()));
-	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*16, BWAPI::Broodwar->mapWidth()).makeValid()));
-	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*16, BWAPI::Broodwar->mapWidth()*32).makeValid()));	
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*1, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*0).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*1).makeValid()));	
 
 }
 
