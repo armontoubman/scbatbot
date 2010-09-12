@@ -26,6 +26,14 @@ void BuildList::removeTop()
 	this->buildlist.erase(this->buildlist.begin());
 }
 
+void BuildList::removeSecond()
+{
+	BuildItem b = this->top();
+	this->removeTop();
+	this->removeTop();
+	this->addItemTop(b);
+}
+
 void BuildList::removeAll(BuildItem b)
 {
 	std::list<BuildItem>::iterator curr = this->buildlist.begin();
@@ -135,6 +143,13 @@ bool BuildList::containsExpand()
 BuildItem BuildList::top()
 {
 	return *buildlist.begin();
+}
+
+BuildItem BuildList::getSecond()
+{
+	iterator it=buildlist.begin();
+	it++
+	return *it;
 }
 
 void BuildList::addItemTop(BuildItem b)
