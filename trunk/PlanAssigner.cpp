@@ -21,7 +21,7 @@ PlanAssigner::PlanAssigner(HighCommand* h, TaskManager* t, EigenUnitGroupManager
 
 std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 {
-	log("PA::maakPlan()\n");
+	//log("PA::maakPlan()\n");
 	std::set<Task> tasklist = this->tm->tasklist;
 	std::set<UnitGroup*> unitgroupset = this->eiugm->unitGroups;
 	std::map<UnitGroup*, Task> currentPlan;
@@ -32,64 +32,64 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 		{
 			continue;
 		}
-		log("PA for each\n");
+		//log("PA for each\n");
 		if(ug->size()<2 && ug != this->eiugm->defendlingUG && ug != this->eiugm->defendgroepUG)
 		{
-			log("PA if\n");
+			//log("PA if\n");
 			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Overlord)) // nieuwe functie
 			{
-				log("PA if if\n");
+				//log("PA if if\n");
 				currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 1, currentPlan)));
 			}
 			else
 			{
-				log("PA if else\n");
+				//log("PA if else\n");
 				if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Overlord))
 				{
-					log("PA if else if\n");
+					//log("PA if else if\n");
 					if(this->tm->existsTaskWithType(4)) // nieuwe functie
 					{
-						log("PA if else if if\n");
+						//log("PA if else if if\n");
 						currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 4, currentPlan)));
 					}
 					else
 					{
-						log("PA if else if else\n");
+						//log("PA if else if else\n");
 						currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 1, currentPlan)));
 					}
 				}
 				else
 				{
-					log("PA if else else\n");
+					//log("PA if else else\n");
 					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
 				}
 			}
 		}
 		else
 		{
-			log("PA else\n");
+			//log("PA else\n");
 			if(ug == this->eiugm->defendgroepUG || ug == this->eiugm->defendlingUG || ug == this->eiugm->defendmutaUG)
 			{
-				log("PA else if\n");
+				//log("PA else if\n");
 				currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
 			}
 			else
 			{
-				log("PA else else\n");
+				//log("PA else else\n");
 				if(this->tm->existsTaskWithPriority(5))
 				{
-					log("PA else else if\n");
+					//log("PA else else if\n");
 					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
 				}
 				else
 				{
-					log("PA else else else\n");
+					//log("PA else else else\n");
 					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 0, currentPlan, true)));
 				}
 			}
 		}
 	}
-	log("PA::maakPlan() einde\n");
+	//log("PA::maakPlan() einde\n");
 	return currentPlan;
 }
 
@@ -97,29 +97,29 @@ int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2)
 {
 	int eigen = 2;
 	if(ug2 == NULL) {
-		log("ca ug2=null\n");
+		//log("ca ug2=null\n");
 		return 2;
 	}
 	if(ug1 == NULL) {
-		log("ca ug1=null\n");
+		//log("ca ug1=null\n");
 		return 0;
 	}
 	if((*ug1->begin())->getPlayer() == BWAPI::Broodwar->self())
 	{
-		log("ca ug1=self\n");
+		//log("ca ug1=self\n");
 		eigen = 1;
 		std::map<BWAPI::Unit*, EnemyUnitData> data = this->eudm->getMapFromUG(ug2);
-		log("ca ug1=self, ok opgezocht\n");
+		//log("ca ug1=self, ok opgezocht\n");
 		if(this->mm->canAttackAir(*ug1) && this->mm->canAttackGround(*ug1) || this->mm->canAttackAir(*ug1) && this->eudm->onlyAirUnits(data) || this->mm->canAttackGround(*ug1) && this->eudm->onlyGroundUnits(data))
 		{
-			log("ca ug1=self airconditie\n");
+			//log("ca ug1=self airconditie\n");
 			return 2;
 		}
 		else
 		{
 			if(!this->eudm->onlyGroundUnits(data) && !this->eudm->onlyAirUnits(data))
 			{
-				log("ca ug1=self mixed\n");
+				//log("ca ug1=self mixed\n");
 				return 1;
 			}
 			return 0;
@@ -127,20 +127,20 @@ int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2)
 	}
 	else
 	{
-		log("ca ug2=self\n");
+		//log("ca ug2=self\n");
 		eigen = 2;
 		std::map<BWAPI::Unit*, EnemyUnitData> data = this->eudm->getMapFromUG(ug1);
-		log("ca ug2=self, ok opgezocht\n");
+		//log("ca ug2=self, ok opgezocht\n");
 		if(this->eudm->canAttackAir(data) && this->eudm->canAttackGround(data) || this->eudm->canAttackAir(data) && (*ug2)(isFlyer).size() == ug2->size() || this->eudm->canAttackGround(data) && (*ug2)(isFlyer).size() == 0)
 		{
-			log("ca ug2=self airconditie\n");
+			//log("ca ug2=self airconditie\n");
 			return 2;
 		}
 		else
 		{
 			if((*ug2)(isFlyer).size() > 0 && (*ug2).not(isFlyer).size() > 0)
 			{
-				log("ca ug2=self mixed\n");
+				//log("ca ug2=self mixed\n");
 				return 1;
 			}
 			return 0;
@@ -155,7 +155,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 
 Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<UnitGroup*, Task> currentPlan, bool nullwaarde)
 {
-	log("PA::mostAppropriate()\n");
+	//log("PA::mostAppropriate()\n");
 	std::set<Task> idealTasks;
 	std::set<Task> appropriateTasks;
 	std::set<Task> lessAppropriateTasks;
@@ -163,16 +163,16 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 	std::set<Task> originalTasks = this->tm->tasklist;
 	for each(Task otask in originalTasks)
 	{
-		log("ma for each\n");
+		//log("ma for each\n");
 		if(nullwaarde || !containsTask(currentPlan, otask)) // nieuwe functie
 		{
-			log("ma if nullwaarde\n");
+			//log("ma if nullwaarde\n");
 			if(tasktype == 0 && (otask.type == 5 || otask.type == 2 || otask.type == 3))
 			{
-				log("ma if 0523\n");
+				//log("ma if 0523\n");
 				if((!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), (*otask.enemy->begin())->getTilePosition())) || this->eiugm->onlyAirUnits(*current)) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
 				{
-					log("ma if !air && connected\n");
+					//log("ma if !air && connected\n");
 					if(otask.enemy == NULL)
 					{
 						lessAppropriateTasks.insert(otask);
@@ -180,56 +180,56 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 					else
 					{
 						//if(otask.enemy == NULL || otask.enemy->size() == 0) // <---- hier staat de ==NULL check, omdat als ie null hij zal crash op ->size()
-						log("ma enemy=null||size=0\n");
+						//log("ma enemy=null||size=0\n");
 						int wk = canAttack(current, otask.enemy);
 						int zk = canAttack(otask.enemy, current);
 
 						if(wk!=0)
 						{
-							log("ma wk!=0\n");
+							//log("ma wk!=0\n");
 							if(current->size() > 9)
 							{
-								log("ma size>9\n");
+								//log("ma size>9\n");
 								if(this->eudm->nrMilitaryUnits(*otask.enemy)>6) // nullpointers
 								{
-									log("ma mil>6\n");
+									//log("ma mil>6\n");
 									idealTasks.insert(otask);
 								}
 								else
 								{
-									log("ma else\n");
+									//log("ma else\n");
 									if(otask.enemy->size()>6)
 									{
-										log("ma size>6\n");
+										//log("ma size>6\n");
 										appropriateTasks.insert(otask);
 									}
 									else
 									{
-										log("ma else !>6\n");
+										//log("ma else !>6\n");
 										lessAppropriateTasks.insert(otask);
 									}
 								}
 							}
 							else
 							{
-								log("ma currentsize <= 9\n");
+								//log("ma currentsize <= 9\n");
 								if(this->eudm->nrMilitaryUnits(*otask.enemy) > 6)
 								{
-									log("ma military>6\n");
+									//log("ma military>6\n");
 									if(zk==2 || wk!=2)
 									{
-										log("ma zk2 wk!2\n");
+										//log("ma zk2 wk!2\n");
 										lessAppropriateTasks.insert(otask);
 									}
 									else
 									{
-										log("ma zk2 wk!2 else\n");
+										//log("ma zk2 wk!2 else\n");
 										appropriateTasks.insert(otask);
 									}
 								}
 								else
 								{
-									log("ma militar>6 else\n");
+									//log("ma militar>6 else\n");
 									idealTasks.insert(otask);
 								}
 							}
@@ -239,55 +239,55 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 			}
 			else
 			{
-				log("ma wel enemy\n");
+				//log("ma wel enemy\n");
 				if(tasktype == 5 && otask.type == 5)
 				{
-					log("ma task 5\n");
+					//log("ma task 5\n");
 					if((!this->eiugm->onlyAirUnits(*current) 
 						&& (otask.enemy != NULL && BWTA::isConnected((*current->begin())->getTilePosition(), (*otask.enemy->begin())->getPosition())) )
 						|| (this->eiugm->onlyAirUnits(*current))) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
 					{
-						log("ma air\n");
+						//log("ma air\n");
 						int wk=canAttack(current, otask.enemy);
 						int zk=canAttack(otask.enemy, current);
 						if(wk!=0)
 						{
-							log("ma !wk=0\n");
+							//log("ma !wk=0\n");
 							if(logicaldistance(current, otask.position)<=(this->mm->dist(20)))
 							{
-								log("ma logicaldist\n");
+								//log("ma logicaldist\n");
 								if(this->eudm->nrMilitaryUnits(*otask.enemy) >6)
 								{
-									log("ma mil>6\n");
+									//log("ma mil>6\n");
 									if(current->size()>6 || zk==0)
 									{
-										log("ma cur>6\n");
+										//log("ma cur>6\n");
 										idealTasks.insert(otask);
 									}
 									else
 									{
-										log("ma cur!>6\n");
+										//log("ma cur!>6\n");
 										appropriateTasks.insert(otask);
 									}
 								}
 								else
 								{
-									log("ma mil!>6\n");
+									//log("ma mil!>6\n");
 									if(current->size()>9 || zk==2)
 									{
-										log("ma size>9 zk=2\n");
+										//log("ma size>9 zk=2\n");
 										lessAppropriateTasks.insert(otask);
 									}
 									else
 									{
-										log("ma ook niet\n");
+										//log("ma ook niet\n");
 										idealTasks.insert(otask);
 									}
 								}
 							}
 							else
 							{
-								log("ma illogical\n");
+								//log("ma illogical\n");
 								lessAppropriateTasks.insert(otask);
 							}
 						}
@@ -295,31 +295,31 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 				}
 				else
 				{
-					log("ma niet 5\n");
+					//log("ma niet 5\n");
 					if(tasktype == 4) // zeker weten?
 					{
-						log("ma 4\n");
+						//log("ma 4\n");
 						if(otask.type == 1)
 						{
-							log("ma 1\n");
+							//log("ma 1\n");
 							appropriateTasks.insert(otask);
 						}
 						else
 						{
-							log("ma niet 1\n");
+							//log("ma niet 1\n");
 							if(otask.type == 4)
 							{
-								log("ma toch wel 4\n");
+								//log("ma toch wel 4\n");
 								idealTasks.insert(otask);
 							}
 						}
 					}
 					else // type task == 2 -> scout dus) // alleen is scout 1 hier
 					{
-						log("ma niet 4\n");
+						//log("ma niet 4\n");
 						if(otask.type == 1)
 						{
-							log("ma 1 dan\n");
+							//log("ma 1 dan\n");
 							idealTasks.insert(otask);
 						}
 					}
@@ -328,30 +328,30 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 		}
 		else
 		{
-			log("ma niet null\n");
+			//log("ma niet null\n");
 			if(otask.type == 5 || otask.type == 2)
 			{
-				log("ma 5 of 2\n");
+				//log("ma 5 of 2\n");
 				lessAppropriateTasks.insert(otask);
 			}
 		}
 	}
 	if(idealTasks.size() > 0)
 	{
-		log("PA::mostAppropriate() idealTasks >0\n");
+		//log("PA::mostAppropriate() idealTasks >0\n");
 		return this->tm->nearestTask(current, idealTasks);
 	}
 	if(appropriateTasks.size() > 0)
 	{
-		log("PA::mostAppropriate() appropriateTasks >0\n");
+		//log("PA::mostAppropriate() appropriateTasks >0\n");
 		return this->tm->nearestTask(current, appropriateTasks);
 	}
 	if(lessAppropriateTasks.size() > 0)
 	{
-		log("PA::mostAppropriate() lessAppropriateTasks >0\n");
+		//log("PA::mostAppropriate() lessAppropriateTasks >0\n");
 		return this->tm->nearestTask(current, lessAppropriateTasks);
 	}
-	log("PA::mostAppropriate() laatste return, hier mag hij nooit komen\n");
+	//log("PA::mostAppropriate() laatste return, hier mag hij nooit komen\n");
 	return this->tm->nearestTask(current, lessAppropriateTasks);
 }
 
@@ -382,38 +382,38 @@ double PlanAssigner::logicaldistance(UnitGroup* ug, BWAPI::Position pos)
 
 void PlanAssigner::update()
 {
-	log("PA:update()\n");
-	log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
+	//log("PA:update()\n");
+	//log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
 	//this->plan = maakPlan();
 	maakPlan();
-	log("PA:update() eind\n");
-	log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
+	//log("PA:update() eind\n");
+	//log(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
 }
 
 Task PlanAssigner::vindTask(UnitGroup* ug)
 {
-	log("PA::vindTask()\n");
+	//log("PA::vindTask()\n");
 	int lolsize = this->hc->hcplan.size();
-	log("PAlolololool\n");
-	log(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
+	//log("PAlolololool\n");
+	//log(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
 	if(lolsize == 0)
 	{
-		log("plan is leeg...\n");
+		//log("plan is leeg...\n");
 	}
 	if(lolsize > 0) {
-		log("plan is niet leeg\n");
+		//log("plan is niet leeg\n");
 	}
 	/*for each(std::pair<UnitGroup*, Task> paar in this->plan)
 	{
-		log("plan iteratie\n");
+		//log("plan iteratie\n");
 		if(paar.first == ug)
 		{
-			log("PA::vindTask() bijbehorende task gevonden\n");
+			//log("PA::vindTask() bijbehorende task gevonden\n");
 			return paar.second;
 		}
 	}*/
 
-	log("PA::vindTask() geen task gevonden, geef defend hatchery\n");
+	//log("PA::vindTask() geen task gevonden, geef defend hatchery\n");
 
 	return this->hc->hcplan[ug];
 
@@ -422,28 +422,28 @@ Task PlanAssigner::vindTask(UnitGroup* ug)
 
 Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 {
-	log("PA::vindTask2()\n");
+	//log("PA::vindTask2()\n");
 	int lolsize = lijst.size();
-	log(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
+	//log(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
 	if(lolsize == 0)
 	{
-		log("plan is leeg...\n");
+		//log("plan is leeg...\n");
 	}
 	if(lolsize > 0)
 	{
-		log("plan is niet leeg\n");
+		//log("plan is niet leeg\n");
 	}
 	for each(std::pair<UnitGroup*, Task> paar in lijst)
 	{
-		log("plan iteratie\n");
+		//log("plan iteratie\n");
 		if(paar.first == ug)
 		{
-			log("PA::vindTask2() bijbehorende task gevonden\n");
+			//log("PA::vindTask2() bijbehorende task gevonden\n");
 			return paar.second;
 		}
 	}
 
-	log("PA::vindTask2() geen task gevonden, geef defend hatchery\n");
+	//log("PA::vindTask2() geen task gevonden, geef defend hatchery\n");
 
 	return Task(-1, 1, this->hc->hatchery->getPosition());
 }

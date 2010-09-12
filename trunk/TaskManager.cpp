@@ -10,6 +10,7 @@
 #include "Util.h"
 #include "HighCommand.h"
 #include "PlanAssigner.h"
+#include <BWTA.h>
 class Task;
 class EigenUnitGroupManager;
 TaskManager::TaskManager()
@@ -239,18 +240,12 @@ void TaskManager::update()
 		insertTask(Task(5, 3, frontline));
 	}
 
-	//BWTA::BaseLocation* enemystart = BWTA::getStartLocation(BWAPI::Broodwar->enemy());
-
-	/*if(!BWAPI::Broodwar->isExplored(enemystart->getPosition()))
-	{
-		insertTask(Task(1, 1, enemystart->getPosition()));
-	}
-	else*/ if(this->eudm->getData().size() < 15)
+	if(this->eudm->getData().size() < 15)
 	{
 		std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
 		for each(BWTA::BaseLocation* baseloc in baselocs)
 		{
-			if(!BWAPI::Broodwar->isExplored(baseloc->getPosition()))
+			if(!BWAPI::Broodwar->isVisible(baseloc->getPosition()))
 			{
 				insertTask(Task(1, 1, baseloc->getPosition()));
 			}
