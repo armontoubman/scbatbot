@@ -114,14 +114,13 @@ void TaskManager::update()
 					{
 						insertTask(Task(4, 3, enemy.second.position, &enemyUG));
 					}
-					if(!enemy.second.unitType.isBuilding()
-						&& enemy.second.unitType != BWAPI::UnitTypes::Zerg_Overlord
-						&& enemy.second.unitType != BWAPI::UnitTypes::Zerg_Drone
-						&& enemy.second.unitType != BWAPI::UnitTypes::Terran_SCV
-						&& enemy.second.unitType != BWAPI::UnitTypes::Protoss_Probe
-						&& enemy.second.unitType != BWAPI::UnitTypes::Protoss_Observer)
+					if((enemy.second.unitType == BWAPI::UnitTypes::Zerg_Overlord
+						|| enemy.second.unitType == BWAPI::UnitTypes::Zerg_Drone
+						|| enemy.second.unitType == BWAPI::UnitTypes::Terran_SCV
+						|| enemy.second.unitType == BWAPI::UnitTypes::Protoss_Probe
+						|| enemy.second.unitType == BWAPI::UnitTypes::Protoss_Observer))
 					{
-						UnitGroup eigenInRange = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), enemy.second.position);
+						UnitGroup eigenInRange = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding).inRadius(dist(10), enemy.second.position);
 						if(eigenInRange.size() > 0)
 						{
 							insertTask(Task(5, 2, enemy.second.position, &enemyUG));
@@ -133,28 +132,32 @@ void TaskManager::update()
 					}
 					else
 					{
-						UnitGroup eigenInRange = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), enemy.second.position);
+						UnitGroup eigenInRange = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding).inRadius(dist(10), enemy.second.position);
 						if(eigenInRange.size() > 0)
 						{
 							UnitGroup enemyUG2;
 							std::map<BWAPI::Unit*, EnemyUnitData> enemyInRange = this->eudm->getEnemyUnitsInRadius(dist(10), enemy.second.position);
+							std::set<BWAPI::Position> posset;
+							for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemypair in enemyInRange)
+							{
+								if(enemypair.second.position != BWAPI::Positions::Unknown)
+								{
+									posset.insert(enemypair.second.position);
+									enemyUG2.insert(enemypair.first);
+								}
+							}
+							BWAPI::Position taskpos = enemy.second.position;
+							if(posset.size() > 0)
+							{
+								taskpos = getCenterPosition(posset);
+							}
 							if(enemyInRange.size() > 4)
 							{
-								std::set<BWAPI::Position> posset;
-								for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemypair in enemyInRange)
-								{
-									if(enemypair.second.position != BWAPI::Positions::Unknown)
-									{
-										posset.insert(enemypair.second.position);
-										enemyUG2.insert(enemypair.first);
-									}
-								}
-								BWAPI::Position taskpos = enemy.second.position;
-								if(posset.size() > 0)
-								{
-									taskpos = getCenterPosition(posset);
-								}
 								insertTask(Task(5, 5, taskpos, &enemyUG2));
+							}
+							else
+							{
+								insertTask(Task(5, 3, taskpos, &enemyUG2));
 							}
 						}
 						else
