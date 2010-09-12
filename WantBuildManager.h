@@ -15,6 +15,8 @@ public:
 	WantBuildManager();
 	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba, HighCommand* h, MicroManager* m);
 
+	int stap;
+
 	void update();
 
 	void doLists();

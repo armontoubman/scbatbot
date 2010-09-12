@@ -500,7 +500,7 @@ void WantBuildManager::doLists()
 {
 	BWAPI::Race enemyRace = BWAPI::Broodwar->enemy()->getRace();
 
-	int stap = 1;
+	stap = 1;
 
 	log("doLists\n\n");
 
