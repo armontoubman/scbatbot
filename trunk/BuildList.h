@@ -9,6 +9,7 @@ public:
 	void removeItem(BuildItem b);
 	void removeAll(BuildItem b);
 	void removeTop();
+	void removeSecond()
 	void clear();
 	int count(BWAPI::UnitType t);
 	int count(BWAPI::TechType t);
@@ -22,6 +23,7 @@ public:
 	bool containsExpand();
 
 	BuildItem top();
+	BuildItem getSecond()
 	void addItemTop(BuildItem b);
 
 	int supplyRequiredForTopThree();

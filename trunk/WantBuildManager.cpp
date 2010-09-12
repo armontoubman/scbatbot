@@ -379,127 +379,159 @@ void WantBuildManager::update()
 					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 					return;
 				}
-				else if(canBeMade(b.buildtype))
+				else
 				{
-					if(!b.buildtype.isBuilding())
+					if(canBeMade(b.buildtype))
 					{
-						log("can make\n\t");
-						log(b.buildtype.getName().append("\n").c_str());
-						(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
-						buildList.removeTop();
-						log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-						return;
-					}
-					else
-					{
-						log("can make\n\t");
-						log(b.buildtype.getName().append("\n").c_str());
-						if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair)
+						if(!b.buildtype.isBuilding())
 						{
-							if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
-							{
-								log("probeer hatchery naar lair te morphen...\n");
-								this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Lair);
-								log("gelukt.\n");
-								buildList.removeTop();
-								return;
-							}
-							else
-							{
-								UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
-								if(hatcheries.size() == 0)
-								{
-									log("kan geen lair maken, geen hatcheries\n");
-									buildList.removeTop();
-								}
-								else
-								{
-									log("probeer hatchery naar lair te morphen...\n");
-									(*hatcheries.begin())->morph(BWAPI::UnitTypes::Zerg_Lair);
-									log("gelukt.\n");
-									buildList.removeTop();
-									return;
-								}
-							}
-						}
-						else if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
-						{
-							if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
-							{
-								log("probeer lair naar hive te morphen...\n");
-								this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
-								log("gelukt.\n");
-								buildList.removeTop();
-								return;
-							}
-							else
-							{
-								UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
-								if(lairs.size() == 0)
-								{
-									log("kan geen hive maken, geen lairs\n");
-									buildList.removeTop();
-								}
-								else
-								{
-									log("probeer lair naar hive te morphen...\n");
-									(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
-									log("gelukt.\n");
-									buildList.removeTop();
-									return;
-								}
-							}
+							log("can make\n\t");
+							log(b.buildtype.getName().append("\n").c_str());
+							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
+							buildList.removeTop();
+							log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+							return;
 						}
 						else
 						{
-							UnitGroup drones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-							bool albezig = false;
-							for each(BWAPI::Unit* drone in drones)
+							log("can make\n\t");
+							log(b.buildtype.getName().append("\n").c_str());
+							if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair)
 							{
-								//if(drone->getOrder() == BWAPI::Orders::PlaceBuilding)
-								if(drone->getBuildType() == b.buildtype)
+								if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
 								{
-									albezig = true;
+									log("probeer hatchery naar lair te morphen...\n");
+									this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Lair);
+									log("gelukt.\n");
+									buildList.removeTop();
+									return;
+								}
+								else
+								{
+									UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
+									if(hatcheries.size() == 0)
+									{
+										log("kan geen lair maken, geen hatcheries\n");
+										buildList.removeTop();
+									}
+									else
+									{
+										log("probeer hatchery naar lair te morphen...\n");
+										(*hatcheries.begin())->morph(BWAPI::UnitTypes::Zerg_Lair);
+										log("gelukt.\n");
+										buildList.removeTop();
+										return;
+									}
 								}
 							}
-							if(albezig == false)
+							else if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
 							{
-								log("bouwen maar\n");
-								bool gogo = false;
-								BWAPI::TilePosition lokatie;
-								if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
+								if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
 								{
-									lokatie = placeFoundExtractor();
-									if(UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Vespene_Geyser).size() == 1
-										&& UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Extractor, Refinery, Assimilator).size() == 0)
+									log("probeer lair naar hive te morphen...\n");
+									this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
+									log("gelukt.\n");
+									buildList.removeTop();
+									return;
+								}
+								else
+								{
+									UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
+									if(lairs.size() == 0)
 									{
+										log("kan geen hive maken, geen lairs\n");
+										buildList.removeTop();
+									}
+									else
+									{
+										log("probeer lair naar hive te morphen...\n");
+										(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
+										log("gelukt.\n");
+										buildList.removeTop();
+										return;
+									}
+								}
+							}
+							else
+							{
+								UnitGroup drones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+								bool albezig = false;
+								for each(BWAPI::Unit* drone in drones)
+								{
+									//if(drone->getOrder() == BWAPI::Orders::PlaceBuilding)
+									if(drone->getBuildType() == b.buildtype)
+									{
+										albezig = true;
+									}
+								}
+								if(albezig == false)
+								{
+									log("bouwen maar\n");
+									bool gogo = false;
+									BWAPI::TilePosition lokatie;
+									if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
+									{
+										lokatie = placeFoundExtractor();
+										if(UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Vespene_Geyser).size() == 1
+											&& UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Extractor, Refinery, Assimilator).size() == 0)
+										{
+											gogo = true;
+										}
+									}
+									else
+									{
+										lokatie = placeFound(b.buildtype);
 										gogo = true;
+									}
+									if(gogo)
+									{
+										bouwStruc(lokatie, b.buildtype);
+										//buildList.removeTop(); // crash
+										log("bouwen gelukt\n");
+									}
+									else
+									{
+										log("bouwen mislukt, geen locatie\n");
+										buildList.removeTop();
 									}
 								}
 								else
 								{
-									lokatie = placeFound(b.buildtype);
-									gogo = true;
-								}
-								if(gogo)
-								{
-									bouwStruc(lokatie, b.buildtype);
 									//buildList.removeTop(); // crash
-									log("bouwen gelukt\n");
+									log("wordt al gemaakt\n");
 								}
-								else
-								{
-									log("bouwen mislukt, geen locatie\n");
-									buildList.removeTop();
-								}
+								log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+								return;
+							}
+						}
+					}
+					else
+					{
+						// als eerste een gebouw is en 2e een unit = oke, 1=unit+2=gebouw, wordt wat lastiger moet je weer het 'buildstuff' doen, mogelijk aparte methode gewoon voor maken. Als je beide build hebt, dan wordt het maybe nog erger, moge we nog meer checks doen... zoals pak geen drone die al buildorder heeft. Maja zo vaak bouw je geen 2 dinge tegelijk als zerg.
+						if (buildList.size()>1)
+						{
+							BuildItem v = buildList.getSecond();
+							if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+							{
+								log("can't make second\n\t");
+								log(v.buildtype.getName().append("\n").c_str());
+								log("remove second\n");
+								buildList.removeSecond();
+								log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+								return;
 							}
 							else
 							{
-								//buildList.removeTop(); // crash
-								log("wordt al gemaakt\n");
+								if (bothCanBeMade(b.buildtype, v.buildtype))
+								{
+									log("can make second\n\t");
+									log(v.buildtype.getName().append("\n").c_str());
+									(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
+									buildList.removeSecond();
+									log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+									return;
+								}
 							}
-							log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-							return;
 						}
 					}
 				} 
@@ -1454,7 +1486,7 @@ void WantBuildManager::doLists()
 		addBuildTop(BWAPI::UnitTypes::Zerg_Overlord); // (dus wordt als eerste gedaan)
 	}
 	
-	if( dronesRequiredAll() > (buildList.count(BWAPI::UnitTypes::Zerg_Drone)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Drone)) && buildList.count(BWAPI::UnitTypes::Zerg_Drone)<2 ) // not sufficient drones
+	if( dronesRequiredAll() > (buildList.count(BWAPI::UnitTypes::Zerg_Drone)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Drone)) && buildList.count(BWAPI::UnitTypes::Zerg_Drone)<6 ) // not sufficient drones
 	{
 		log("drone build\n");	
 		addBuild(BWAPI::UnitTypes::Zerg_Drone);
@@ -1581,6 +1613,12 @@ bool WantBuildManager::canBeMade(BWAPI::UnitType unittype)
 {
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	return ((!unittype.isBuilding() && allUnits(Larva).size() > 0) || unittype.isBuilding()) && unittype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && unittype.gasPrice() <= BWAPI::Broodwar->self()->gas() && unittype.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed());
+}
+
+bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype,BWAPI::UnitType unittypetwo)
+{
+	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed());
 }
 
 bool WantBuildManager::canBeMade(BWAPI::TechType techtype)
