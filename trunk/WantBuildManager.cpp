@@ -98,12 +98,18 @@ void WantBuildManager::addBuildTop(BWAPI::UnitType unittype)
 
 void WantBuildManager::addBuild(BWAPI::TechType techtype)
 {
-	this->buildList.addItem(BuildItem(techtype, 1));
+	if (this->wantList.count(techtype)<1)
+	{
+		this->buildList.addItem(BuildItem(techtype, 1));
+	}
 }
 
 void WantBuildManager::addBuild(BWAPI::UpgradeType upgradetype)
 {
-	this->buildList.addItem(BuildItem(upgradetype, 1));
+	if (this->wantList.count(upgradetype)<1)
+	{
+		this->buildList.addItem(BuildItem(upgradetype, 1));
+	}
 }
 
 void WantBuildManager::wantExpand()
@@ -320,9 +326,9 @@ void WantBuildManager::update()
 	{
 		BuildItem b = buildList.top();
 
-		if(b.typenr == 1)
+		if(b.typenr == 1 || b.typenr == 4)
 		{
-			if(b.buildtype.isBuilding())
+			if(b.buildtype.isBuilding() || b.typenr == 4)
 			{
 				UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
 				// bezig kan size > 1 hebben
@@ -330,10 +336,16 @@ void WantBuildManager::update()
 				{
 					log("bezig met: ");
 					log(b.buildtype.getName().append("\n").c_str());
-					if(b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
+					if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
 					{
 						log(b.buildtype.getName().append(" ").c_str());
 						log("started and removed from top\n");
+						buildList.removeTop();
+						b = buildList.top();
+					}
+					if(b.typenr == 4 && lolgebouw->getType() == BWAPI::UnitTypes::Zerg_Hatchery && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
+					{
+						log("expand started and removed from top\n");
 						buildList.removeTop();
 						b = buildList.top();
 					}
@@ -512,7 +524,7 @@ void WantBuildManager::update()
 				if(requirementsSatisfied(BWAPI::UnitTypes::Zerg_Hatchery) && canBeMade(BWAPI::UnitTypes::Zerg_Hatchery))
 				{
 					doExpand();
-					buildList.removeTop();
+					//buildList.removeTop();
 					return;
 				}
 			}
@@ -1515,7 +1527,7 @@ void WantBuildManager::doLists()
 		}
 		if((*it).typenr == 3)
 		{
-			if(buildList.count((*it).upgradetype) == 0 && !BWAPI::Broodwar->self()->getUpgradeLevel((*it).upgradetype))
+			if(buildList.count((*it).upgradetype) == 0 && BWAPI::Broodwar->self()->getUpgradeLevel((*it).upgradetype  < (*it).upgradetype.maxRepeats()))
 			{
 				log("dl generiek upgrade\n");
 				addBuild((*it).upgradetype);
@@ -1784,11 +1796,11 @@ void WantBuildManager::logBuildList(BuildList bl)
 		}
 		if(bi.typenr == 2)
 		{
-			log(bi.upgradetype.getName().c_str());
+			log(bi.researchtype.getName().c_str());
 		}
 		if(bi.typenr == 3)
 		{
-			log(bi.researchtype.getName().c_str());
+			log(bi.upgradetype.getName().c_str());
 		}
 		if(bi.typenr == 4)
 		{

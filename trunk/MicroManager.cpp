@@ -361,7 +361,13 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 {
 	if ((unit->isGatheringGas()) || (unit->isConstructing()) || ((unit->isMoving()) && (!unit->isGatheringMinerals())) )
 	{
-		//return unit->getTarget();
+		/*if (unit->isGatheringGas())
+		{
+			 if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), unit->getTarget()->getPosition()).size()>3)
+			 {
+					 unit->stop();
+			 }
+		}*/
 	}
 	else
 	{
@@ -369,8 +375,9 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 		UnitGroup result = extractors;
 		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 		{
-			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(6), (*it)->getPosition()).size()>=3)
+			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()>=3)
 			{
+				log("erase extractor\n");
 				result.erase(*it); // ug met een unit ehh
 			}
 		}
