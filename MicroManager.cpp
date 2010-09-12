@@ -359,7 +359,7 @@ void MicroManager::gasWhere(BWAPI::Unit* unit)
 
 void MicroManager::gatherWhere(BWAPI::Unit* unit)
 {
-	if ((unit->isGatheringGas()) || (unit->isGatheringMinerals()) || (unit->isConstructing()) || (unit->isMoving()))
+	if ((unit->isGatheringGas()) || (unit->isConstructing()) || ((unit->isMoving()) && (!unit->isGatheringMinerals())) )
 	{
 		//return unit->getTarget();
 	}
@@ -379,13 +379,18 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 		{
 			unit->gather(nearestUnitInGroup(unit, result)); // ga eerst naar extractor
 		}
-
-		result = result + getUnusedMineralsNearHatcheries();
-		if (result.empty())
+		else
 		{
-			unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
+			if (!unit->isGatheringMinerals())
+			{
+				result = getUnusedMineralsNearHatcheries();
+				if (result.empty())
+				{
+					unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
+				}
+				unit->gather(nearestUnitInGroup(unit, result));
+			}
 		}
-		unit->gather(nearestUnitInGroup(unit, result));
 	}
 }
 
