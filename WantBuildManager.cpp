@@ -442,7 +442,8 @@ void WantBuildManager::update()
 								if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
 								{
 									lokatie = placeFoundExtractor();
-									if(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()).size() == 0)
+									if(UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Vespene_Geyser).size() == 1
+										&& UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Extractor, Refinery, Assimilator).size() == 0)
 									{
 										gogo = true;
 									}

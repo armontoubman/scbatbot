@@ -480,6 +480,9 @@ void EigenUnitGroupManager::update()
 		//log("verwijder\n");
 		removeUG(*dit);
 	}
+	log("EIUGM aantal UGs: ");
+	log(this->highCommand->wantBuildManager->intToString(this->unitGroups.size()).c_str());
+	log("\n");
 	//log("einde van EIUGM::update()\n");
 }
 
