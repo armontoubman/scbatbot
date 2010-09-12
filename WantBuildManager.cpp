@@ -328,6 +328,8 @@ void WantBuildManager::update()
 				// bezig kan size > 1 hebben
 				for each(BWAPI::Unit* lolgebouw in bezig)
 				{
+					log("bezig met: ");
+					log(b.buildtype.getName().append("\n").c_str());
 					if(b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
 					{
 						log(b.buildtype.getName().append(" ").c_str());
@@ -462,6 +464,7 @@ void WantBuildManager::update()
 								else
 								{
 									log("bouwen mislukt, geen locatie\n");
+									buildList.removeTop();
 								}
 							}
 							else
