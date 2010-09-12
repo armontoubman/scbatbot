@@ -66,6 +66,7 @@ public:
 	bool canBeMade(BWAPI::UpgradeType upgradetype);
 
 	BWAPI::TilePosition placeFound(BWAPI::UnitType unittype);
+	BWAPI::TilePosition placeFoundExtractor();
 	void bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType unittype);
 	BWAPI::Unit* pickBuildDrone(BWAPI::TilePosition tilepos);
 
