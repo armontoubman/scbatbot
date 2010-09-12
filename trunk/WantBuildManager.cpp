@@ -1415,12 +1415,12 @@ void WantBuildManager::doLists()
 
 	// vangnetten/algemeen
 	log("dl v start\n");
-	log(std::string("overlord eggs: ").append(intToString(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))).append("\n").c_str());
+	/*log(std::string("overlord eggs: ").append(intToString(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))).append("\n").c_str());
 	if( BWAPI::Broodwar->self()->supplyUsed() >= (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))) && (buildList.top().typenr == 1 && buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord) && (BWAPI::Broodwar->self()->supplyTotal() < 400)) // voorkomt dat het overlords spamt als het al op max bevindt
 	{
 		log("dl v buildtopoverlord1\n");
 		addBuildTop(BWAPI::UnitTypes::Zerg_Overlord); // (dus wordt als eerste gedaan)
-	}
+	}*/
 	
 	if( (BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) > (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) && buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && (BWAPI::Broodwar->self()->supplyTotal() < 400) ) //next 3 items in buildqueue increases the supply required > supplyprovided
 	{
@@ -1777,6 +1777,7 @@ void WantBuildManager::logBuildList(BuildList bl)
 	for each(BuildItem bi in bl.buildlist)
 	{
 		log("[");
+		log(intToString(bi.typenr).append(" ").c_str());
 		if(bi.typenr == 1)
 		{
 			log(bi.buildtype.getName().c_str());
