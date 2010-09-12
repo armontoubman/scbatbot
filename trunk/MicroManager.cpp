@@ -359,7 +359,7 @@ void MicroManager::gasWhere(BWAPI::Unit* unit)
 
 void MicroManager::gatherWhere(BWAPI::Unit* unit)
 {
-	if ((unit->isGatheringGas()) || (unit->isGatheringMinerals()) || (unit->isConstructing()))
+	if ((unit->isGatheringGas()) || (unit->isGatheringMinerals()) || (unit->isConstructing()) || (unit->isMoving()))
 	{
 		//return unit->getTarget();
 	}
@@ -369,11 +369,17 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 		UnitGroup result = extractors;
 		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 		{
-			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone).inRadius(dist(6), (*it)->getPosition()).size()<3)
+			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(6), (*it)->getPosition()).size()>=3)
 			{
 				result.erase(*it); // ug met een unit ehh
 			}
 		}
+
+		if (!result.empty())
+		{
+			unit->gather(nearestUnitInGroup(unit, result)); // ga eerst naar extractor
+		}
+
 		result = result + getUnusedMineralsNearHatcheries();
 		if (result.empty())
 		{
@@ -407,12 +413,12 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive);
 	UnitGroup result = UnitGroup();
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
-	for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
+	for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
 	{
-		UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition());
-		if ((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>2))
+		for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
 		{
-			for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
+			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition());
+			if ((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>2))
 			{
 				if((*it)->getDistance(*mit) <= dist(13) && !(*mit)->isBeingGathered())
 				{
