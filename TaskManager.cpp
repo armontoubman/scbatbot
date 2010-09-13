@@ -27,27 +27,36 @@ TaskManager::TaskManager(EigenUnitGroupManager* e, EnemyUnitDataManager* eu, Hig
 
 void TaskManager::insertTask(Task t)
 {
+	// tasklist had altijd maar grootte 1
+	// tasklist was eerst een set
+	// unique = fout
 	log("insertTask()\n");
-	std::set<Task>::iterator insertposition;
+	log("tasklist voor: ");
+	log(this->hc->wantBuildManager->intToString(this->tasklist.size()).append("\n").c_str());
+
+	this->tasklist.push_front(t);
+	log(" tasklist na: ");
+	log(this->hc->wantBuildManager->intToString(this->tasklist.size()).append("\n").c_str());
+	/*std::list<Task>::iterator insertposition;
 	bool plek = false;
-	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
+	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
-		log("for\n");
+		//log("for\n");
 		if((*i).priority > t.priority) {
-			log("for if priority >\n");
+			//log("for if priority >\n");
 			insertposition = i;
 			plek = true;
 			break;
 		}
 	}
 	if(plek) {
-		log("if plek\n");
+		//log("if plek\n");
 		this->tasklist.insert(insertposition, t);
 	}
 	else {
-		log("else\n");
+		//log("else\n");
 		this->tasklist.insert(this->tasklist.end(), t);
-	}
+	}*/
 
 	//BWAPI::Broodwar->printf("%s %d", "Task gemaakt met type", t.type);
 }
@@ -245,6 +254,17 @@ void TaskManager::update()
 		std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
 		for each(BWTA::BaseLocation* baseloc in baselocs)
 		{
+			if(!BWAPI::Broodwar->isExplored(baseloc->getPosition()))
+			{
+				insertTask(Task(1, 1, baseloc->getPosition()));
+			}
+		}
+	}
+	else
+	{
+		std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
+		for each(BWTA::BaseLocation* baseloc in baselocs)
+		{
 			if(!BWAPI::Broodwar->isVisible(baseloc->getPosition()))
 			{
 				insertTask(Task(1, 1, baseloc->getPosition()));
@@ -252,29 +272,32 @@ void TaskManager::update()
 		}
 	}
 
+	/*
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*1, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.01, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*0.01).makeValid()));
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*1).makeValid()));	
+	*/
 
-	insertTask(Task(5, 3, this->hc->hatchery->getPosition()));
+	// zit nu in mostappropriate
+	//insertTask(Task(5, 3, this->hc->hatchery->getPosition()));
 
 }
 
-std::set<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype) // via plan
+std::list<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype) // via plan
 {
-	std::set<Task> result;
-	for(std::set<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
+	std::list<Task> result;
+	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
 	{
 		UnitGroup* mettype = &(*i->unitGroup)(GetType,unittype);
 		if(mettype->size() > 0) {
-			result.insert(*i);
+			result.push_front(*i);
 		}
 	}
 	return result;
 }
 
-std::set<Task> TaskManager::findTasksWithType(int t)
+std::list<Task> TaskManager::findTasksWithType(int t)
 {
 	return this->hc->planAssigner->findTasksWithType(this->hc->hcplan, t);
 }
@@ -387,13 +410,13 @@ bool TaskManager::existsTaskWithPriority(int priority)
 	return false;
 }
 
-Task TaskManager::nearestTask(UnitGroup* ug, std::set<Task> tasks)
+Task TaskManager::nearestTask(UnitGroup* ug, std::list<Task> tasks)
 {
 	Task nearest;
 	double distance = -1;
 	BWAPI::Position center = ug->getCenter();
 
-	for(std::set<Task>::iterator it=tasks.begin(); it!=tasks.end(); it++)
+	for(std::list<Task>::iterator it=tasks.begin(); it!=tasks.end(); it++)
 	{
 		double currentDistance = center.getDistance((*it).position);
 		if(distance == -1)
@@ -408,4 +431,14 @@ Task TaskManager::nearestTask(UnitGroup* ug, std::set<Task> tasks)
 		}
 	}
 	return nearest;
+}
+
+std::string TaskManager::getName(int type)
+{
+	if(type == 1) return "scout";
+	if(type == 2) return "combat";
+	if(type == 3) return "prepare";
+	if(type == 4) return "detector";
+	if(type == 5) return "defend";
+	return "";
 }

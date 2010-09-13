@@ -331,7 +331,7 @@ void WantBuildManager::update()
 			if(b.buildtype.isBuilding() || b.typenr == 4)
 			{
 				UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
-				bezig.insert(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(Extractor).not(isCompleted));
+				bezig = bezig + (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(Extractor).not(isCompleted));
 				if(b.typenr == 4)
 				{
 					std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
@@ -1906,7 +1906,13 @@ void WantBuildManager::doExpand()
 				underconstruction = true;
 			}
 		}
-		if(!underconstruction && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(getTargetPosition, BWAPI::Position(tilepos)).size()==0);
+		//(ugdateralheengaat == 0 && pickeddronegaaternietheen) || (ugdateralheengaat == 1 && (pickeddronehasmove order to position || pickeddrone has build order at position))
+		UnitGroup gaateralheen = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTargetPosition, BWAPI::Position(tilepos));
+		bool droneonderweg = drone->getOrder() == BWAPI::Orders::PlaceBuilding || drone->getTargetPosition() == BWAPI::Position(tilepos);
+		if(!underconstruction && (
+			(gaateralheen.size() == 0 && !droneonderweg)
+			|| (gaateralheen.size() == 1 && droneonderweg)
+			))
 		{
 			if(!BWAPI::Broodwar->isVisible(tilepos))
 			{

@@ -35,7 +35,7 @@ public:
 	void update();
 	Task vindTask(UnitGroup* ug);
 	Task vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug);
-	std::set<Task> findTasksWithType(std::map<UnitGroup*, Task> lijst, int t);
+	std::list<Task> findTasksWithType(std::map<UnitGroup*, Task> lijst, int t);
 	void logc(const char* msg);
 };
 

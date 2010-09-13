@@ -75,10 +75,14 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	{
 		log("HC::update taskManager\n");
 		this->taskManager->update();
+		log("tasklist: ");
+		log(this->wantBuildManager->intToString(this->taskManager->tasklist.size()).append("\n").c_str());
 		log("HC::update planAssigner\n");
+		log("hcplan: ");
 		log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
 		//this->planAssigner->update();
 		this->hcplan = this->planAssigner->maakPlan();
+		log("hcplan: ");
 		log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
 	}
 
@@ -110,6 +114,9 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	}
 	log("\n");*/
 
+	///////////////////
+	//// print berichten op units
+	/////////////////
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	for each(BWAPI::Unit* unit in allUnits)
 	{
@@ -124,6 +131,20 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 
 		BWAPI::Broodwar->drawTextMap(unit->getPosition().x(), unit->getPosition().y(), unitmsg.c_str());
 	}
+	////////////////////
+
+	///////////////
+	///// print tasks en ug centers
+	////////////////
+	for each(std::pair<UnitGroup*, Task> paar in this->hcplan)
+	{
+		BWAPI::Broodwar->drawLineMap(paar.first->getCenter().x(), paar.first->getCenter().y(), paar.second.position.x(), paar.second.position.y(), BWAPI::Colors::Green);
+		BWAPI::Broodwar->drawCircleMap(paar.first->getCenter().x(), paar.first->getCenter().y(), 5*32, BWAPI::Colors::Green);
+		BWAPI::Broodwar->drawCircleMap(paar.second.position.x(), paar.second.position.y(), 3*32, BWAPI::Colors::Green);
+		BWAPI::Broodwar->drawTextMap(paar.second.position.x(), paar.second.position.y(), this->taskManager->getName(paar.second.type).c_str());
+
+	}
+	/////////////
 }
 
 void HighCommand::onRemoveUnit(BWAPI::Unit* unit)
