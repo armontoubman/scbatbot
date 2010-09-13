@@ -32,6 +32,9 @@ public:
 	void splitGroup(UnitGroup* ug);
 
 	bool groupContainsType(std::set<BWAPI::Unit*>* ug, BWAPI::UnitType unittype);
+	std::string getName(UnitGroup* group);
+	void logug(UnitGroup* group, char* msg);
+	void printGroepen();
 
 	// zelfde als in micromanager
 	BWAPI::Unit* nearestUnitInGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units);

@@ -147,8 +147,8 @@ BuildItem BuildList::top()
 
 BuildItem BuildList::getSecond()
 {
-	iterator it=buildlist.begin();
-	it++
+	std::list<BuildItem>::iterator it=buildlist.begin();
+	it++;
 	return *it;
 }
 

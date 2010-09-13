@@ -373,10 +373,12 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 	{
 		UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
 		UnitGroup result = extractors;
+		log("(result = extractors) aantal extractors: ");
+		log(this->hc->wantBuildManager->intToString(result.size()).c_str());
+		log("\n");
 		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 		{
-			//if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()>=3)
-			if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *it).size() > 2)
+			if(((UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()+UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *it).size()) > 2))
 			{
 				log("erase extractor\n");
 				result.erase(*it); // ug met een unit ehh
@@ -385,6 +387,10 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 
 		if (!result.empty())
 		{
+			log("!result.empty() gaat gas\n");
+			log("!result.empty() aantal extractors: ");
+			log(this->hc->wantBuildManager->intToString(result.size()).c_str());
+			log("\n");
 			unit->gather(nearestUnitInGroup(unit, result)); // ga eerst naar extractor
 		}
 		else

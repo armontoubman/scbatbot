@@ -1618,7 +1618,7 @@ bool WantBuildManager::canBeMade(BWAPI::UnitType unittype)
 bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype,BWAPI::UnitType unittypetwo)
 {
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed());
+	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()));
 }
 
 bool WantBuildManager::canBeMade(BWAPI::TechType techtype)
