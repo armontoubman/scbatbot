@@ -62,7 +62,7 @@ public:
 	bool requirementsSatisfied(BWAPI::TechType techtype);
 	bool requirementsSatisfied(BWAPI::UpgradeType upgradetype);
 	bool canBeMade(BWAPI::UnitType unittype);
-	bool bothCanBeMade(BWAPI::UnitType unittype,BWAPI::UnitType unittypetwo)
+	bool bothCanBeMade(BWAPI::UnitType unittype,BWAPI::UnitType unittypetwo);
 	bool canBeMade(BWAPI::TechType techtype);
 	bool canBeMade(BWAPI::UpgradeType upgradetype);
 
