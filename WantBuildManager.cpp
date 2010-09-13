@@ -469,7 +469,7 @@ void WantBuildManager::update()
 								}
 								else
 								{
-									bool albezig = isBeingHandled();
+									bool albezig = isBeingHandled(b);
 									if(albezig == false)
 									{
 										log("bouwen maar\n");
@@ -1923,4 +1923,12 @@ void WantBuildManager::logBuildList(BuildList bl)
 		log("]");
 	}
 	log("\n");
+}
+
+void WantBuildManager::logc(const char* msg)
+{
+	if(false)
+	{
+		log(msg);
+	}
 }

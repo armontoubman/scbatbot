@@ -373,24 +373,24 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 	{
 		UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted);
 		UnitGroup result = extractors;
-		log("(result = extractors) aantal extractors: ");
-		log(this->hc->wantBuildManager->intToString(result.size()).c_str());
-		log("\n");
+		logc("(result = extractors) aantal extractors: ");
+		logc(this->hc->wantBuildManager->intToString(result.size()).c_str());
+		logc("\n");
 		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 		{
 			if(((UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()+UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *it).size()) > 2))
 			{
-				log("erase extractor\n");
+				logc("erase extractor\n");
 				result.erase(*it); // ug met een unit ehh
 			}
 		}
 
 		if (!result.empty())
 		{
-			log("!result.empty() gaat gas\n");
-			log("!result.empty() aantal extractors: ");
-			log(this->hc->wantBuildManager->intToString(result.size()).c_str());
-			log("\n");
+			logc("!result.empty() gaat gas\n");
+			logc("!result.empty() aantal extractors: ");
+			logc(this->hc->wantBuildManager->intToString(result.size()).c_str());
+			logc("\n");
 			unit->gather(nearestUnitInGroup(unit, result)); // ga eerst naar extractor
 		}
 		else
@@ -488,7 +488,7 @@ bool MicroManager::tooSplitUp(double radius, UnitGroup* ug)
 
 void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 {
-	log("\n\ndoMicro\n\n");
+	logc("\n\ndoMicro\n\n");
 
 	UnitGroup allSelfUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	UnitGroup allEnemyUnits = this->eudm->getUG();
@@ -809,13 +809,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		{
 			for(std::set<BWAPI::Unit*>::iterator unitit=(*it)->begin(); unitit!=(*it)->end(); unitit++)
 			{
-				log("for unit iterator findtaskwithunit\n");
-				log((*unitit)->getType().getName().c_str());
-				log("\n");
-				//log(this->hc->wantBuildManager->intToString(this->hc->planAssigner->plan.size()).append("\n").c_str());
+				logc("for unit iterator findtaskwithunit\n");
+				logc((*unitit)->getType().getName().c_str());
+				logc("\n");
+				//logc(this->hc->wantBuildManager->intToString(this->hc->planAssigner->plan.size()).append("\n").c_str());
 				//Task currentTask = this->tm->findTaskWithUnit(*unitit);
 				Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(*unitit));
-				log("na findtaskwithunit\n");
+				logc("na findtaskwithunit\n");
 
 				/* ULTRALISK */
 				if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Ultralisk)
@@ -1699,7 +1699,10 @@ std::string MicroManager::intToString(int i) {
 
 void MicroManager::logx(std::string func, BWAPI::Unit* unit, std::string msg)
 {
-	log(std::string(func).append(intToString(unit->getID())).append(std::string(msg)).c_str());
+	if(false)
+	{
+		logc(std::string(func).append(intToString(unit->getID())).append(std::string(msg)).c_str());
+	}
 
 	// geeft spam aan berichten
 	// werkt wel als logx alleen in het laagste if/else niveau van doMicro staat
@@ -1734,4 +1737,12 @@ BWAPI::Position MicroManager::getCenterPositionFromEnemyMap(std::map<BWAPI::Unit
 	result_y = int(avg_y);
 
 	return BWAPI::Position(result_x, result_y);
+}
+
+void MicroManager::logc(const char* msg)
+{
+	if(false)
+	{
+		log(msg);
+	}
 }
