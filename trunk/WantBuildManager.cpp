@@ -324,7 +324,14 @@ void WantBuildManager::update()
 	if(buildList.size() > 0)
 	{
 		BuildItem b = buildList.top();
-
+		if(buildList.count(BWAPI::UnitTypes::Zerg_Drone)>2 && b.buildtype!=BWAPI::UnitTypes::Zerg_Drone)
+		{
+			log(b.buildtype.getName().append(" ").c_str());
+			log("drones voorrang\n");
+			buildList.removeTop();
+		}
+		else
+		{
 		if(b.typenr == 1 || b.typenr == 4)
 		{
 			if(b.buildtype.isBuilding() || b.typenr == 4)
@@ -573,6 +580,7 @@ void WantBuildManager::update()
 					//buildList.removeTop();
 					return;
 				}
+			}
 			}
 	}
 	else
