@@ -3,7 +3,7 @@
 #include <UnitGroup.h>
 Task::Task()
 {
-	this->type = -1;
+	this->type = -999;
 }
 
 Task::Task(int t, int p, BWAPI::Position pos)
@@ -29,5 +29,5 @@ bool Task::operator==(const Task& param) const
 
 bool Task::operator<(const Task& rhs) const
 {
-	return priority < rhs.priority;
+	return priority > rhs.priority; // hogere prioriteit (>) is eerder in de lijst (<)
 }

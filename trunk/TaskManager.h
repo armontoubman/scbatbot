@@ -23,16 +23,17 @@ public:
 	Task highestPriorityTask();
 	Task findTaskWithUnitGroup(UnitGroup* ug);
 	Task findTaskWithUnit(BWAPI::Unit* unit);
-	std::set<Task> findTasksWithUnitType(BWAPI::UnitType unittype);
-	std::set<Task> findTasksWithType(int t);
+	std::list<Task> findTasksWithUnitType(BWAPI::UnitType unittype);
+	std::list<Task> findTasksWithType(int t);
 	BWAPI::Position frontlineBuilding(std::set<BWAPI::Position> posset);
 	bool existsTaskWithType(int type);
 	bool existsTaskWithPriority(int priority);
-	Task nearestTask(UnitGroup* ug, std::set<Task> tasks);
+	Task nearestTask(UnitGroup* ug, std::list<Task> tasks);
+	std::string getName(int type);
 
 	void update();
 
-	std::set<Task> tasklist;
+	std::list<Task> tasklist;
 
 	// zelfde als overal
 	double dist(int d);

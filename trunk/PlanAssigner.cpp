@@ -22,13 +22,13 @@ PlanAssigner::PlanAssigner(HighCommand* h, TaskManager* t, EigenUnitGroupManager
 std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 {
 	logc("PA::maakPlan()\n");
-	std::set<Task> tasklist = this->tm->tasklist;
+	std::list<Task> tasklist = this->tm->tasklist;
 	std::set<UnitGroup*> unitgroupset = this->eiugm->unitGroups;
 	std::map<UnitGroup*, Task> currentPlan;
 
 	for each(UnitGroup* ug in unitgroupset)
 	{
-		if(ug == this->eiugm->droneUG)
+		if(ug == this->eiugm->droneUG || ug->size() == 0)
 		{
 			continue;
 		}
@@ -36,7 +36,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 		if(ug->size()<2 && ug != this->eiugm->defendlingUG && ug != this->eiugm->defendgroepUG)
 		{
 			logc("PA if\n");
-			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Overlord)) // nieuwe functie
+			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Drone)) // nieuwe functie
 			{
 				logc("PA if if\n");
 				currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 1, currentPlan)));
@@ -156,11 +156,15 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<UnitGroup*, Task> currentPlan, bool nullwaarde)
 {
 	logc("PA::mostAppropriate()\n");
-	std::set<Task> idealTasks;
-	std::set<Task> appropriateTasks;
-	std::set<Task> lessAppropriateTasks;
+	logc(" voor: ");
+	logc(this->hc->eigenUnitGroupManager->getName(current).append("\n").c_str());
+	std::list<Task> idealTasks;
+	std::list<Task> appropriateTasks;
+	std::list<Task> lessAppropriateTasks;
 
-	std::set<Task> originalTasks = this->tm->tasklist;
+	lessAppropriateTasks.push_front(Task(5, 1, this->hc->hatchery->getPosition()));
+
+	std::list<Task> originalTasks = this->tm->tasklist;
 	for each(Task otask in originalTasks)
 	{
 		logc("ma for each\n");
@@ -175,7 +179,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 					logc("ma if !air && connected\n");
 					if(otask.enemy == NULL)
 					{
-						lessAppropriateTasks.insert(otask);
+						lessAppropriateTasks.push_front(otask);
 					}
 					else
 					{
@@ -193,7 +197,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 								if(this->eudm->nrMilitaryUnits(*otask.enemy)>6) // nullpointers
 								{
 									logc("ma mil>6\n");
-									idealTasks.insert(otask);
+									idealTasks.push_front(otask);
 								}
 								else
 								{
@@ -201,12 +205,12 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 									if(otask.enemy->size()>6)
 									{
 										logc("ma size>6\n");
-										appropriateTasks.insert(otask);
+										appropriateTasks.push_front(otask);
 									}
 									else
 									{
 										logc("ma else !>6\n");
-										lessAppropriateTasks.insert(otask);
+										lessAppropriateTasks.push_front(otask);
 									}
 								}
 							}
@@ -219,18 +223,18 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 									if(zk==2 || wk!=2)
 									{
 										logc("ma zk2 wk!2\n");
-										lessAppropriateTasks.insert(otask);
+										lessAppropriateTasks.push_front(otask);
 									}
 									else
 									{
 										logc("ma zk2 wk!2 else\n");
-										appropriateTasks.insert(otask);
+										appropriateTasks.push_front(otask);
 									}
 								}
 								else
 								{
 									logc("ma militar>6 else\n");
-									idealTasks.insert(otask);
+									idealTasks.push_front(otask);
 								}
 							}
 						}
@@ -262,12 +266,12 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 									if(current->size()>6 || zk==0)
 									{
 										logc("ma cur>6\n");
-										idealTasks.insert(otask);
+										idealTasks.push_front(otask);
 									}
 									else
 									{
 										logc("ma cur!>6\n");
-										appropriateTasks.insert(otask);
+										appropriateTasks.push_front(otask);
 									}
 								}
 								else
@@ -276,19 +280,19 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 									if(current->size()>9 || zk==2)
 									{
 										logc("ma size>9 zk=2\n");
-										lessAppropriateTasks.insert(otask);
+										lessAppropriateTasks.push_front(otask);
 									}
 									else
 									{
 										logc("ma ook niet\n");
-										idealTasks.insert(otask);
+										idealTasks.push_front(otask);
 									}
 								}
 							}
 							else
 							{
 								logc("ma illogical\n");
-								lessAppropriateTasks.insert(otask);
+								lessAppropriateTasks.push_front(otask);
 							}
 						}
 					}
@@ -302,7 +306,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 						if(otask.type == 1)
 						{
 							logc("ma 1\n");
-							appropriateTasks.insert(otask);
+							appropriateTasks.push_front(otask);
 						}
 						else
 						{
@@ -310,7 +314,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 							if(otask.type == 4)
 							{
 								logc("ma toch wel 4\n");
-								idealTasks.insert(otask);
+								idealTasks.push_front(otask);
 							}
 						}
 					}
@@ -320,7 +324,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 						if(otask.type == 1)
 						{
 							logc("ma 1 dan\n");
-							idealTasks.insert(otask);
+							idealTasks.push_front(otask);
 						}
 					}
 				}
@@ -332,7 +336,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 			if(otask.type == 5 || otask.type == 2)
 			{
 				logc("ma 5 of 2\n");
-				lessAppropriateTasks.insert(otask);
+				lessAppropriateTasks.push_front(otask);
 			}
 		}
 	}
@@ -351,7 +355,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 		logc("PA::mostAppropriate() lessAppropriateTasks >0\n");
 		return this->tm->nearestTask(current, lessAppropriateTasks);
 	}
-	logc("PA::mostAppropriate() laatste return, hier mag hij nooit komen\n");
+	log("PA::mostAppropriate() laatste return, hier mag hij nooit komen\n");
 	return this->tm->nearestTask(current, lessAppropriateTasks);
 }
 
@@ -422,9 +426,11 @@ Task PlanAssigner::vindTask(UnitGroup* ug)
 
 Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 {
-	logc("PA::vindTask2()\n");
+	log("PA::vindTask2()\n");
 	int lolsize = lijst.size();
-	logc(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
+	log("zoek task voor: ");
+	//logc(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
+	log(this->hc->eigenUnitGroupManager->getName(ug).append("\n").c_str());
 	if(lolsize == 0)
 	{
 		logc("plan is leeg...\n");
@@ -438,24 +444,24 @@ Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 		logc("plan iteratie\n");
 		if(paar.first == ug)
 		{
-			logc("PA::vindTask2() bijbehorende task gevonden\n");
+			log("PA::vindTask2() bijbehorende task gevonden\n");
 			return paar.second;
 		}
 	}
 
-	logc("PA::vindTask2() geen task gevonden, geef defend hatchery\n");
+	log("PA::vindTask2() geen task gevonden, geef defend hatchery\n");
 
-	return Task(-1, 1, this->hc->hatchery->getPosition());
+	return Task(-1, 1, ug->getCenter());
 }
 
-std::set<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst, int t)
+std::list<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst, int t)
 {
-	std::set<Task> result;
+	std::list<Task> result;
 	for each(std::pair<UnitGroup*, Task> paar in this->plan)
 	{
 		if(paar.second.type == t)
 		{
-			result.insert(paar.second);
+			result.push_front(paar.second);
 		}
 	}
 	return result;
@@ -463,7 +469,7 @@ std::set<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst,
 
 void PlanAssigner::logc(const char* msg)
 {
-	if(false)
+	if(true)
 	{
 		log(msg);
 	}
