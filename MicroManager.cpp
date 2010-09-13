@@ -814,15 +814,15 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 
 		else
 		{
+			Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, *it);
+
 			for(std::set<BWAPI::Unit*>::iterator unitit=(*it)->begin(); unitit!=(*it)->end(); unitit++)
 			{
-				logc("for unit iterator findtaskwithunit\n");
+				logc("doMicro for unit iterator");
 				logc((*unitit)->getType().getName().c_str());
 				logc("\n");
-				//logc(this->hc->wantBuildManager->intToString(this->hc->planAssigner->plan.size()).append("\n").c_str());
-				//Task currentTask = this->tm->findTaskWithUnit(*unitit);
-				Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(*unitit));
-				logc("na findtaskwithunit\n");
+				//Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(*unitit));
+				logc("doMicro selecteer unittype\n");
 
 				/* ULTRALISK */
 				if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Ultralisk)

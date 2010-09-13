@@ -246,7 +246,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 				logc("ma wel enemy\n");
 				if(tasktype == 5 && otask.type == 5)
 				{
-					logc("ma task 5\n");
+					logc("ma task 5\n"); // crash
 					if((!this->eiugm->onlyAirUnits(*current) 
 						&& (otask.enemy != NULL && BWTA::isConnected((*current->begin())->getTilePosition(), (*otask.enemy->begin())->getPosition())) )
 						|| (this->eiugm->onlyAirUnits(*current))) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
