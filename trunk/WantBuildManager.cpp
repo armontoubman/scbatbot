@@ -324,14 +324,8 @@ void WantBuildManager::update()
 	if(buildList.size() > 0)
 	{
 		BuildItem b = buildList.top();
-		if(buildList.count(BWAPI::UnitTypes::Zerg_Drone)>2 && b.buildtype!=BWAPI::UnitTypes::Zerg_Drone)
-		{
-			log(b.buildtype.getName().append(" ").c_str());
-			log("drones voorrang\n");
-			buildList.removeTop();
-		}
-		else
-		{
+
+		// check of gebouw al aant bouwe is
 		if(b.typenr == 1 || b.typenr == 4)
 		{
 			if(b.buildtype.isBuilding() || b.typenr == 4)
@@ -363,27 +357,39 @@ void WantBuildManager::update()
 						log("started and removed from top\n");
 						buildList.removeTop();
 						b = buildList.top();
+						return;
 					}
 					if(b.typenr == 4 && lolgebouw->getType() == BWAPI::UnitTypes::Zerg_Hatchery && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
 					{
 						log("expand started and removed from top\n");
 						buildList.removeTop();
 						b = buildList.top();
+						return;
 					}
 				}
 			}
 		}
+		//einde remove build als aant bouwe is
 
 		log(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
-			if(b.typenr == 1)
+		if(b.typenr == 1)
+		{
+			if(!requirementsSatisfied(b.buildtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
-				if(!requirementsSatisfied(b.buildtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+				log("can't make\n\t");
+				log(b.buildtype.getName().append("\n").c_str());
+				log("remove\n");
+				buildList.removeTop();
+				log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+				return;
+			}
+			else
+			{
+				if(buildList.count(BWAPI::UnitTypes::Zerg_Drone)>2 && b.buildtype!=BWAPI::UnitTypes::Zerg_Drone && !isBeingHandled(b)) // conditie die checkt of b niet al in maak is
 				{
-					log("can't make\n\t");
-					log(b.buildtype.getName().append("\n").c_str());
-					log("remove\n");
+					log(b.buildtype.getName().append(" ").c_str());
+					log("drones voorrang\n");
 					buildList.removeTop();
-					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 					return;
 				}
 				else
@@ -431,84 +437,78 @@ void WantBuildManager::update()
 									}
 								}
 							}
-							else if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+							else
 							{
-								if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
+								if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
 								{
-									log("probeer lair naar hive te morphen...\n");
-									this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
-									log("gelukt.\n");
-									buildList.removeTop();
-									return;
-								}
-								else
-								{
-									UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
-									if(lairs.size() == 0)
-									{
-										log("kan geen hive maken, geen lairs\n");
-										buildList.removeTop();
-									}
-									else
+									if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
 									{
 										log("probeer lair naar hive te morphen...\n");
-										(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
+										this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
 										log("gelukt.\n");
 										buildList.removeTop();
 										return;
 									}
-								}
-							}
-							else
-							{
-								UnitGroup drones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-								bool albezig = false;
-								for each(BWAPI::Unit* drone in drones)
-								{
-									//if(drone->getOrder() == BWAPI::Orders::PlaceBuilding)
-									if(drone->getBuildType() == b.buildtype)
+									else
 									{
-										albezig = true;
-									}
-								}
-								if(albezig == false)
-								{
-									log("bouwen maar\n");
-									bool gogo = false;
-									BWAPI::TilePosition lokatie;
-									if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
-									{
-										lokatie = placeFoundExtractor();
-										if(UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Vespene_Geyser).size() == 1
-											&& UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Extractor, Refinery, Assimilator).size() == 0)
+										UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
+										if(lairs.size() == 0)
 										{
-											gogo = true;
+											log("kan geen hive maken, geen lairs\n");
+											buildList.removeTop();
 										}
-									}
-									else
-									{
-										lokatie = placeFound(b.buildtype);
-										gogo = true;
-									}
-									if(gogo)
-									{
-										bouwStruc(lokatie, b.buildtype);
-										//buildList.removeTop(); // crash
-										log("bouwen gelukt\n");
-									}
-									else
-									{
-										log("bouwen mislukt, geen locatie\n");
-										buildList.removeTop();
+										else
+										{
+											log("probeer lair naar hive te morphen...\n");
+											(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
+											log("gelukt.\n");
+											buildList.removeTop();
+											return;
+										}
 									}
 								}
 								else
 								{
-									//buildList.removeTop(); // crash
-									log("wordt al gemaakt\n");
+									bool albezig = isBeingHandled();
+									if(albezig == false)
+									{
+										log("bouwen maar\n");
+										bool gogo = false;
+										BWAPI::TilePosition lokatie;
+										if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
+										{
+											lokatie = placeFoundExtractor();
+											if(UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Vespene_Geyser).size() == 1
+												&& UnitGroup::getUnitGroup(BWAPI::Broodwar->unitsOnTile(lokatie.x(), lokatie.y()))(Extractor, Refinery, Assimilator).size() == 0)
+											{
+												gogo = true;
+											}
+										}
+										else
+										{
+											lokatie = placeFound(b.buildtype);
+											gogo = true;
+										}
+										if(gogo)
+										{
+											bouwStruc(lokatie, b.buildtype);
+											//buildList.removeTop(); // crash
+											log("bouwen gelukt\n");
+										}
+										else
+										{
+											log("bouwen mislukt, geen locatie\n");
+											buildList.removeTop();
+										}
+									}
+									else
+									{
+										//buildList.removeTop(); // crash
+										log("wordt al gemaakt\n");
+									}
+									log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+									return;
 								}
-								log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-								return;
 							}
 						}
 					}
@@ -541,47 +541,53 @@ void WantBuildManager::update()
 							}
 						}
 					}
-				} 
-				log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-			}
-			if(b.typenr == 2)
-			{
-				if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
-				{
-					buildList.removeTop();
-					return;
 				}
-				else if(canBeMade(b.researchtype) && !BWAPI::Broodwar->self()->hasResearched(b.researchtype))
+			}
+		}
+		log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+		if(b.typenr == 2)
+		{
+			if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+			{
+				buildList.removeTop();
+				return;
+			}
+			else
+			{
+				if(canBeMade(b.researchtype) && !BWAPI::Broodwar->self()->hasResearched(b.researchtype))
 				{
 					this->bom->research(b.researchtype, 1);
 					buildList.removeTop();
 					return;
 				} 
 			}
-			if(b.typenr == 3)
+		}
+		if(b.typenr == 3)
+		{
+			if(!requirementsSatisfied(b.upgradetype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
-				if(!requirementsSatisfied(b.upgradetype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
-				{
-					buildList.removeTop();
-					return;
-				}
-				else if(canBeMade(b.upgradetype) && (b.upgradetype.maxRepeats() > BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)))
+				buildList.removeTop();
+				return;
+			}
+			else
+			{
+				if(canBeMade(b.upgradetype) && (b.upgradetype.maxRepeats() > BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)))
 				{
 					this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)+1, b.upgradetype, 1);
 					buildList.removeTop();
 					return;
 				}
 			}
-			if(b.typenr == 4)
+		}
+		if(b.typenr == 4)
+		{
+			if(requirementsSatisfied(BWAPI::UnitTypes::Zerg_Hatchery) && canBeMade(BWAPI::UnitTypes::Zerg_Hatchery))
 			{
-				if(requirementsSatisfied(BWAPI::UnitTypes::Zerg_Hatchery) && canBeMade(BWAPI::UnitTypes::Zerg_Hatchery))
-				{
-					doExpand();
-					//buildList.removeTop();
-					return;
-				}
+				doExpand();
+				//buildList.removeTop();
+				return;
 			}
-			}
+		}
 	}
 	else
 	{
@@ -1875,6 +1881,20 @@ void WantBuildManager::doExpand()
 		}
 		//this->bouwdrones.insert(drone);
 	}
+}
+
+bool WantBuildManager::isBeingHandled(BuildItem b)
+{
+	UnitGroup drones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	for each(BWAPI::Unit* drone in drones)
+	{
+		//if(drone->getOrder() == BWAPI::Orders::PlaceBuilding)
+		if(drone->getBuildType() == b.buildtype)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void WantBuildManager::logBuildList(BuildList bl)

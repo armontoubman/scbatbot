@@ -89,6 +89,7 @@ public:
 
 	std::set<BWAPI::Unit*> bouwdrones;
 	void doExpand();
+	bool isBeingHandled(BuildItem b);
 
 	void logBuildList(BuildList bl);
 };
