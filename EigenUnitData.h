@@ -6,6 +6,7 @@ public:
 	EigenUnitData();
 
 	BWAPI::Unit* unit;
+	BWAPI::UnitType type;
 	int hitPoints;
 	bool seenByEnemy;
 	int seenByEnemyTime;

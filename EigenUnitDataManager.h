@@ -1,11 +1,12 @@
 #pragma once
 #include <BWAPI.h>
 #include "EigenUnitData.h"
+#include "HighCommand.h"
 class EigenUnitDataManager
 {
 	friend class HighCommand;
 public:
-	EigenUnitDataManager();
+	EigenUnitDataManager(HighCommand* h);
 	void update(std::set<BWAPI::Unit*> units, std::set<BWAPI::Unit*> enemyUnits);
 	void onRemoveUnit(BWAPI::Unit* unit);
 	void eventHitPointsChanged(BWAPI::Unit* unit, int difference);
@@ -20,4 +21,6 @@ private:
 	std::set<BWAPI::Unit*> lostHealthSet;
 	void addToHealthSet(BWAPI::Unit* unit);
 	void clearHealthSet();
+
+	HighCommand* hc;
 };

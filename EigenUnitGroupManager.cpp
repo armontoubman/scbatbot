@@ -111,11 +111,16 @@ void EigenUnitGroupManager::removeUG(UnitGroup* unitGroup) {
 }
 
 void EigenUnitGroupManager::moveAll(UnitGroup* ug1, UnitGroup* ug2) {
-	for(std::set<BWAPI::Unit*>::iterator it=ug1->begin(); it!=ug1->end(); it++)
+	/*for(std::set<BWAPI::Unit*>::iterator it=ug1->begin(); it!=ug1->end(); it++)
 	{
 		ug2->insert(*it);
 	}
-	ug1->clear();
+	ug1->clear();*/
+	if(ug1 != ug2)
+	{
+		ug2 = &(*ug2+*ug1);
+		ug1->clear();
+	}
 }
 
 void EigenUnitGroupManager::moveUnitBetweenGroups(UnitGroup* ug1, BWAPI::Unit* unit, UnitGroup* ug2)
@@ -171,8 +176,11 @@ void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
 	}
 	if(type == BWAPI::UnitTypes::Zerg_Zergling)
 	{
-		this->defendlingUG->insert(unit);
-		log("ASSIGN ZERGLING -> DEFENDLINGUG\n");
+		if(this->defendlingUG->count(unit) == 0)
+		{
+			this->defendlingUG->insert(unit);
+			log("ASSIGN ZERGLING -> DEFENDLINGUG\n");
+		}
 	}
 	else if(type == BWAPI::UnitTypes::Zerg_Overlord)
 	{
@@ -256,14 +264,15 @@ void EigenUnitGroupManager::update()
 		(**it) = (**it) - (**it)(isBuilding);
 		// if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "eind for elke unitgroup\n");
 	}
-
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 1\n");
 	if(this->defendmutaUG->size() > 0 && defendmutaconditie)
 	{
 		// if(BWAPI::Broodwar->getFrameCount() > 3000) log("defendmutaconditie, zet eerste muta over\n");
 		BWAPI::Unit* firstmuta = *(*defendmutaUG)(Mutalisk).begin();
 		moveUnitBetweenGroups(defendmutaUG, firstmuta, defendmutaconditiegroep);
 	}
-
+	
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 2\n");
 	if(this->defendmutaUG->size() > 2 && othermutaconditie)
 	{
 		// if(BWAPI::Broodwar->getFrameCount() > 3000) log("othermutaconfitie\n");
@@ -271,18 +280,23 @@ void EigenUnitGroupManager::update()
 		moveAll(defendmutaUG, newmuta);
 		addUG(newmuta);
 	}
-
+	
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 3\n");
 	int aantalhatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery,Lair,Hive).size();
 	if((defendgroepUG->size()+defendlingUG->size()+defendmutaUG->size() > 2* aantalhatcheries) && defendgroepUG->size()>2)
 	{
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 4\n");
 		// if(BWAPI::Broodwar->getFrameCount() > 3000) log("meer def dan hatcheries");
 		if(defendgroepUG->size() < 10 && geenmutalingconditie)
 		{
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 5\n");
 			// if(BWAPI::Broodwar->getFrameCount() > 3000) log("\tgeen mutas en zerglings def\n");
 			if(geenmutalinggroep->size() < 8)
 			{
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 6\n");
 				// if(BWAPI::Broodwar->getFrameCount() > 3000) log("\t\tmoveall def naar groep zonder zerglings en mutas\n");
 				moveAll(defendgroepUG, geenmutalinggroep);
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 7\n");
 			}
 		}
 		else
@@ -291,6 +305,7 @@ void EigenUnitGroupManager::update()
 			UnitGroup* newdefendgroep = new UnitGroup();
 			moveAll(defendgroepUG, newdefendgroep);
 			addUG(newdefendgroep);
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 8\n");
 		}
 	}
 
@@ -319,6 +334,7 @@ void EigenUnitGroupManager::update()
 		UnitGroup* newoverlordgroep = new UnitGroup();
 		moveUnitBetweenGroups(overlordUG, firstoverlord, newoverlordgroep);
 		addUG(newoverlordgroep);
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 9\n");
 	}
 
 
@@ -329,11 +345,13 @@ void EigenUnitGroupManager::update()
 		// if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "for groepen samenvoegen/units toevoegen\n");
 		if((**kit)(Mutalisk).size() > 0 && (**kit)(Overlord).size() == 0)
 		{
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 10\n");
 			// if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "\tmuta>0 overlord==0\n");
 			BWAPI::Unit* eerste = *(**kit)(Mutalisk).begin();
 			UnitGroup overlords = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Overlord);
 			BWAPI::Unit* besteoverlord = nearestUnitInGroup(eerste, overlords);
 			moveUnitBetweenGroups(findUnitGroupWithUnit(besteoverlord), besteoverlord, *kit);
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 11\n");
 		}
 
 		bool zerglingmergeconditie = false;
@@ -369,23 +387,33 @@ void EigenUnitGroupManager::update()
 		}
 		currentGroup = *kit;
 		// if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "\t(zit) einde for binnen for:\n");
-
+		
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 12\n");
 		if((**kit)(Zergling).size() > 0 && (**kit).size() < 5 && zerglingmergeconditie)
 		{
 			// if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "\tzerglingmergeconditie\n");
+			int size = this->defendlingUG->size();
 			moveAll(*kit, zerglingmergegroep);
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 13\n");
+			if(size == 2 && this->defendlingUG->size() == 0) {
+				logug(*kit, " moveall van deze\n");
+				logug(zerglingmergegroep, " naar deze\n");
+				//BWAPI::Broodwar->leaveGame();
+			}
 		}
 
 		if((**kit)(Zergling).size() == 0 && (**kit)(Mutalisk).size() == 0 && hydramergeconditie)
 		{
 			// if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "\thydramergeconditie\n");
 			moveAll(*kit, hydramergegroep);
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 14\n");
 		}
 
 		if((**kit).size() > 20 && (**kit)(Lurker).size() == 0)
 		{
 			// if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "\t>20 split\n");
 			splitGroup(*kit);
+	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(this->defendlingUG, "defendlingcheck 15\n");
 		}
 
 		if((**kit)(Lurker).size() > 0 && (**kit).not(Lurker).size() > 0)
