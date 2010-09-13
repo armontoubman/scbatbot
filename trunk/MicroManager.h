@@ -73,6 +73,7 @@ public:
 	
 	std::string intToString(int i);
 	void logx(std::string func, BWAPI::Unit*, std::string msg);
+	void logc(const char* msg);
 
 	double dist(int d);
 };

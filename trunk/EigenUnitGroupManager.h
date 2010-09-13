@@ -34,6 +34,7 @@ public:
 	bool groupContainsType(std::set<BWAPI::Unit*>* ug, BWAPI::UnitType unittype);
 	std::string getName(UnitGroup* group);
 	void logug(UnitGroup* group, char* msg);
+	void logc(const char* msg);
 	void printGroepen();
 
 	// zelfde als in micromanager

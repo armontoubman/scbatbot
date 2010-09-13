@@ -86,6 +86,7 @@ public:
 	double dist(int d);
 	void logx(std::string func, int id, std::string msg);
 	std::string intToString(int i);
+	void logc(const char* msg);
 
 	std::set<BWAPI::Unit*> bouwdrones;
 	void doExpand();
