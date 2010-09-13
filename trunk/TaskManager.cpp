@@ -253,8 +253,8 @@ void TaskManager::update()
 	}
 
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*1, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
-	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
-	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*0).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.01, BWAPI::Broodwar->mapWidth()*0.5).makeValid()));
+	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*0.01).makeValid()));
 	insertTask(Task(1, 1, BWAPI::Position(BWAPI::Broodwar->mapHeight()*0.5, BWAPI::Broodwar->mapWidth()*1).makeValid()));	
 
 	insertTask(Task(5, 3, this->hc->hatchery->getPosition()));
