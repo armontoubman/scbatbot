@@ -1500,7 +1500,7 @@ void WantBuildManager::doLists()
 		addBuild(BWAPI::UnitTypes::Zerg_Drone);
 	}
 	
-	UnitGroup hatcheries = getHatcheriesWithMinerals();
+	UnitGroup hatcheries = getHatcheriesWithMinerals()(isCompleted);
 	UnitGroup geysers = UnitGroup::getUnitGroup(BWAPI::Broodwar->getGeysers());
 	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor);
 	log("dl v extrac\n");
