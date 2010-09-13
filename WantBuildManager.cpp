@@ -331,6 +331,7 @@ void WantBuildManager::update()
 			if(b.buildtype.isBuilding() || b.typenr == 4)
 			{
 				UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
+				bezig.insert(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(Extractor).not(isCompleted));
 				if(b.typenr == 4)
 				{
 					std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
@@ -385,7 +386,7 @@ void WantBuildManager::update()
 			}
 			else
 			{
-				if(buildList.count(BWAPI::UnitTypes::Zerg_Drone)>2 && b.buildtype!=BWAPI::UnitTypes::Zerg_Drone && !isBeingHandled(b)) // conditie die checkt of b niet al in maak is
+				if(buildList.count(BWAPI::UnitTypes::Zerg_Drone)>2 && b.buildtype!=BWAPI::UnitTypes::Zerg_Drone && b.buildtype!=BWAPI::UnitTypes::Zerg_Overlord && !isBeingHandled(b)) // conditie die checkt of b niet al in maak is
 				{
 					log(b.buildtype.getName().append(" ").c_str());
 					log("drones voorrang\n");
@@ -512,35 +513,6 @@ void WantBuildManager::update()
 							}
 						}
 					}
-					else
-					{
-						// als eerste een gebouw is en 2e een unit = oke, 1=unit+2=gebouw, wordt wat lastiger moet je weer het 'buildstuff' doen, mogelijk aparte methode gewoon voor maken. Als je beide build hebt, dan wordt het maybe nog erger, moge we nog meer checks doen... zoals pak geen drone die al buildorder heeft. Maja zo vaak bouw je geen 2 dinge tegelijk als zerg.
-						if (buildList.size()>1)
-						{
-							BuildItem v = buildList.getSecond();
-							if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
-							{
-								log("can't make second\n\t");
-								log(v.buildtype.getName().append("\n").c_str());
-								log("remove second\n");
-								buildList.removeSecond();
-								log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-								return;
-							}
-							else
-							{
-								if (bothCanBeMade(b.buildtype, v.buildtype))
-								{
-									log("can make second\n\t");
-									log(v.buildtype.getName().append("\n").c_str());
-									(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
-									buildList.removeSecond();
-									log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-									return;
-								}
-							}
-						}
-					}
 				}
 			}
 		}
@@ -588,6 +560,69 @@ void WantBuildManager::update()
 				return;
 			}
 		}
+		// als eerste een gebouw is en 2e een unit = oke, 1=unit+2=gebouw, wordt wat lastiger moet je weer het 'buildstuff' doen, mogelijk aparte methode gewoon voor maken. Als je beide build hebt, dan wordt het maybe nog erger, moge we nog meer checks doen... zoals pak geen drone die al buildorder heeft. Maja zo vaak bouw je geen 2 dinge tegelijk als zerg.
+		if (buildList.size()>1)
+		{
+			BuildItem v = buildList.getSecond();
+			if (v.typenr == 1)
+			{
+				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+				{
+					log("can't make second\n\t");
+					log(v.buildtype.getName().append("\n").c_str());
+					log("remove second\n");
+					buildList.removeSecond();
+					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+					return;
+				}
+				else
+				{
+					if (bothCanBeMade(b.buildtype, v.buildtype))
+					{
+						log("can make second\n\t");
+						log(v.buildtype.getName().append("\n").c_str());
+						(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
+						buildList.removeSecond();
+						log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+						return;
+					}
+				}
+			}
+			if (v.typenr == 2 && ((b.typenr == 1) || b.typenr == 4))
+			{
+				if(!requirementsSatisfied(v.researchtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+				{
+					buildList.removeSecond();
+					return;
+				}
+				else
+				{
+					if(bothCanBeMade(b.buildtype, v.researchtype) && !BWAPI::Broodwar->self()->hasResearched(v.researchtype))
+					{
+						this->bom->research(v.researchtype, 1);
+						buildList.removeSecond();
+						return;
+					} 
+				}
+			}
+			if(v.typenr == 3 && ((b.typenr == 1) || b.typenr == 4))
+			{
+				if(!requirementsSatisfied(v.upgradetype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
+				{
+					buildList.removeSecond();
+					return;
+				}
+				else
+				{
+					if(bothCanBeMade(b.buildtype, v.upgradetype) && (v.upgradetype.maxRepeats() > BWAPI::Broodwar->self()->getUpgradeLevel(v.upgradetype)))
+					{
+						this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(v.upgradetype)+1, v.upgradetype, 1);
+						buildList.removeSecond();
+						return;
+					}
+				}
+			}
+		}
 	}
 	else
 	{
@@ -620,19 +655,19 @@ void WantBuildManager::doLists()
 		if( stap == 2)
 		{
 			log("doLists stap 2\n");
-			if(	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) == 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 4) && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<4)
+			if(	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2) && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) == 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 4) && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<4)
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 				log("dolists p first cond\n");
 			}
 			else 
 			{
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 2)	&& photonCannonNearBase() ) // *7* goedgekeurd, check buildexpand ligt in methode zelf
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 2) && photonCannonNearBase() ) // *7* goedgekeurd, check buildexpand ligt in methode zelf
 				{
 					buildExpand();
 					log("dl p 1-1\n");
 				}
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) >= 1)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 9)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 10)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)==2)	) // nakijken
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2) && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) >= 1)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 9)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 10)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)==2)	) // nakijken
 				{
 					buildExpand();
 					log("dl p 1-2\n");
@@ -667,7 +702,7 @@ void WantBuildManager::doLists()
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
 					stap = 3;
 				}
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) > 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon) > 3)) // *7*fix
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) > 0)	&& (nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon) > 3)) // *7*fix
 				{
 					log("dl p 1-7\n");
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling, 20);
@@ -954,7 +989,7 @@ void WantBuildManager::doLists()
 					}
 					else
 					{
-						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3)
+						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<1)
 						{
 							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 						}
@@ -1145,7 +1180,7 @@ void WantBuildManager::doLists()
 					}
 					else
 					{
-						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3 && nrOfOwn(BWAPI::UnitTypes::Zerg_Spawning_Pool)>0)
+						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<1 && nrOfOwn(BWAPI::UnitTypes::Zerg_Spawning_Pool)>0)
 						{
 							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 						}
@@ -1227,7 +1262,7 @@ void WantBuildManager::doLists()
 					}
 					else
 					{
-						if (nrOfOwn(BWAPI::UnitTypes::Zerg_Spawning_Pool)>0 && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3)
+						if (nrOfOwn(BWAPI::UnitTypes::Zerg_Spawning_Pool)>0 && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<1)
 						{
 							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 						}
@@ -1254,7 +1289,7 @@ void WantBuildManager::doLists()
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Sunken_Colony);
 			}
-			if( (((nrOfEnemy(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Lair)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Hive)) == 0 || (nrOfEnemy(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Lair)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Hive)) == 2) && (nrOfEnemy(BWAPI::UnitTypes::Zerg_Mutalisk) == 0)) && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2 )
+			if( (((nrOfEnemy(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Lair)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Hive)) == 0 || (nrOfEnemy(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Lair)+nrOfEnemy(BWAPI::UnitTypes::Zerg_Hive)) == 2) && (nrOfEnemy(BWAPI::UnitTypes::Zerg_Mutalisk) == 0)) && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2 && nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling)<10 )
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 			}
@@ -1352,7 +1387,7 @@ void WantBuildManager::doLists()
 					}
 					else
 					{
-						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3)
+						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<1)
 						{
 							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 						}
@@ -1377,7 +1412,7 @@ void WantBuildManager::doLists()
 				}
 				else
 				{
-					if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Drone) >= ( 2*nrOfOwn(BWAPI::UnitTypes::Zerg_Extractor) + 4*(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)))) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2))
+					if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Drone) >= ( 2*nrOfOwn(BWAPI::UnitTypes::Zerg_Extractor) + 4*(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)))) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2) && nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling)<17)
 					{
 						addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 					}
@@ -1629,7 +1664,7 @@ bool WantBuildManager::canBeMade(BWAPI::UnitType unittype)
 	return ((!unittype.isBuilding() && allUnits(Larva).size() > 0) || unittype.isBuilding()) && unittype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && unittype.gasPrice() <= BWAPI::Broodwar->self()->gas() && unittype.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed());
 }
 
-bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype,BWAPI::UnitType unittypetwo)
+bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UnitType unittypetwo)
 {
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()));
@@ -1640,11 +1675,22 @@ bool WantBuildManager::canBeMade(BWAPI::TechType techtype)
 	return techtype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && techtype.gasPrice() <= BWAPI::Broodwar->self()->gas();
 }
 
-bool WantBuildManager::canBeMade(BWAPI::UpgradeType upgradetype)
+bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::TechType techtype)
 {
-	return upgradetype.mineralPriceBase() <= BWAPI::Broodwar->self()->minerals() && upgradetype.gasPriceBase() <= BWAPI::Broodwar->self()->gas();
+	return (((unittype.mineralPrice()+techtype.mineralPrice()) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+techtype.gasPrice()) <= BWAPI::Broodwar->self()->gas()));
 }
 
+bool WantBuildManager::canBeMade(BWAPI::UpgradeType upgradetype)
+{
+	int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(upgradetype);
+	return (((upgradetype.mineralPriceBase()+(lvl*upgradetype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((upgradetype.gasPriceBase()+(lvl*upgradetype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+}
+
+bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UpgradeType researchtype)
+{
+	int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(researchtype);
+	return (((unittype.mineralPrice()+researchtype.mineralPriceBase()+(lvl*researchtype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+researchtype.gasPriceBase()+(lvl*researchtype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+}
 
 bool WantBuildManager::requirementsSatisfied(BWAPI::UnitType unittype)
 {
@@ -1860,7 +1906,7 @@ void WantBuildManager::doExpand()
 				underconstruction = true;
 			}
 		}
-		if(!underconstruction)
+		if(!underconstruction && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(getTargetPosition, BWAPI::Position(tilepos)).size()==0);
 		{
 			if(!BWAPI::Broodwar->isVisible(tilepos))
 			{
