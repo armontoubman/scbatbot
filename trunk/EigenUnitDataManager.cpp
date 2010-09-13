@@ -3,10 +3,11 @@
 #include <BWAPI.h>
 #include "Util.h"
 #include <sstream>
+#include "HighCommand.h"
 
-EigenUnitDataManager::EigenUnitDataManager()
+EigenUnitDataManager::EigenUnitDataManager(HighCommand* h)
 {
-  
+	this->hc = h;
 }
 
 void EigenUnitDataManager::update(std::set<BWAPI::Unit*> units, std::set<BWAPI::Unit*> enemyUnits)
@@ -25,9 +26,20 @@ void EigenUnitDataManager::update(std::set<BWAPI::Unit*> units, std::set<BWAPI::
 		// TODO: als type niet meer drone is, uit wbm->bouwdrones halen
 
 		// nieuwe unit, hitpoints goed opslaan
-		if(currentUnitData.hitPoints == 0) {
+		if(currentUnitData.unit == NULL || (*i)->getType() != currentUnitData.type) {
+
+			//unit is nieuw of zn type is veranderd
+			// type veranderd -> uit eugm halen voordat we opnieuw assignen
+			if((*i)->getType() != currentUnitData.type)
+			{
+				this->hc->eigenUnitGroupManager->onRemoveUnit(*i);
+			}
+			// sowieso opnieuw assignen
+			this->hc->eigenUnitGroupManager->assignUnit(*i);
+
 			currentUnitData.hitPoints = currentHitPoints;
 			currentUnitData.unit = *i;
+			currentUnitData.type = (*i)->getType();
 		}
 
 		// current unit heeft schade opgelopen sinds vorige update
