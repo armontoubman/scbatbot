@@ -1358,7 +1358,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						UnitGroup allEnemies = allEnemyUnits;
 						UnitGroup allMelee = allEnemies(Drone) + allEnemies(Zealot) + allEnemies(Zergling) + allEnemies(SCV) + allEnemies(Probe) + allEnemies(Ultralisk);
 						allMelee = allMelee.inRadius(dist(6), (*unitit)->getPosition());
-						if(nearestSwarm(*unitit)->getPosition().getDistance((*unitit)->getPosition()) < dist(10) && allMelee.size() == 0)
+						BWAPI::Unit* swarm = nearestSwarm(*unitit);
+						if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(10) && allMelee.size() == 0)
 						{
 							if(!isUnderDarkSwarm(*unitit))
 							{
@@ -1736,7 +1737,7 @@ void MicroManager::logx(BWAPI::Unit* unit, std::string msg)
 
 void MicroManager::logc(const char* msg)
 {
-	if(true)
+	if(false)
 	{
 		log(msg);
 	}

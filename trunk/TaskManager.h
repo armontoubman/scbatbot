@@ -23,7 +23,6 @@ public:
 	Task highestPriorityTask();
 	Task findTaskWithUnitGroup(UnitGroup* ug);
 	Task findTaskWithUnit(BWAPI::Unit* unit);
-	std::list<Task> findTasksWithUnitType(BWAPI::UnitType unittype);
 	std::list<Task> findTasksWithType(int t);
 	BWAPI::Position frontlineBuilding(std::set<BWAPI::Position> posset);
 	bool existsTaskWithType(int type);

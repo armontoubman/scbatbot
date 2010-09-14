@@ -254,7 +254,14 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 					if(otask.enemy != NULL)
 					{
 						logc("ma task 5 enemy!=NULL\n");
-						if(current->size() == 0) logc("current size = 0\n");
+						if(current->size() == 0)
+						{
+							logc("current size = 0\n");
+						}
+						else
+						{
+							logc("current size > 0\n");
+						}
 						BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position));
 						logc("isConnected test\n");
 						this->eiugm->onlyAirUnits(*current);
@@ -500,7 +507,7 @@ std::list<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst
 
 void PlanAssigner::logc(const char* msg)
 {
-	if(true)
+	if(false)
 	{
 		log(msg);
 	}
