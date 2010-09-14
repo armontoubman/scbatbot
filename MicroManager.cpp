@@ -1361,9 +1361,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						BWAPI::Unit* swarm = nearestSwarm(*unitit);
 						if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(10) && allMelee.size() == 0)
 						{
-							if(!isUnderDarkSwarm(*unitit))
+							BWAPI::Unit* swarm = nearestSwarm(*unitit);
+							if(!isUnderDarkSwarm(*unitit) && swarm != NULL)
 							{
-								(*unitit)->attackMove(nearestSwarm(*unitit)->getPosition());
+								(*unitit)->attackMove(swarm->getPosition());
 							}
 							else
 							{
