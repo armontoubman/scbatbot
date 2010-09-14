@@ -1677,14 +1677,14 @@ std::string WantBuildManager::intToString(int i) {
 bool WantBuildManager::canBeMade(BWAPI::UnitType unittype)
 {
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	return (((!unittype.isBuilding() && allUnits(Larva).size() > 0) || unittype.isBuilding()) && unittype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && unittype.gasPrice() <= BWAPI::Broodwar->self()->gas() && unittype.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - (BWAPI::Broodwar->self()->supplyUsed()+unittype.supplyProvided())));
+	return (((!unittype.isBuilding() && allUnits(Larva).size() > 0) || unittype.isBuilding()) && unittype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && unittype.gasPrice() <= BWAPI::Broodwar->self()->gas() && unittype.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittype.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
 }
 
 bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UnitType unittypetwo)
 {
 	// enkel 1st is building, 2e is unit
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - (BWAPI::Broodwar->self()->supplyUsed()+unittypetwo.supplyProvided())));
+	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittypetwo.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
 }
 
 bool WantBuildManager::canBeMade(BWAPI::TechType techtype)
