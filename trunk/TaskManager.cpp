@@ -207,7 +207,7 @@ void TaskManager::update()
 									BWAPI::Unit* nearestbuilding = nearestUnit(enemy.second.position, eigenbuildings);
 									insertTask(Task(5, 5, nearestbuilding->getPosition(), &enemyUG3));
 								}
-								insertTask(Task(2, 4, enemy.second.position, &enemyUG3));
+								insertTask(Task(2, 4, enemy.second.position, &enemyUG3)); // huge
 								log(std::string("***** enemyInRange ").append(this->hc->wantBuildManager->intToString(enemyInRange.size())).append(" ").c_str());
 								log(std::string("enemyUG3 ").append(this->hc->wantBuildManager->intToString(enemyUG3.size())).append(" ").c_str());
 								log(std::string("&enemyUG3 ").append(this->hc->wantBuildManager->intToString((int) &enemyUG3)).append("\n").c_str());
@@ -231,7 +231,7 @@ void TaskManager::update()
 				{
 					insertTask(Task(1, 1, enemy.second.position, &enemyUG4));
 				}
-				insertTask(Task(2, 2, enemy.second.position, &enemyUG4));
+				insertTask(Task(2, 2, enemy.second.position, &enemyUG4)); // huge
 			}
 		}
 	}
