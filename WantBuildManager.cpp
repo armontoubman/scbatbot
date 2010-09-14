@@ -331,7 +331,7 @@ void WantBuildManager::update()
 			if(b.buildtype.isBuilding() || b.typenr == 4)
 			{
 				UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
-				bezig = bezig + (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(Extractor).not(isCompleted));
+				bezig = bezig + (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).not(isCompleted));
 				if(b.typenr == 4)
 				{
 					std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
@@ -353,6 +353,14 @@ void WantBuildManager::update()
 					log("bezig met: ");
 					log(b.buildtype.getName().append("\n").c_str());
 					if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
+					{
+						log(b.buildtype.getName().append(" ").c_str());
+						log("started and removed from top\n");
+						buildList.removeTop();
+						b = buildList.top();
+						return;
+					}
+					if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
 					{
 						log(b.buildtype.getName().append(" ").c_str());
 						log("started and removed from top\n");
@@ -729,6 +737,10 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 3)
 		{
+			if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<3)
+			{
+				buildExpand();
+			}
 			if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Observatory) == 0)
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
@@ -1057,6 +1069,10 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 3)
 		{
+			if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<3)
+			{
+				buildExpand();
+			}
 			if(nrOfEnemy(BWAPI::UnitTypes::Terran_Marine) > 8)
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
@@ -1529,7 +1545,7 @@ void WantBuildManager::doLists()
 		addBuildTop(BWAPI::UnitTypes::Zerg_Overlord); // (dus wordt als eerste gedaan)
 	}*/
 	
-	if( (BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) > (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) && buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && (BWAPI::Broodwar->self()->supplyTotal() < 400) ) //next 3 items in buildqueue increases the supply required > supplyprovided
+	if( (BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) >= (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) && buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && (BWAPI::Broodwar->self()->supplyTotal() < 400) ) //next 3 items in buildqueue increases the supply required > supplyprovided
 	{
 		log("dl v buildtopoverlord2\n");
 		addBuildTop(BWAPI::UnitTypes::Zerg_Overlord); // (dus wordt als eerste gedaan)
@@ -1554,7 +1570,7 @@ void WantBuildManager::doLists()
 		}
 	}
 	log("dl v startcheck hatcheryexpands\n");
-	BWTA::BaseLocation* natural = getNaturalExpansion();
+	BWTA::BaseLocation* natural = getNaturalExpansion(); // eigenlijk check je dit bij het bouwen zelf, dan kun je het altijd nog deleten.
 	int enemiesNearNatural = 0;
 	if(natural != NULL)
 	{
@@ -1568,13 +1584,13 @@ void WantBuildManager::doLists()
 		buildExpand();
 	}
 
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() > 250 && enemiesNearNatural == 0 && !buildList.containsExpand())
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 300 && enemiesNearNatural == 0 && !buildList.containsExpand())
 	{
 		log("dl v expand 2\n");
 		buildExpand();
 	}
 
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() > 250 && enemiesNearNatural > 0 && !buildList.containsExpand())
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 300 && enemiesNearNatural > 0 && !buildList.containsExpand())
 	{
 		log("dl v extrahatch req\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
@@ -1661,13 +1677,14 @@ std::string WantBuildManager::intToString(int i) {
 bool WantBuildManager::canBeMade(BWAPI::UnitType unittype)
 {
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	return ((!unittype.isBuilding() && allUnits(Larva).size() > 0) || unittype.isBuilding()) && unittype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && unittype.gasPrice() <= BWAPI::Broodwar->self()->gas() && unittype.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed());
+	return (((!unittype.isBuilding() && allUnits(Larva).size() > 0) || unittype.isBuilding()) && unittype.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && unittype.gasPrice() <= BWAPI::Broodwar->self()->gas() && unittype.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - (BWAPI::Broodwar->self()->supplyUsed()+unittype.supplyProvided())));
 }
 
 bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UnitType unittypetwo)
 {
+	// enkel 1st is building, 2e is unit
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()));
+	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= (BWAPI::Broodwar->self()->supplyTotal() - (BWAPI::Broodwar->self()->supplyUsed()+unittypetwo.supplyProvided())));
 }
 
 bool WantBuildManager::canBeMade(BWAPI::TechType techtype)
