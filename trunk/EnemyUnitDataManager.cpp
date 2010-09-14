@@ -91,7 +91,7 @@ UnitGroup EnemyUnitDataManager::getUG()
 
 EnemyUnitData EnemyUnitDataManager::getEnemyUnitData(BWAPI::Unit* unit)
 {
-	EnemyUnitData result;
+	/*EnemyUnitData result;
 	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in enemyUnitsMap)
 	{
 		if(enemy.first == unit)
@@ -99,7 +99,8 @@ EnemyUnitData EnemyUnitDataManager::getEnemyUnitData(BWAPI::Unit* unit)
 			result = enemy.second;
 		}
 	}
-	return result;
+	return result;*/
+	return enemyUnitsMap[unit];
 }
 
 std::map<BWAPI::Unit*, EnemyUnitData> EnemyUnitDataManager::getEnemyUnitsInRadius(double radius, BWAPI::Position pos)
@@ -138,11 +139,19 @@ bool EnemyUnitDataManager::isMilitary(BWAPI::UnitType unittype)
 
 std::map<BWAPI::Unit*, EnemyUnitData> EnemyUnitDataManager::getMapFromUG(UnitGroup* ug)
 {
+	log("EUDM gmFUG\n");
+	log("size ug: ");
+	log(this->intToString(ug->size()).c_str());
+	log("\n");
 	std::map<BWAPI::Unit*, EnemyUnitData> result;
 	for(std::set<BWAPI::Unit*>::iterator it=ug->begin(); it!=ug->end(); it++)
 	{
-		result.insert(std::pair<BWAPI::Unit*, EnemyUnitData>(*it, getEnemyUnitData(*it)));
+		//result.insert(std::pair<BWAPI::Unit*, EnemyUnitData>(*it, getEnemyUnitData(*it)));
+		result.insert(std::make_pair(*it, getEnemyUnitData(*it)));
 	}
+	log("size result: ");
+	log(this->intToString(result.size()).c_str());
+	log("\n");
 	return result;
 }
 

@@ -432,7 +432,7 @@ UnitGroup MicroManager::getHatcheriesWithMinerals()
 
 UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 {
-	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive)(isCompleted;
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive)(isCompleted);
 	UnitGroup result = UnitGroup();
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
 	for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
@@ -620,10 +620,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			BWAPI::Unit* eerste = *((*it)->begin());
 			if((**it).size() == 1)
 			{
-				logx("doMicro zergling ", eerste, " group.size()=1\n");
+				logx(eerste, " group.size()=1\n");
 				if (amountCanAttackGround(enemiesInRange(eerste->getPosition(),dist(8),0))>2)
 				{
-					logx("doMicro zergling ", eerste, " enemy in de buurt, moveToNearestBase\n");
+					logx(eerste, " enemy in de buurt, moveToNearestBase\n");
 					moveToNearestBase(**it);
 				}
 				else
@@ -631,10 +631,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)); // was this-> tm->findTaskWithUnit(eerste)
 					if (currentTask.type == 1) // <-- deze
 					{
-						logx("doMicro zergling ", eerste, " task.type!=1\n");
+						logx(eerste, " task.type!=1\n");
 						if (eerste->getPosition().getDistance(currentTask.position) < dist(5) && !eerste->isMoving())
 						{
-							logx("doMicro zergling ", eerste, " dichtbij task, loop random\n");
+							logx(eerste, " dichtbij task, loop random\n");
 							int x = eerste->getPosition().x();
 							int y = eerste->getPosition().y();
 							int factor = dist(10);
@@ -644,25 +644,25 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							logx("doMicro zergling ", eerste, " move naar task\n");
+							logx(eerste, " move naar task\n");
 							(*it)->move(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position); // move
 						}
 					}
 					else
 					{
-						logx("doMicro zergling ", eerste, " task.type=1 moveToNearestBase\n"); // ???????????????????
+						logx(eerste, " task.type=1 moveToNearestBase\n"); // ???????????????????
 						moveToNearestBase(**it);
 					}
 				}
 			}
 			else
 			{
-				logx("doMicro zergling ", eerste, " groep is groter dan 1\n");
+				logx(eerste, " groep is groter dan 1\n");
 				UnitGroup enemies = enemiesInRange(eerste->getPosition(), dist(10), 1);
 				UnitGroup allies = allSelfUnits.inRadius(dist(10), eerste->getPosition());
 				if((**it).size() * 0.8 < enemies.size() && allies.size() < 3)
 				{
-					logx("doMicro zergling ", eerste, " outnumbered\n");
+					logx(eerste, " outnumbered\n");
 					moveAway(**it);
 				}
 				else
@@ -670,40 +670,40 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					BWAPI::Unit* swarm = nearestSwarm(eerste);
 					if(swarm != NULL && swarm->getPosition().getDistance(eerste->getPosition()) < dist(9))
 					{
-						logx("doMicro zergling ", eerste, " swarm in de buurt\n");
+						logx(eerste, " swarm in de buurt\n");
 						if(!isUnderDarkSwarm(eerste))
 						{
-							logx("doMicro zergling ", eerste, " naar swarm\n");
+							logx(eerste, " naar swarm\n");
 							(**it).move(swarm->getPosition()); // move
 						}
 						else
 						{
-							logx("doMicro zergling ", eerste, " onder swarm, attack enemy\n"); // wat als geen enemy? nullpointer!
+							logx(eerste, " onder swarm, attack enemy\n"); // wat als geen enemy? nullpointer!
 							(**it).attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10), 1)));
 						}
 					}
 					else
 					{
-						logx("doMicro zergling ", eerste, " geen swarm\n");
+						logx(eerste, " geen swarm\n");
 						if((**it).size() > 6)
 						{
-							logx("doMicro zergling ", eerste, " group.size()>6\n");
+							logx(eerste, " group.size()>6\n");
 							UnitGroup enemijes = enemiesInRange(eerste->getPosition(), dist(10), 1);
 							UnitGroup military = enemijes.not(isBuilding).not(isWorker);
 							UnitGroup buildings = enemijes(isBuilding);
 							UnitGroup workers = enemijes(isWorker);
 							if(military.size()>0)
 							{
-								logx("doMicro zergling ", eerste, " enemy in de buurt\n");
+								logx(eerste, " enemy in de buurt\n");
 								BWAPI::Unit* nearest = nearestUnit(eerste->getPosition(), military);
 								if(canAttackGround(enemiesInRange(eerste->getPosition(), dist(5), 2)))
 								{
-									logx("doMicro zergling ", eerste, " air enemy in de buurt, moveaway\n");
+									logx(eerste, " air enemy in de buurt, moveaway\n");
 									moveAway(**it);
 								}
 								else
 								{
-									logx("doMicro zergling ", eerste, " geen air enemy\n");
+									logx(eerste, " geen air enemy\n");
 									BWAPI::Unit* enemy = nearestUnit(eerste->getPosition(), military);
 									UnitGroup enemyUG = enemiesInRange(enemy->getPosition(), dist(6), 1);
 									
@@ -712,39 +712,39 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									/*BWAPI::Position eigencenter = (**it).getCenter();
 									if(enemyUG.size() > 0 && center.getDistance(eigencenter) < dist(3))
 									{
-										logx("doMicro zergling ", eerste, " attackMove center\n");
+										logx(eerste, " attackMove center\n");
 										(*it)->attackMove(center);
 									}
 									else
 									{
-										logx("doMicro zergling ", eerste, " naar enemy position\n");
+										logx(eerste, " naar enemy position\n");
 										(*it)->move(enemy->getPosition()); // move
 									}*/
 								}
 							}
 							else
 							{
-								logx("doMicro zergling ", eerste, " geen enemy in range\n");
+								logx(eerste, " geen enemy in range\n");
 								if(buildings.size() > 0)
 								{
-									logx("doMicro zergling ", eerste, " wel buildings\n");
+									logx(eerste, " wel buildings\n");
 									if(workers.size() > 0)
 									{
-										logx("doMicro zergling ", eerste, " wel workers\n");
+										logx(eerste, " wel workers\n");
 										(*it)->attackUnit(*(workers).begin());
 									}
 									else
 									{
-										logx("doMicro zergling ", eerste, " geen workers\n");
+										logx(eerste, " geen workers\n");
 										(*it)->attackUnit(*(buildings).begin());
 									}
 								}
 								else
 								{
-									logx("doMicro zergling ", eerste, " geen buildings\n");
+									logx(eerste, " geen buildings\n");
 									if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position) < dist(6))
 									{
-										logx("doMicro zergling ", eerste, " task in de buurt, splitUp\n");
+										logx(eerste, " task in de buurt, splitUp\n");
 										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
 										{
 											(*zergit)->attackMove(splitUp(*zergit));
@@ -754,12 +754,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										if (tooSplitUp(dist(15), *it))
 										{
-											logx("doMicro zergling ", eerste, " breng zerg samen\n");
+											logx(eerste, " breng zerg samen\n");
 											(*it)->attackMove((*it)->getCenter().makeValid()); // move
 										}
 										else
 										{
-											logx("doMicro zergling ", eerste, " move naar task\n");
+											logx(eerste, " move naar task\n");
 											(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position); // move
 										}
 									}
@@ -768,38 +768,38 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							logx("doMicro zergling ", eerste, " group.size()<=7\n");
+							logx(eerste, " group.size()<=7\n");
 							UnitGroup enemies = enemiesInRange(eerste->getPosition(), dist(10), 1);
 							if(enemies.size() > 0)
 							{
-								logx("doMicro zergling ", eerste, " enemies in de buurt\n");
+								logx(eerste, " enemies in de buurt\n");
 								(*it)->attackMove(enemies.getCenter());
 							}
 							else
 							{
-								logx("doMicro zergling ", eerste, " geen enemies in de buurt\n");
+								logx(eerste, " geen enemies in de buurt\n");
 								UnitGroup buildings = enemiesInRange(eerste->getPosition(), dist(7), 1)(isBuilding);
 								UnitGroup workers = enemiesInRange(eerste->getPosition(), dist(10), 1)(isWorker);
 								if(buildings.size() > 0)
 								{
-									logx("doMicro zergling ", eerste, " wel buildings\n");
+									logx(eerste, " wel buildings\n");
 									if(workers.size() > 0)
 									{
-										logx("doMicro zergling ", eerste, " wel workers\n");
+										logx(eerste, " wel workers\n");
 										(*it)->attackUnit(*(workers).begin());
 									}
 									else
 									{
-										logx("doMicro zergling ", eerste, " geen workers\n");
+										logx(eerste, " geen workers\n");
 										(*it)->attackUnit(*(buildings).begin());
 									}
 								}
 								else
 								{
-									logx("doMicro zergling ", eerste, " geen buildings\n");
+									logx(eerste, " geen buildings\n");
 									if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position) < dist(6))
 									{
-										logx("doMicro zergling ", eerste, " in de buurt van task, splitUp\n");
+										logx(eerste, " in de buurt van task, splitUp\n");
 										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
 										{
 											(*zergit)->attackMove(splitUp(*zergit));
@@ -809,12 +809,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										if (tooSplitUp(dist(15), *it))
 										{
-											logx("doMicro zergling ", eerste, " breng zerg samen\n");
+											logx(eerste, " breng zerg samen\n");
 											(*it)->attackMove((*it)->getCenter().makeValid()); // move
 										}
 										else
 										{
-											logx("doMicro zergling ", eerste, " move naar task\n");
+											logx(eerste, " move naar task\n");
 											(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(eerste)).position); // move
 										}
 									}
@@ -1089,54 +1089,54 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* OVERLORD */
 				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 				{
-					logx("\n\ndoMicro overlord ", (*unitit), "\n"); 
+					logx((*unitit), "\n"); 
 					if((*unitit)->isUnderStorm())
 					{
-						logx("doMicro overlord ", (*unitit), " under storm moveAway\n");
+						logx((*unitit), " under storm moveAway\n");
 						(*unitit)->move(moveAway(*unitit));
 					}
 					else
 					{						
-						logx("doMicro overlord ", (*unitit), std::string(" task.type=").append(intToString(currentTask.type)).append("\n").c_str());
+						logx((*unitit), std::string(" task.type=").append(intToString(currentTask.type)).append("\n").c_str());
 						if(currentTask.type == 1 || currentTask.type == 4)
 						{
-							logx("doMicro overlord ", (*unitit), " type=1||4\n");
+							logx((*unitit), " type=1||4\n");
 							BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
 							// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
 							if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9), 0)))
 							{
-								logx("doMicro overlord ", (*unitit), " air enemy dichtbij\n");
+								logx((*unitit), " air enemy dichtbij\n");
 								if(overlordSupplyProvidedSoon() && currentTask.type == 1)
 								{
 									
-									logx("doMicro overlord ", (*unitit), " overlordSupplySoon\n");
+									logx((*unitit), " overlordSupplySoon\n");
 									UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(dist(8), currentTask.position);
 									if(buildings.size() == 0)
 									{
-										logx("doMicro overlord ", (*unitit), " geen buildings\n");
+										logx((*unitit), " geen buildings\n");
 										(*unitit)->move(moveAway(*unitit));
 									}
 									else
 									{
 										
-										logx("doMicro overlord ", (*unitit), " wel buildings\n");
+										logx((*unitit), " wel buildings\n");
 										if((*unitit)->getPosition().getDistance(currentTask.position) < dist(2))
 										{
 											
-											logx("doMicro overlord ", (*unitit), " moveAway\n");
+											logx((*unitit), " moveAway\n");
 											(*unitit)->move(moveAway(*unitit));
 										}
 										else
 										{
 											
-											logx("doMicro overlord ", (*unitit), " move naar task\n");
+											logx((*unitit), " move naar task\n");
 											(*unitit)->move(currentTask.position);
 										}
 									}
 								}
 								else
 								{
-									logx("doMicro overlord ", (*unitit), " moveAway\n");
+									logx((*unitit), " moveAway\n");
 									(*unitit)->move(moveAway(*unitit));
 								}
 							}
@@ -1147,7 +1147,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								if(neareststealth != NULL)
 								{
 										
-									logx("doMicro overlord ", (*unitit), " stealth gezien\n");
+									logx((*unitit), " stealth gezien\n");
 									(*unitit)->rightClick(neareststealth->getPosition());
 								}
 								else
@@ -1157,13 +1157,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									if(dropships.size() > 0)
 									{
 											
-										logx("doMicro overlord ", (*unitit), " dropship gezien\n");
+										logx((*unitit), " dropship gezien\n");
 										(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
 									}
 									else
 									{
 											
-										logx("doMicro overlord ", (*unitit), " geen dropship, move naar task\n");
+										logx((*unitit), " geen dropship, move naar task\n");
 										(*unitit)->move(currentTask.position);
 									}
 								}
@@ -1171,7 +1171,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							/*logx("doMicro overlord ", (*unitit), " hydratask deel\n");
+							/*logx((*unitit), " hydratask deel\n");
 							std::list<Task> hydratasks = this->tm->findTasksWithUnitType(BWAPI::UnitTypes::Zerg_Hydralisk);
 							Task* hydratask = NULL;
 							for(std::list<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
@@ -1186,7 +1186,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							if(hydratask != NULL)
 							{
 								
-								logx("doMicro overlord ", (*unitit), " hydratask\n");
+								logx((*unitit), " hydratask\n");
 								BWAPI::Unit* volghydra = *(hydratask->unitGroup->begin());
 								(*unitit)->rightClick(volghydra->getPosition());
 							}
@@ -1196,18 +1196,18 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								if(overlordsnearby.size() > 1)
 								{
 									
-									logx("doMicro overlord ", (*unitit), " andere overlord\n");
+									logx((*unitit), " andere overlord\n");
 									if(canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(8), 0)))
 									{
 										
-										logx("doMicro overlord ", (*unitit), " canAttackAir moveAway\n");
+										logx((*unitit), " canAttackAir moveAway\n");
 										(*unitit)->move(moveAway(*unitit));
 									}
 									else
 									{
 										if (!(*unitit)->isMoving())
 										{
-											logx("doMicro overlord ", (*unitit), " splitUp\n");
+											logx((*unitit), " splitUp\n");
 											(*unitit)->move(splitUp(*unitit));
 										}
 									}
@@ -1219,7 +1219,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										if (!(*unitit)->isMoving())
 										{
-											logx("doMicro overlord ", (*unitit), " building random\n");
+											logx((*unitit), " building random\n");
 											// als dit elk frame gebeurt, krijgt hij elk frame een nieuwe positie -> stuiterbal
 											int x = (*unitit)->getPosition().x();
 											int y = (*unitit)->getPosition().y();
@@ -1232,7 +1232,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									else
 									{
 										
-										logx("doMicro overlord ", (*unitit), " eigen building\n");
+										logx((*unitit), " eigen building\n");
 										BWAPI::Unit* nearestbuilding = nearestUnit((*unitit)->getPosition(), allSelfUnits(isBuilding));
 										(*unitit)->move(nearestbuilding->getPosition());
 									}
@@ -1249,28 +1249,28 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					/*logx("\n\ndoMicro drone ", (*unitit), "\n");
 					if(this->wbm->bouwdrones.count(*unitit) > 0)
 					{
-						logx("doMicro drone", (*unitit), " drone is aan het bouwen, skip\n");
+						logx((*unitit), " drone is aan het bouwen, skip\n");
 						continue;
 					}*/
 					if((*unitit)->isUnderStorm())
 					{
-						logx("doMicro drone ", (*unitit), " under storm moveAway\n");
+						logx((*unitit), " under storm moveAway\n");
 						moveToNearestBase(*unitit);
 					}
 					else
 					{
 						if(currentTask.type != 1)
 						{
-							logx("doMicro drone ", (*unitit), " task.type != 1\n");
+							logx((*unitit), " task.type != 1\n");
 							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(5), 0)) || this->eiudm->lostHealthThisFrame(*unitit))
 							{
-								logx("doMicro drone ", (*unitit), " ground enemies of geraakt\n");
+								logx((*unitit), " ground enemies of geraakt\n");
 								UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(dist(7), (*unitit)->getPosition());
 								UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(dist(7), (*unitit)->getPosition());
 								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7), 0);
 								if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
 								{
-									logx("doMicro drone ", (*unitit), " drone rage\n");
+									logx((*unitit), " drone rage\n");
 									BWAPI::Unit* target = getVisibleUnit(enemies);
 									if(target != NULL)
 									{
@@ -1286,7 +1286,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									UnitGroup detectorsInRange = enemiesInRange((*unitit)->getPosition(), dist(10), 0)(isDetector);
 									if(BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Burrowing) && detectorsInRange.size() == 0)
 									{
-										logx("doMicro drone ", (*unitit), " geen detectors, wel burrow\n");
+										logx((*unitit), " geen detectors, wel burrow\n");
 										(*unitit)->burrow();
 									}
 									else
@@ -1294,12 +1294,12 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										UnitGroup militaryInRange = allSelfUnits.inRadius(dist(14), (*unitit)->getPosition()).not(isWorker)(canAttack);
 										if(militaryInRange.size() > 0)
 										{
-											logx("doMicro drone ", (*unitit), " military \n");
+											logx((*unitit), " military \n");
 											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), militaryInRange)->getPosition());
 										}
 										else
 										{
-											logx("doMicro drone ", (*unitit), " geen military moveAway\n");
+											logx((*unitit), " geen military moveAway\n");
 											(*unitit)->move(moveAway(*unitit));
 										}
 									}
@@ -1307,30 +1307,30 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								logx("doMicro drone ", (*unitit), " harvestcheck\n");
+								logx((*unitit), " harvestcheck\n");
 								UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
 								gatherWhere(*unitit);
-								logx("doMicro drone ", (*unitit), " harvestdone\n");							
+								logx((*unitit), " harvestdone\n");							
 							}
 						}
 						else
 						{
-							logx("doMicro drone ", (*unitit), " task.type = 1\n");
+							logx((*unitit), " task.type = 1\n");
 							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(7), 0)))
 							{
-								logx("doMicro drone ", (*unitit), " enemies moveAway\n");
+								logx((*unitit), " enemies moveAway\n");
 								(*unitit)->move(moveAway(*unitit));
 							}
 							else
 							{
 								if((*unitit)->getPosition().getDistance(currentTask.position) < dist(7))
 								{
-									logx("doMicro drone ", (*unitit), " moveToNearestBase\n");
+									logx((*unitit), " moveToNearestBase\n");
 									moveToNearestBase(*unitit);
 								}
 								else
 								{
-									logx("doMicro drone ", (*unitit), " naar task\n");
+									logx((*unitit), " naar task\n");
 									(*unitit)->move(currentTask.position);
 								}
 							}
@@ -1338,10 +1338,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					}
 					if((*unitit)->isIdle()==true || (*unitit)->getOrder() == BWAPI::Orders::None || (*unitit)->getOrder() == BWAPI::Orders::Nothing)
 					{
-						logx("doMicro drone ", (*unitit), " harvestcheckidle\n");
+						logx((*unitit), " harvestcheckidle\n");
 						UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
 						gatherWhere(*unitit);
-						logx("doMicro drone ", (*unitit), " harvestdonewasidle\n");	
+						logx((*unitit), " harvestdonewasidle\n");	
 					}
 				}
 				/* EINDE DRONE */
@@ -1725,12 +1725,9 @@ std::string MicroManager::intToString(int i) {
 	return buffer.str();
 }
 
-void MicroManager::logx(std::string func, BWAPI::Unit* unit, std::string msg)
+void MicroManager::logx(BWAPI::Unit* unit, std::string msg)
 {
-	if(true)
-	{
-		logc(std::string(func).append(intToString(unit->getID())).append(std::string(msg)).c_str());
-	}
+	logc(std::string("MM ").append(unit->getType().getName()).append(" ").append(intToString(unit->getID())).append(std::string(msg)).c_str());
 
 	// geeft spam aan berichten
 	// werkt wel als logx alleen in het laagste if/else niveau van doMicro staat
