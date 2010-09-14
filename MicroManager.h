@@ -57,6 +57,7 @@ public:
 	UnitGroup* inRadiusUnitGroup(double radius, UnitGroup* ug);
 	UnitGroup* inRadiusUnitGroupUnitType(double radius, UnitGroup* ug, BWAPI::UnitType ut);
 	BWAPI::Position getCenterPositionFromEnemyMap(std::map<BWAPI::Unit*, EnemyUnitData> data);
+	BWAPI::Unit* getVisibleUnit(std::set<BWAPI::Unit*> units);
 
 	void doMicro(std::set<UnitGroup*> listUG);
 

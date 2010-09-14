@@ -62,8 +62,9 @@ HighCommand::~HighCommand() {
 
 void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits)
 {
-
-	this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
+	
+	if(this->hatchery->getHitPoints() < 100) this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
+	
 	log("HC::update eigenUnitDataManager\n");
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
 	log("HC::update enemyUnitDataManager\n");
