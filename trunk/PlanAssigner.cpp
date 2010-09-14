@@ -324,7 +324,16 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 						if(otask.type == 1)
 						{
 							logc("ma 1 dan\n");
-							idealTasks.push_front(otask);
+							if(((*current)(isFlyer).size() == 0 && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position)))
+								|| (*current)(isFlyer).size() > 0)
+							{
+								logc("task bereikbaar\n");
+								idealTasks.push_front(otask);
+							}
+							else
+							{
+								logc("task onbereikbaar voor deze groep\n");
+							}
 						}
 					}
 				}

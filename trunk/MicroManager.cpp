@@ -497,7 +497,7 @@ bool MicroManager::tooSplitUp(double radius, UnitGroup* ug)
 			amount++;
 		}
 	}
-	if (ug.size()/2 < amount)
+	if (ug->size()/2 < amount)
 	{
 		return true;
 	}
@@ -1103,17 +1103,17 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							logx("doMicro overlord ", (*unitit), " type=1||4\n");
 							BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
 							// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
-							if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9))).size()>0)
+							if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9), 0)))
 							{
 								logx("doMicro overlord ", (*unitit), " air enemy dichtbij\n");
 								if(overlordSupplyProvidedSoon() && currentTask.type == 1)
 								{
 									
-									logx("doMicro overlord ", (*unitit), " overlordSupplySoon");
+									logx("doMicro overlord ", (*unitit), " overlordSupplySoon\n");
 									UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(dist(8), currentTask.position);
 									if(buildings.size() == 0)
 									{
-										logx("doMicro overlord ", (*unitit), " geen buildings");
+										logx("doMicro overlord ", (*unitit), " geen buildings\n");
 										(*unitit)->move(moveAway(*unitit));
 									}
 									else
@@ -1271,7 +1271,15 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
 								{
 									logx("doMicro drone ", (*unitit), " drone rage\n");
-									(*unitit)->attackUnit(*enemies.begin());
+									BWAPI::Unit* target = getVisibleUnit(enemies);
+									if(target != NULL)
+									{
+										(*unitit)->attackUnit(target);
+									}
+									else
+									{
+										(*unitit)->move(this->eudm->getEnemyUnitData(*enemies.begin()).lastKnownPosition);
+									}
 								}
 								else
 								{
@@ -1765,4 +1773,16 @@ BWAPI::Position MicroManager::getCenterPositionFromEnemyMap(std::map<BWAPI::Unit
 	result_y = int(avg_y);
 
 	return BWAPI::Position(result_x, result_y);
+}
+
+BWAPI::Unit* MicroManager::getVisibleUnit(std::set<BWAPI::Unit*> units)
+{
+	for each(BWAPI::Unit* unit in units)
+	{
+		if(unit->isVisible())
+		{
+			return unit;
+		}
+	}
+	return NULL;
 }
