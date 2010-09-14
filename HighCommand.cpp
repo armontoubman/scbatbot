@@ -62,6 +62,11 @@ HighCommand::~HighCommand() {
 
 void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits)
 {
+	log("eudm map: ");
+	log(this->wantBuildManager->intToString(this->enemyUnitDataManager->enemyUnitsMap.size()).append("\n").c_str());
+	
+	log("eiudm map: ");
+	log(this->wantBuildManager->intToString(this->eigenUnitDataManager->myUnitsMap.size()).append("\n").c_str());
 	
 	if(this->hatchery->getHitPoints() < 100) this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
 	

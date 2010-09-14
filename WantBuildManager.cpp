@@ -86,7 +86,7 @@ void WantBuildManager::addBuild(BWAPI::UnitType unittype, int amount)
 	for(int i=0; i<amount; i++)
 	{
 		this->buildList.addItem(BuildItem(unittype, 1));
-		log(std::string("addBuild ").append(unittype.getName()).append("\n").c_str());
+		logc(std::string("addBuild ").append(unittype.getName()).append("\n").c_str());
 	}
 }
 
@@ -242,9 +242,9 @@ int WantBuildManager::dronesRequiredAll()
 {
 	int amount = 0;
 	UnitGroup minerals = UnitGroup::getUnitGroup(BWAPI::Broodwar->getMinerals());
-	log(std::string("dronesreq mins: ").append(intToString(minerals.size())).append("\n").c_str());
+	logc(std::string("dronesreq mins: ").append(intToString(minerals.size())).append("\n").c_str());
 	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
-	log(std::string("dronesreq hatch: ").append(intToString(hatcheries.size())).append("\n").c_str());
+	logc(std::string("dronesreq hatch: ").append(intToString(hatcheries.size())).append("\n").c_str());
 
 	// minerals per basis
 	for(std::set<BWAPI::Unit*>::iterator mit=minerals.begin(); mit!=minerals.end(); mit++)
@@ -264,13 +264,13 @@ int WantBuildManager::dronesRequiredAll()
 			}
 		}
 	}
-	log(std::string("minsperbasis: ").append(intToString(amount)).append("\n").c_str());
+	logc(std::string("minsperbasis: ").append(intToString(amount)).append("\n").c_str());
 	// extractors
 	amount += (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor)(isCompleted).size()*3);
-	log(std::string("plusextractors: ").append(intToString(amount)).append("\n").c_str());
+	logc(std::string("plusextractors: ").append(intToString(amount)).append("\n").c_str());
 	// aantal workers al aan de slag
 	amount -= UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isWorker).not(isMorphing).not(isConstructing).size();
-	log(std::string("minus workers: ").append(intToString(amount)).append("\n").c_str());
+	logc(std::string("minus workers: ").append(intToString(amount)).append("\n").c_str());
 	if (amount < 0)
 	{
 		return 0;
@@ -318,7 +318,7 @@ int WantBuildManager::nrOfEnemyBases()
 
 void WantBuildManager::update()
 {
-	log("WantBuildManager::update()\n");
+	logc("WantBuildManager::update()\n");
 	logBuildList(this->buildList);
 	// Actual building of items
 	if(buildList.size() > 0)
@@ -350,27 +350,27 @@ void WantBuildManager::update()
 				// bezig kan size > 1 hebben
 				for each(BWAPI::Unit* lolgebouw in bezig)
 				{
-					log("bezig met: ");
-					log(b.buildtype.getName().append("\n").c_str());
+					logc("bezig met: ");
+					logc(b.buildtype.getName().append("\n").c_str());
 					if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
 					{
-						log(b.buildtype.getName().append(" ").c_str());
-						log("started and removed from top\n");
+						logc(b.buildtype.getName().append(" ").c_str());
+						logc("started and removed from top\n");
 						buildList.removeTop();
 						b = buildList.top();
 						return;
 					}
 					if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
 					{
-						log(b.buildtype.getName().append(" ").c_str());
-						log("started and removed from top\n");
+						logc(b.buildtype.getName().append(" ").c_str());
+						logc("started and removed from top\n");
 						buildList.removeTop();
 						b = buildList.top();
 						return;
 					}
 					if(b.typenr == 4 && lolgebouw->getType() == BWAPI::UnitTypes::Zerg_Hatchery && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
 					{
-						log("expand started and removed from top\n");
+						logc("expand started and removed from top\n");
 						buildList.removeTop();
 						b = buildList.top();
 						return;
@@ -380,24 +380,24 @@ void WantBuildManager::update()
 		}
 		//einde remove build als aant bouwe is
 
-		log(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
+		logc(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
 		if(b.typenr == 1)
 		{
 			if(!requirementsSatisfied(b.buildtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
-				log("can't make\n\t");
-				log(b.buildtype.getName().append("\n").c_str());
-				log("remove\n");
+				logc("can't make\n\t");
+				logc(b.buildtype.getName().append("\n").c_str());
+				logc("remove\n");
 				buildList.removeTop();
-				log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+				logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 				return;
 			}
 			else
 			{
 				if(buildList.count(BWAPI::UnitTypes::Zerg_Drone)>2 && b.buildtype!=BWAPI::UnitTypes::Zerg_Drone && b.buildtype!=BWAPI::UnitTypes::Zerg_Overlord && !isBeingHandled(b)) // conditie die checkt of b niet al in maak is
 				{
-					log(b.buildtype.getName().append(" ").c_str());
-					log("drones voorrang\n");
+					logc(b.buildtype.getName().append(" ").c_str());
+					logc("drones voorrang\n");
 					buildList.removeTop();
 					return;
 				}
@@ -407,24 +407,24 @@ void WantBuildManager::update()
 					{
 						if(!b.buildtype.isBuilding())
 						{
-							log("can make\n\t");
-							log(b.buildtype.getName().append("\n").c_str());
+							logc("can make\n\t");
+							logc(b.buildtype.getName().append("\n").c_str());
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
 							buildList.removeTop();
-							log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+							logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 							return;
 						}
 						else
 						{
-							log("can make\n\t");
-							log(b.buildtype.getName().append("\n").c_str());
+							logc("can make\n\t");
+							logc(b.buildtype.getName().append("\n").c_str());
 							if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair)
 							{
 								if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
 								{
-									log("probeer hatchery naar lair te morphen...\n");
+									logc("probeer hatchery naar lair te morphen...\n");
 									this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Lair);
-									log("gelukt.\n");
+									logc("gelukt.\n");
 									buildList.removeTop();
 									return;
 								}
@@ -433,14 +433,14 @@ void WantBuildManager::update()
 									UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
 									if(hatcheries.size() == 0)
 									{
-										log("kan geen lair maken, geen hatcheries\n");
+										logc("kan geen lair maken, geen hatcheries\n");
 										buildList.removeTop();
 									}
 									else
 									{
-										log("probeer hatchery naar lair te morphen...\n");
+										logc("probeer hatchery naar lair te morphen...\n");
 										(*hatcheries.begin())->morph(BWAPI::UnitTypes::Zerg_Lair);
-										log("gelukt.\n");
+										logc("gelukt.\n");
 										buildList.removeTop();
 										return;
 									}
@@ -452,9 +452,9 @@ void WantBuildManager::update()
 								{
 									if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
 									{
-										log("probeer lair naar hive te morphen...\n");
+										logc("probeer lair naar hive te morphen...\n");
 										this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
-										log("gelukt.\n");
+										logc("gelukt.\n");
 										buildList.removeTop();
 										return;
 									}
@@ -463,14 +463,14 @@ void WantBuildManager::update()
 										UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
 										if(lairs.size() == 0)
 										{
-											log("kan geen hive maken, geen lairs\n");
+											logc("kan geen hive maken, geen lairs\n");
 											buildList.removeTop();
 										}
 										else
 										{
-											log("probeer lair naar hive te morphen...\n");
+											logc("probeer lair naar hive te morphen...\n");
 											(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
-											log("gelukt.\n");
+											logc("gelukt.\n");
 											buildList.removeTop();
 											return;
 										}
@@ -481,7 +481,7 @@ void WantBuildManager::update()
 									bool albezig = isBeingHandled(b);
 									if(albezig == false)
 									{
-										log("bouwen maar\n");
+										logc("bouwen maar\n");
 										bool gogo = false;
 										BWAPI::TilePosition lokatie;
 										if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
@@ -502,20 +502,20 @@ void WantBuildManager::update()
 										{
 											bouwStruc(lokatie, b.buildtype);
 											//buildList.removeTop(); // crash
-											log("bouwen gelukt\n");
+											logc("bouwen gelukt\n");
 										}
 										else
 										{
-											log("bouwen mislukt, geen locatie\n");
+											logc("bouwen mislukt, geen locatie\n");
 											buildList.removeTop();
 										}
 									}
 									else
 									{
 										//buildList.removeTop(); // crash
-										log("wordt al gemaakt\n");
+										logc("wordt al gemaakt\n");
 									}
-									log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+									logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 									return;
 								}
 							}
@@ -524,7 +524,7 @@ void WantBuildManager::update()
 				}
 			}
 		}
-		log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+		logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 		if(b.typenr == 2)
 		{
 			if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
@@ -576,22 +576,22 @@ void WantBuildManager::update()
 			{
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
-					log("can't make second\n\t");
-					log(v.buildtype.getName().append("\n").c_str());
-					log("remove second\n");
+					logc("can't make second\n\t");
+					logc(v.buildtype.getName().append("\n").c_str());
+					logc("remove second\n");
 					buildList.removeSecond();
-					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+					logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 					return;
 				}
 				else
 				{
 					if (bothCanBeMade(b.buildtype, v.buildtype))
 					{
-						log("can make second\n\t");
-						log(v.buildtype.getName().append("\n").c_str());
+						logc("can make second\n\t");
+						logc(v.buildtype.getName().append("\n").c_str());
 						(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
 						buildList.removeSecond();
-						log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+						logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 						return;
 					}
 				}
@@ -600,22 +600,22 @@ void WantBuildManager::update()
 				{
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
-					log("can't make second\n\t");
-					log(v.buildtype.getName().append("\n").c_str());
-					log("remove second\n");
+					logc("can't make second\n\t");
+					logc(v.buildtype.getName().append("\n").c_str());
+					logc("remove second\n");
 					buildList.removeSecond();
-					log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+					logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 					return;
 				}
 				else
 				{
 					if (bothCanBeMadeExpand(v.buildtype))
 					{
-						log("can make second\n\t");
-						log(v.buildtype.getName().append("\n").c_str());
+						logc("can make second\n\t");
+						logc(v.buildtype.getName().append("\n").c_str());
 						(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
 						buildList.removeSecond();
-						log(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+						logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 						return;
 					}
 				}
@@ -692,7 +692,7 @@ void WantBuildManager::update()
 	}
 	else
 	{
-		log("buildlist is leeg\n");
+		logc("buildlist is leeg\n");
 	}
 }
 
@@ -702,14 +702,14 @@ void WantBuildManager::doLists()
 
 	stap = 1;
 
-	log("doLists\n\n");
+	logc("doLists\n\n");
 
 	if(enemyRace == BWAPI::Races::Protoss)
 	{
 		
 		if(	stap == 1 && (buildListIsEmpty()) && (wantListIsEmpty())) 
 		{
-			log("doLists stap 1 lege lijsten\n");
+			logc("doLists stap 1 lege lijsten\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 5);
 			//addWant(BWAPI::UnitTypes::Zerg_Drone, 9);
 			addBuild(BWAPI::UnitTypes::Zerg_Spawning_Pool);
@@ -720,27 +720,27 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 2)
 		{
-			log("doLists stap 2\n");
+			logc("doLists stap 2\n");
 			if(	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2) && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) == 0)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 4) && buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<4)
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Zergling);
-				log("dolists p first cond\n");
+				logc("dolists p first cond\n");
 			}
 			else 
 			{
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 2) && photonCannonNearBase() ) // *7* goedgekeurd, check buildexpand ligt in methode zelf
 				{
 					buildExpand();
-					log("dl p 1-1\n");
+					logc("dl p 1-1\n");
 				}
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus) == 2) && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Forge) >= 1)	&&	(nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) < 9)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 10)	&&	(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)==2)	) // nakijken
 				{
 					buildExpand();
-					log("dl p 1-2\n");
+					logc("dl p 1-2\n");
 				}
 				if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Stargate) > 0)
 				{
-					log("dl p 1-3\n");
+					logc("dl p 1-3\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 					addWant(BWAPI::UnitTypes::Zerg_Hydralisk,10);
@@ -748,14 +748,14 @@ void WantBuildManager::doLists()
 				}
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) > 7) || ((nrOfEnemy(BWAPI::UnitTypes::Protoss_Gateway) > 2)  && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) == 0)))
 				{
-					log("dl p 1-4\n");
+					logc("dl p 1-4\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
 					stap = 3;
 				}
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 5)) // *7*
 				{
-					log("dl p 1-5\n");
+					logc("dl p 1-5\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
@@ -763,30 +763,30 @@ void WantBuildManager::doLists()
 				}
 				//if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0)) // deze was gecomment
 				{
-					log("dl p 1-6\n");
+					logc("dl p 1-6\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
 					stap = 3;
 				}
 				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) > 0)	&& (nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon) > 3)) // *7*fix
 				{
-					log("dl p 1-7\n");
+					logc("dl p 1-7\n");
 					addBuild(BWAPI::UnitTypes::Zerg_Zergling, 20);
 					if(	(((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))+wantList.count(BWAPI::UnitTypes::Zerg_Hatchery)+wantList.count(BWAPI::UnitTypes::Zerg_Lair)+wantList.count(BWAPI::UnitTypes::Zerg_Hive)) < 2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den)==0)) // *7*
 					{
-						log("dl p 1-7-1\n");
+						logc("dl p 1-7-1\n");
 						addWant(BWAPI::UnitTypes::Zerg_Hatchery,1);
 					}
 					else
 					{
-						log("dl p 1-7-2\n");
+						logc("dl p 1-7-2\n");
 						addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 						addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					}
 				}
 				if(  (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && !wantListContains(BWAPI::UnitTypes::Zerg_Extractor))
 				{
-					log("dl p 1-8\n");
+					logc("dl p 1-8\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
 					stap = 3;
@@ -839,16 +839,16 @@ void WantBuildManager::doLists()
 			addWant(BWAPI::UnitTypes::Zerg_Ultralisk);
 		}
 		// reinforcements -->
-		log("dl p r start\n");
+		logc("dl p r start\n");
 		if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) > 9)
 		{
-			log("dl p r 1\n");
+			logc("dl p r 1\n");
 			if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle) > 0) || this->eudm->getUG()(isFlyer).size() >4)
 			{
-				log("dl p r 1-1\n");
+				logc("dl p r 1-1\n");
 				if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 9)
 				{
-					log("dl p r 1-2\n");
+					logc("dl p r 1-2\n");
 					if( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0 )
 					{
 						if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
@@ -868,12 +868,12 @@ void WantBuildManager::doLists()
 					{
 						if( ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))< 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) )
 						{
-							log("dl p r 1-2-2-m\n");
+							logc("dl p r 1-2-2-m\n");
 							addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
 						}
 						else
 						{
-							log("dl p r 1-2-2-h\n");
+							logc("dl p r 1-2-2-h\n");
 							if (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3)
 							{
 							addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
@@ -885,14 +885,14 @@ void WantBuildManager::doLists()
 				{
 					if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<4)
 					{
-						log("dl p r 1-1-2\n");
+						logc("dl p r 1-1-2\n");
 						addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
 					}
 				}
 			} 
 			else
 			{
-				log("dl p r 2\n");
+				logc("dl p r 2\n");
 				if(nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 				{
 					if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
@@ -910,14 +910,14 @@ void WantBuildManager::doLists()
 				}
 				else if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<4)
 				{
-					log("dl p r 3\n");
+					logc("dl p r 3\n");
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
 				}
 			}
 		}
 		else if( nrOfEnemyMilitaryUnits() < 6)
 		{
-			log("dl p r 3\n");
+			logc("dl p r 3\n");
 			if(nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
@@ -935,26 +935,26 @@ void WantBuildManager::doLists()
 			}
 			else
 			{
-				log("dl p r 3-2\n");
+				logc("dl p r 3-2\n");
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) < 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<2)
 				{
-					log("dl p r 3-2-1\n");
+					logc("dl p r 3-2-1\n");
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
 				}
 				else
 				{
 					if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3)
 					{
-						log("dl p r 3-2-2\n");
+						logc("dl p r 3-2-2\n");
 						addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 					}
 				}
 			}
 		}
-		log("dl p r elseifuit\n");
+		logc("dl p r elseifuit\n");
 		if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon) > 4)
 		{
-			log("dl p r 4\n");
+			logc("dl p r 4\n");
 			if(nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
@@ -972,15 +972,15 @@ void WantBuildManager::doLists()
 			}
 			else
 			{
-				log("dl p r 4-2\n");
+				logc("dl p r 4-2\n");
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<4)
 				{
-					log("dl p r 4-2-1\n");
+					logc("dl p r 4-2-1\n");
 					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
 				}
 				else
 				{
-					log("dl p r 4-2-2\n");
+					logc("dl p r 4-2-2\n");
 					if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<3)
 					{
 						addBuild(BWAPI::UnitTypes::Zerg_Zergling);
@@ -990,7 +990,7 @@ void WantBuildManager::doLists()
 		}
 		if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle) > 0)
 		{
-			log("dl p r 5\n");
+			logc("dl p r 5\n");
 			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<2)
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
@@ -1000,10 +1000,10 @@ void WantBuildManager::doLists()
 				addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
 			}
 		}
-		log("dl p r 5 -> 6 check\n");
+		logc("dl p r 5 -> 6 check\n");
 		if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Observatory) == 0) && (BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Lurker_Aspect))) // *7*fix
 		{
-			log("dl p r 6\n");
+			logc("dl p r 6\n");
 			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 5) && (buildList.count(BWAPI::UnitTypes::Zerg_Lurker)<3))
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Lurker);
@@ -1019,12 +1019,12 @@ void WantBuildManager::doLists()
 		}
 		if( (BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Lurker_Aspect)) && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) > 7) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Lurker) < 8) && (buildList.count(BWAPI::UnitTypes::Zerg_Lurker)<2)) // *7*fix
 		{
-			log("dl p r 7\n");
+			logc("dl p r 7\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Lurker);
 		}
 		if( (((BWAPI::Broodwar->self()->minerals()>200 || BWAPI::Broodwar->self()->gas()>200) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) > nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus)) || nrOfOwnMilitaryUnits() <7 || (nrOfOwnMilitaryUnits() < nrOfEnemyMilitaryUnits())) && !buildList.containsUnits() )
 		{
-			log("dl p r 8\n");
+			logc("dl p r 8\n");
 			if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
 			{
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
@@ -1046,7 +1046,7 @@ void WantBuildManager::doLists()
 			}
 			else 
 			{
-				log("dl p r 8b-2\n");
+				logc("dl p r 8b-2\n");
 				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+(buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))) < 11) )
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
@@ -1067,7 +1067,7 @@ void WantBuildManager::doLists()
 				}
 			}
 		}
-		log("dl p klaar\n");
+		logc("dl p klaar\n");
 	}
 	else if(enemyRace == BWAPI::Races::Terran)
 	{
@@ -1507,58 +1507,58 @@ void WantBuildManager::doLists()
 	int zerglingtotaal = this->buildList.count(BWAPI::UnitTypes::Zerg_Zergling);
 	zerglingtotaal += UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Zergling).size();
 	zerglingtotaal += countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Zergling);
-	log("dl g zlingtotal\n");
+	logc("dl g zlingtotal\n");
 	if (zerglingtotaal > 10)
 	{
-		log("dl g zlingtotal satis\n");
+		logc("dl g zlingtotal satis\n");
 		addWant(BWAPI::UpgradeTypes::Metabolic_Boost);
 	}
 	
 	if( ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) + nrOfOwn(BWAPI::UnitTypes::Zerg_Lurker)) * 2) >47 && buildList.count(BWAPI::UpgradeTypes::Zerg_Missile_Attacks)<1 )
 	{
-		log("dl upgr missile\n");
+		logc("dl upgr missile\n");
 		addWant(BWAPI::UpgradeTypes::Zerg_Missile_Attacks); // research ranged ground dmg
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 11 && buildList.count(BWAPI::UpgradeTypes::Muscular_Augments)<1 )
 	{
-		log("dl upgr muscu\n");
+		logc("dl upgr muscu\n");
 		addWant(BWAPI::UpgradeTypes::Muscular_Augments); // research hydralisk speed
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
-	log("dl upgr muscu->spines\n");
+	logc("dl upgr muscu->spines\n");
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 19 && buildList.count(BWAPI::UpgradeTypes::Grooved_Spines)<1 )
 	{
-		log("dl upgr spines\n");
+		logc("dl upgr spines\n");
 		addWant(BWAPI::UpgradeTypes::Grooved_Spines); // research range
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 
 	if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling)+nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk)) > 39 && buildList.count(BWAPI::UpgradeTypes::Zerg_Melee_Attacks)<1 )
 	{
-		log("dl upgr melee\n");
+		logc("dl upgr melee\n");
 		addWant(BWAPI::UpgradeTypes::Zerg_Melee_Attacks); // research melee ground damage
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
 
 	if( BWAPI::Broodwar->self()->supplyUsed() > 180 && buildList.count(BWAPI::UpgradeTypes::Zerg_Carapace)<1 ) // >90 supply required (dubbel vanwege werking API)
 	{
-		log("dl upgr cara\n");
+		logc("dl upgr cara\n");
 		addWant(BWAPI::UpgradeTypes::Zerg_Carapace); // upgrade ground armor
 		addWant(BWAPI::UnitTypes::Zerg_Evolution_Chamber);
 	}
-	log("dl upgr cara->burrow\n");
+	logc("dl upgr cara->burrow\n");
 
 	if( BWAPI::Broodwar->self()->supplyUsed() > 90 && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 15 || nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 20) && buildList.count(BWAPI::TechTypes::Burrowing)<1 )
 	{
-		log("dl upgr burrow\n");
+		logc("dl upgr burrow\n");
 		addWant(BWAPI::TechTypes::Burrowing);
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hive) > 0 )
 	{
-		log("dl hive tech\n");
+		logc("dl hive tech\n");
 		if (buildList.count(BWAPI::UpgradeTypes::Zerg_Melee_Attacks)<1)
 		{
 			addWant(BWAPI::UpgradeTypes::Zerg_Melee_Attacks); // upgrade melee ground damage
@@ -1595,39 +1595,39 @@ void WantBuildManager::doLists()
 	}
 
 	// vangnetten/algemeen
-	log("dl v start\n");
-	/*log(std::string("overlord eggs: ").append(intToString(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))).append("\n").c_str());
+	logc("dl v start\n");
+	/*logc(std::string("overlord eggs: ").append(intToString(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))).append("\n").c_str());
 	if( BWAPI::Broodwar->self()->supplyUsed() >= (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord))) && (buildList.top().typenr == 1 && buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord) && (BWAPI::Broodwar->self()->supplyTotal() < 400)) // voorkomt dat het overlords spamt als het al op max bevindt
 	{
-		log("dl v buildtopoverlord1\n");
+		logc("dl v buildtopoverlord1\n");
 		addBuildTop(BWAPI::UnitTypes::Zerg_Overlord); // (dus wordt als eerste gedaan)
 	}*/
 	
 	if( (BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) >= (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) && buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && (BWAPI::Broodwar->self()->supplyTotal() < 400) ) //next 3 items in buildqueue increases the supply required > supplyprovided
 	{
-		log("dl v buildtopoverlord2\n");
+		logc("dl v buildtopoverlord2\n");
 		addBuildTop(BWAPI::UnitTypes::Zerg_Overlord); // (dus wordt als eerste gedaan)
 	}
 	
 	if( dronesRequiredAll() > (buildList.count(BWAPI::UnitTypes::Zerg_Drone)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Drone)) && buildList.count(BWAPI::UnitTypes::Zerg_Drone)<6 ) // not sufficient drones
 	{
-		log("drone build\n");	
+		logc("drone build\n");	
 		addBuild(BWAPI::UnitTypes::Zerg_Drone);
 	}
 	
 	UnitGroup hatcheries = getHatcheriesWithMinerals()(isCompleted);
 	UnitGroup geysers = UnitGroup::getUnitGroup(BWAPI::Broodwar->getGeysers());
 	UnitGroup extractors = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Extractor);
-	log("dl v extrac\n");
+	logc("dl v extrac\n");
 	for(std::set<BWAPI::Unit*>::iterator hit=hatcheries.begin(); hit!=hatcheries.end(); hit++)
 	{
 		if(geysers.inRadius(dist(10.00), (*hit)->getPosition()).size() > 0 && extractors.inRadius(dist(10.00), (*hit)->getPosition()).size() == 0 && buildList.count(BWAPI::UnitTypes::Zerg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
 		{
-			log("dl v addbuild extrac\n");
+			logc("dl v addbuild extrac\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Extractor);
 		}
 	}
-	log("dl v startcheck hatcheryexpands\n");
+	logc("dl v startcheck hatcheryexpands\n");
 	BWTA::BaseLocation* natural = getNaturalExpansion(); // eigenlijk check je dit bij het bouwen zelf, dan kun je het altijd nog deleten.
 	int enemiesNearNatural = 0;
 	if(natural != NULL)
@@ -1638,35 +1638,35 @@ void WantBuildManager::doLists()
 	if( (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Protoss || BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Terran)
 		&& (nrOfEnemyBases() *2 >= nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)) && !buildList.containsExpand() && enemiesNearNatural == 0)
 	{
-		log("dl v expand 1\n");
+		logc("dl v expand 1\n");
 		buildExpand();
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 300 && enemiesNearNatural == 0 && !buildList.containsExpand())
 	{
-		log("dl v expand 2\n");
+		logc("dl v expand 2\n");
 		buildExpand();
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 300 && enemiesNearNatural > 0 && !buildList.containsExpand())
 	{
-		log("dl v extrahatch req\n");
+		logc("dl v extrahatch req\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
 	}
 
 	if(wantList.count(BWAPI::UnitTypes::Zerg_Spire) == 1 || wantList.count(BWAPI::TechTypes::Lurker_Aspect) == 1) // toegevoegd
 	{
-		log("dl v lair want\n");
+		logc("dl v lair want\n");
 		addWant(BWAPI::UnitTypes::Zerg_Extractor);
 		addWant(BWAPI::UnitTypes::Zerg_Lair);
 	}
 
 	if( BWAPI::Broodwar->self()->minerals() > 300 && wantList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den) == 0 && wantList.count(BWAPI::UnitTypes::Zerg_Spire) == 0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) >10) // toegevoegd
 	{
-		log("dl v expand 3\n");
+		logc("dl v expand 3\n");
 		if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery)(isBeingConstructed).size() + UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery,Lair,Hive).size() <3)
 		{
-			log("dl v expand 3.1\n");
+			logc("dl v expand 3.1\n");
 			buildExpand();
 		}
 	}
@@ -1675,11 +1675,11 @@ void WantBuildManager::doLists()
 	// geskipt volgens Ben
 
 	//Generieke rule:
-	log("dl start generiek\n");
-	log("wantlist size: ");
-	log(this->intToString(wantList.size()).append("\n").c_str());
-	log("buildlist size: ");
-	log(this->intToString(buildList.size()).append("\n").c_str());
+	logc("dl start generiek\n");
+	logc("wantlist size: ");
+	logc(this->intToString(wantList.size()).append("\n").c_str());
+	logc("buildlist size: ");
+	logc(this->intToString(buildList.size()).append("\n").c_str());
 	for(std::list<BuildItem>::iterator it=wantList.buildlist.begin(); it!=wantList.buildlist.end(); it++)
 	{
 		if((*it).typenr == 1)
@@ -1687,21 +1687,21 @@ void WantBuildManager::doLists()
 			int wantAantal = wantList.count((*it).buildtype);
 			int buildAantal = buildList.count((*it).buildtype);
 			int hebAantal = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType,(*it).buildtype).size();
-			log("for wantlist type==1\n");
+			logc("for wantlist type==1\n");
 			if(wantAantal > (buildAantal+hebAantal))
 			{
-				log("dl generiek buildenunit\n");
-				log((*it).buildtype.getName().append("\n").c_str());
+				logc("dl generiek buildenunit\n");
+				logc((*it).buildtype.getName().append("\n").c_str());
 				addBuild((*it).buildtype);
-				log("na de addbuild\n");
+				logc("na de addbuild\n");
 			}
-			log("na de if\n");
+			logc("na de if\n");
 		}
 		if((*it).typenr == 2)
 		{
 			if(buildList.count((*it).researchtype) == 0 && !BWAPI::Broodwar->self()->hasResearched((*it).researchtype))
 			{
-				log("dl generiek research\n");
+				logc("dl generiek research\n");
 				addBuild((*it).researchtype);
 			}
 		}
@@ -1709,7 +1709,7 @@ void WantBuildManager::doLists()
 		{
 			if(buildList.count((*it).upgradetype) == 0 && BWAPI::Broodwar->self()->getUpgradeLevel((*it).upgradetype  < (*it).upgradetype.maxRepeats()))
 			{
-				log("dl generiek upgrade\n");
+				logc("dl generiek upgrade\n");
 				addBuild((*it).upgradetype);
 			}
 		}
@@ -1723,7 +1723,7 @@ double WantBuildManager::dist(int d)
 
 void WantBuildManager::logx(std::string func, int id, std::string msg)
 {
-	log(std::string(func).append(intToString(id)).append(std::string(msg)).c_str());
+	logc(std::string(func).append(intToString(id)).append(std::string(msg)).c_str());
 }
 
 std::string WantBuildManager::intToString(int i) {
@@ -1823,7 +1823,7 @@ bool WantBuildManager::requirementsSatisfied(BWAPI::UpgradeType upgradetype)
 
 BWAPI::TilePosition WantBuildManager::placeFound(BWAPI::UnitType unittype)
 {
-	log("placeFound\n");
+	logc("placeFound\n");
 	return BuildingPlacer().getBuildLocationNear(this->hc->hatchery->getTilePosition(), unittype);
 }
 
@@ -1839,23 +1839,23 @@ BWAPI::TilePosition WantBuildManager::placeFoundExtractor()
 	}
 	if(geysers.size() > 0)
 	{
-		log("geysers gevonden\n");
+		logc("geysers gevonden\n");
 		return (*geysers.begin())->getTilePosition();
 	}
 	else
 	{
-		log("geen geysers gevonden\n");
+		logc("geen geysers gevonden\n");
 		return (*hatcheries.begin())->getTilePosition();
 	}
 }
 
 void WantBuildManager::bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType unittype)
 {
-	log("bouwStruc\n");
+	logc("bouwStruc\n");
 	BWAPI::Unit* drone = pickBuildDrone(tilepos);
 	if(drone != NULL)
 	{
-		log("drone != NULL\n");
+		logc("drone != NULL\n");
 		drone->build(tilepos, unittype);
 		//this->bouwdrones.insert(drone);
 	}
@@ -1863,38 +1863,38 @@ void WantBuildManager::bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType un
 
 BWAPI::Unit* WantBuildManager::pickBuildDrone(BWAPI::TilePosition tilepos)
 {
-	log("pickBuildDrone\n");
+	logc("pickBuildDrone\n");
 	UnitGroup alldrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone);
 	UnitGroup idledrones = alldrones(isIdle);
 	if(idledrones.size() == 0)
 	{
-		log("idledrones.size() == 0\n");
+		logc("idledrones.size() == 0\n");
 		UnitGroup notcarrying = alldrones.not(isCarryingMinerals).not(isCarryingGas);
 		if(notcarrying.size() == 0)
 		{
-			log("notcarrying.size() == 0\n");
+			logc("notcarrying.size() == 0\n");
 			if(alldrones.size() == 0)
 			{
-				log("alldrones.size() == 0\n");
+				logc("alldrones.size() == 0\n");
 				return NULL;
 			}
 			else
 			{
-				log("alldrones.size() > 0\n");
+				logc("alldrones.size() > 0\n");
 				BWAPI::Unit* chosenOne = nearestUnit(BWAPI::Position(tilepos), alldrones);
 				return chosenOne;
 			}
 		}
 		else
 		{
-			log("notcarrying.size() > 0\n");
+			logc("notcarrying.size() > 0\n");
 			BWAPI::Unit* chosenOne = nearestUnit(BWAPI::Position(tilepos), notcarrying);
 			return chosenOne;
 		}
 	}
 	else
 	{
-		log("idledrones.size() > 0\n");
+		logc("idledrones.size() > 0\n");
 		BWAPI::Unit* chosenOne = nearestUnit(BWAPI::Position(tilepos), idledrones);
 		return chosenOne;
 	}
@@ -1927,7 +1927,7 @@ BWAPI::Unit* WantBuildManager::nearestUnit(BWAPI::Position pos, UnitGroup ug)
 
 void WantBuildManager::doExpand()
 {
-	log("doExpand\n");
+	logc("doExpand\n");
 	BWAPI::TilePosition tilepos = this->hc->hatchery->getTilePosition();
 	std::set<BWTA::BaseLocation*> baselocations = BWTA::getBaseLocations();
 	std::map<BWAPI::Unit*, EnemyUnitData> enemies = this->eudm->getData();
@@ -1985,7 +1985,7 @@ void WantBuildManager::doExpand()
 	BWAPI::Unit* drone = pickBuildDrone(tilepos);
 	if(drone != NULL && tilepos != this->hc->hatchery->getTilePosition() && BWTA::isConnected(drone->getTilePosition(), tilepos))
 	{
-		log("drone != NULL\n");
+		logc("drone != NULL\n");
 
 		UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery)(isBeingConstructed);
 		// bezig kan size > 1 hebben
@@ -2007,19 +2007,19 @@ void WantBuildManager::doExpand()
 		{
 			if(!BWAPI::Broodwar->isVisible(tilepos))
 			{
-				log("expand plek niet visible, move\n");
+				logc("expand plek niet visible, move\n");
 				drone->move(BWAPI::Position(tilepos));
 			}
 			else
 			{
-				log("expand plek visible, build\n");
+				logc("expand plek visible, build\n");
 				drone->build(tilepos, BWAPI::UnitTypes::Zerg_Hatchery);
 			}
 			BWAPI::Broodwar->drawTextMap(drone->getPosition().x(), drone->getPosition().y(), std::string("\nexpand").c_str());
 		}
 		if(underconstruction)
 		{
-			log("wordt al een hatchery gebouwd, stop\n");
+			logc("wordt al een hatchery gebouwd, stop\n");
 			drone->stop();
 		}
 		//this->bouwdrones.insert(drone);
@@ -2042,35 +2042,35 @@ bool WantBuildManager::isBeingHandled(BuildItem b)
 
 void WantBuildManager::logBuildList(BuildList bl)
 {
-	log("BUILDLIST: ");
+	logc("BUILDLIST: ");
 	for each(BuildItem bi in bl.buildlist)
 	{
-		log("[");
-		log(intToString(bi.typenr).append(" ").c_str());
+		logc("[");
+		logc(intToString(bi.typenr).append(" ").c_str());
 		if(bi.typenr == 1)
 		{
-			log(bi.buildtype.getName().c_str());
+			logc(bi.buildtype.getName().c_str());
 		}
 		if(bi.typenr == 2)
 		{
-			log(bi.researchtype.getName().c_str());
+			logc(bi.researchtype.getName().c_str());
 		}
 		if(bi.typenr == 3)
 		{
-			log(bi.upgradetype.getName().c_str());
+			logc(bi.upgradetype.getName().c_str());
 		}
 		if(bi.typenr == 4)
 		{
-			log("expand");
+			logc("expand");
 		}
-		log("]");
+		logc("]");
 	}
-	log("\n");
+	logc("\n");
 }
 
 void WantBuildManager::logc(const char* msg)
 {
-	if(true)
+	if(false)
 	{
 		log(msg);
 	}
