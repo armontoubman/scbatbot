@@ -67,6 +67,10 @@ public:
 	bool bothCanBeMade(BWAPI::UnitType unittype, BWAPI::TechType techtype);
 	bool canBeMade(BWAPI::UpgradeType upgradetype);
 	bool bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UpgradeType researchtype);
+	bool bothCanBeMadeExpand(BWAPI::UnitType unittype);
+	bool bothCanBeMadeExpand(BWAPI::TechType techtype);
+	bool bothCanBeMadeExpand(BWAPI::UpgradeType researchtype);
+	
 
 	BWAPI::TilePosition placeFound(BWAPI::UnitType unittype);
 	BWAPI::TilePosition placeFoundExtractor();
