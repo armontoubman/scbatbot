@@ -21,5 +21,5 @@ public:
 	bool operator==(const Task& param) const;
 	bool operator<(const Task& rhs) const;
 
-	UnitGroup* unitGroup; // FOUT MOET WEG MAAR COMPILET ANDERS NIET
+	//UnitGroup* unitGroup; // FOUT MOET WEG MAAR COMPILET ANDERS NIET
 };

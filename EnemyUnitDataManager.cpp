@@ -25,17 +25,17 @@ void EnemyUnitDataManager::update(std::set<BWAPI::Unit*> units)
 
 		if((*i)->isVisible())
 		{
-			log("EUDM ");
-			log((*i)->getType().getName().c_str());
-			log(" gezien\n");
+			//log("EUDM ");
+			//log((*i)->getType().getName().c_str());
+			//log(" gezien\n");
 			//update info
 			currentUnitData.update(*i);
 		}
 		if(BWAPI::Broodwar->isVisible((*i)->getPosition()) && BWAPI::Broodwar->unitsOnTile((*i)->getTilePosition().x(), (*i)->getTilePosition().y()).count((*i)) == 0)
 		{
-			log("EUDM ");
-			log((*i)->getType().getName().c_str());
-			log(" niet op bekende plek\n");
+			//log("EUDM ");
+			//log((*i)->getType().getName().c_str());
+			//log(" niet op bekende plek\n");
 			currentUnitData.position = BWAPI::Positions::Unknown;
 		}
 		// updates uitvoeren

@@ -208,6 +208,9 @@ void TaskManager::update()
 									insertTask(Task(5, 5, nearestbuilding->getPosition(), &enemyUG3));
 								}
 								insertTask(Task(2, 4, enemy.second.position, &enemyUG3));
+								log(std::string("***** enemyInRange ").append(this->hc->wantBuildManager->intToString(enemyInRange.size())).append(" ").c_str());
+								log(std::string("enemyUG3 ").append(this->hc->wantBuildManager->intToString(enemyUG3.size())).append(" ").c_str());
+								log(std::string("&enemyUG3 ").append(this->hc->wantBuildManager->intToString((int) &enemyUG3)).append("\n").c_str());
 							}
 						}
 					}
@@ -284,19 +287,6 @@ void TaskManager::update()
 
 }
 
-std::list<Task> TaskManager::findTasksWithUnitType(BWAPI::UnitType unittype) // via plan
-{
-	std::list<Task> result;
-	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
-	{
-		UnitGroup* mettype = &(*i->unitGroup)(GetType,unittype);
-		if(mettype->size() > 0) {
-			result.push_front(*i);
-		}
-	}
-	return result;
-}
-
 std::list<Task> TaskManager::findTasksWithType(int t)
 {
 	return this->hc->planAssigner->findTasksWithType(this->hc->hcplan, t);
@@ -359,8 +349,8 @@ BWAPI::Unit* TaskManager::nearestUnit(BWAPI::Position pos, UnitGroup ug)
 
 BWAPI::Position TaskManager::frontlineBuilding(std::set<BWAPI::Position> posset)
 {
-	UnitGroup eigenbuildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	BWAPI::Position nearest;
+	UnitGroup eigenbuildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding);
+	BWAPI::Position nearest = this->hc->hatchery->getPosition();
 
 	double distance = -1;
 

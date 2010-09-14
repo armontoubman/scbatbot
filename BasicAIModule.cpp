@@ -88,7 +88,7 @@ void BasicAIModule::onFrame()
 {
   if (Broodwar->isReplay()) return;
   if (!this->analyzed) return;
-  this->buildManager->update();
+  //this->buildManager->update();
   this->buildOrderManager->update();
   this->baseManager->update();
   //this->workerManager->update();
