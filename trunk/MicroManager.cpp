@@ -439,14 +439,24 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 	{
 		for(std::set<BWAPI::Unit*>::iterator it=hatcheries.begin(); it!=hatcheries.end(); it++)
 		{
-			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition());
-			if ((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>2))
+			UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(15), (*it)->getPosition()).not(Drone).not(Overlord).not(isBuilding);
+			UnitGroup effectivemining = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition())(Drone)(isGatheringMinerals);
+			UnitGroup mineralsnearby = minerals.inRadius(dist(10), (*it)->getPosition());
+			// idee is: per mineral check of er een hatchery in de buurt is, zo ja, check voor die hatchery of het wel een geldige basis is (i.e. geen enemies in de buurt of allies nearby) EN of er niet al genoeg drones in de buurt aant minen zijn.
+			if (((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>4)) && effectivemining.size()<mineralsnearby.size())
 			{
+				// als er niet al genoeg drones zijn voor de minerals && de basis is veilig && slechts per 1 hatchery checken of de mineral in de buurt van een hatchery bevindt.
+				// het wordt erg dubbelop.. maar op deze manier weet ik zeker dat een mineral niet 10x erin komt te staan, dat niet alle drones gewoon naar de dichtsbijzijnde gaat, etc.
 				//if((*it)->getDistance(*mit) <= dist(13) && !(*mit)->isBeingGathered())
 				if((*it)->getDistance(*mit) <= dist(13) && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *mit).size() == 0)
 				{
 					result.insert(*mit);
+					break;
 				}
+			}
+			else
+			{
+				break;
 			}
 		}
 	}
@@ -479,12 +489,17 @@ UnitGroup* MicroManager::inRadiusUnitGroupUnitType(double radius, UnitGroup* ug,
 bool MicroManager::tooSplitUp(double radius, UnitGroup* ug)
 {
 	BWAPI::Position ugcenter = ug->getCenter();
+	int amount = 0;
 	for(std::set<BWAPI::Unit*>::iterator it=ug->begin(); it!=ug->end(); it++)
 	{
 		if ((*it)->getDistance(ugcenter) > radius)
 		{
-			return true;
+			amount++;
 		}
+	}
+	if (ug.size()/2 < amount)
+	{
+		return true;
 	}
 	return false;
 }
@@ -1088,10 +1103,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							logx("doMicro overlord ", (*unitit), " type=1||4\n");
 							BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
 							// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
-							if(nearAir != NULL && (*unitit)->getPosition().getDistance(nearAir->getPosition()) < dist(8) && currentTask.type == 1)
+							if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9))).size()>0)
 							{
 								logx("doMicro overlord ", (*unitit), " air enemy dichtbij\n");
-								if(overlordSupplyProvidedSoon())
+								if(overlordSupplyProvidedSoon() && currentTask.type == 1)
 								{
 									
 									logx("doMicro overlord ", (*unitit), " overlordSupplySoon");
