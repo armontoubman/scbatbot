@@ -1039,51 +1039,6 @@ void WantBuildManager::doLists()
 			logc("dl p r 7\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Lurker);
 		}
-		if( (((BWAPI::Broodwar->self()->minerals()>200 || BWAPI::Broodwar->self()->gas()>200) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) > nrOfEnemy(BWAPI::UnitTypes::Protoss_Nexus)) || nrOfOwnMilitaryUnits() <7 || (nrOfOwnMilitaryUnits() < nrOfEnemyMilitaryUnits())) && !buildList.containsUnits() )
-		{
-			logc("dl p r 8\n");
-			if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
-			{
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
-				{
-					addBuild(BWAPI::UnitTypes::Zerg_Zergling);
-				}
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler)+buildList.count(BWAPI::UnitTypes::Zerg_Defiler)) < (1 + ((nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) + nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk)) / 17) ) )
-				{
-					addBuild(BWAPI::UnitTypes::Zerg_Defiler);
-				}
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler) > 2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 20)  && (buildList.count(BWAPI::UnitTypes::Zerg_Ultralisk)<3))
-				{
-					addBuild(BWAPI::UnitTypes::Zerg_Ultralisk);
-				}
-			}
-			if ( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) < 10) && (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3) )
-			{
-				addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
-			}
-			else 
-			{
-				logc("dl p r 8b-2\n");
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+(buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))) < 11) )
-				{
-					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
-				}
-				else
-				{
-					if ( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 6) && (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3) )
-					{
-						addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
-					}
-					else
-					{
-						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<1)
-						{
-							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
-						}
-					}
-				}
-			}
-		}
 		logc("dl p klaar\n");
 	}
 	else if(enemyRace == BWAPI::Races::Terran)
@@ -1685,6 +1640,52 @@ void WantBuildManager::doLists()
 		{
 			logc("dl v expand 3.1\n");
 			buildExpand();
+		}
+	}
+
+	if((((BWAPI::Broodwar->self()->minerals()>400 || BWAPI::Broodwar->self()->gas()>400) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) > 2)) || (nrOfOwnMilitaryUnits() <7) || ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) > 4) || (nrOfOwnMilitaryUnits() < nrOfEnemyMilitaryUnits())) && !buildList.containsUnits() )
+	{
+		logc("dl v maakunits 8\n");
+		if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
+		{
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < 26) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) < (nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk) * 7)) && (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<6) )
+			{
+				addBuild(BWAPI::UnitTypes::Zerg_Zergling);
+			}
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler)+buildList.count(BWAPI::UnitTypes::Zerg_Defiler)) < (1 + ((nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) + nrOfOwn(BWAPI::UnitTypes::Zerg_Ultralisk)) / 17) ) )
+			{
+				addBuild(BWAPI::UnitTypes::Zerg_Defiler);
+			}
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler) > 2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 20)  && (buildList.count(BWAPI::UnitTypes::Zerg_Ultralisk)<3))
+			{
+				addBuild(BWAPI::UnitTypes::Zerg_Ultralisk);
+			}
+		}
+		if ( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) < 10) && (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3) )
+		{
+			addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
+		}
+		else 
+		{
+			logc("dl v b 8b-2\n");
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+(buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))) < 11) )
+			{
+				addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
+			}
+			else
+			{
+				if ( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 6) && (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3) )
+				{
+					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
+				}
+				else
+				{
+					if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<1)
+					{
+						addBuild(BWAPI::UnitTypes::Zerg_Zergling);
+					}
+				}
+			}
 		}
 	}
 
