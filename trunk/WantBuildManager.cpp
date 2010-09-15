@@ -572,7 +572,7 @@ void WantBuildManager::update()
 		if (buildList.size()>1)
 		{
 			BuildItem v = buildList.getSecond();
-			if (v.typenr == 1 && b.typenr == 1)
+			if (v.typenr == 1 && b.typenr == 1 && !v.buildtype.isBuilding() && b.buildtype.isBuilding())
 			{
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
@@ -876,7 +876,14 @@ void WantBuildManager::doLists()
 							logc("dl p r 1-2-2-h\n");
 							if (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3)
 							{
-							addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
+								addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
+							}
+							else
+							{
+								if buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2)
+								{
+									addBuild(BWAPI::UnitTypes::Zerg_Zergling);
+								}
 							}
 						}
 					}
@@ -908,10 +915,20 @@ void WantBuildManager::doLists()
 						addBuild(BWAPI::UnitTypes::Zerg_Ultralisk);
 					}
 				}
-				else if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<4)
+				else
 				{
-					logc("dl p r 3\n");
-					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
+					if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<4)
+					{
+						logc("dl p r 3\n");
+						addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
+					}
+					else
+					{
+						if buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2)
+						{
+							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
+						}
+					}
 				}
 			}
 		}
