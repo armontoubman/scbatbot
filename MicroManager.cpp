@@ -711,16 +711,16 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									if (enemies.size()>0)
+									if (enemiesInRange((*unitit)->getPosition(), dist(3), 1).size()>0)
 									{
-										BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
-										(*unitit)->attackMove(nearest->getPosition());
+										// nothing AI enzo
 									}
 									else
 									{
-										if (enemiesInRange((*unitit)->getPosition(), dist(3), 1).size()>0)
+										if (enemies.size()>0)
 										{
-											// nothing AI enzo
+											BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
+											(*unitit)->attackMove(nearest->getPosition());
 										}
 										else
 										{

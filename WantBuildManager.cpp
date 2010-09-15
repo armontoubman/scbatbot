@@ -794,7 +794,7 @@ void WantBuildManager::doLists()
 						addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					}
 				}
-				if(  (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2))
+				if(  (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>1))
 				{
 					logc("dl p 1-8\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
