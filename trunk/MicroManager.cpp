@@ -647,7 +647,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* NEW ZERGLING */
 				if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Zergling)
 				{
-					UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*unitit)->getPosition());
+					UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(20), (*unitit)->getPosition());
 					UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(10), 1);
 					UnitGroup enemiesair = enemiesInRange((*unitit)->getPosition(), dist(7), 2);
 					if (MicroManager::amountCanAttackGround(enemiesair)>0 && MicroManager::amountCanAttackAir(allies)==0)

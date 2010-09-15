@@ -127,17 +127,17 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 									}
 									else
 									{
-										logc("ma else\n");
-										if(otask.enemySize>3)
-										{
+										//logc("ma else\n");
+										//if(otask.enemySize>3)
+										//{
 											logc("ma size>6\n");
 											appropriateTasks.push_front(otask);
-										}
-										else
-										{
-											logc("ma else !>6\n");
-											lessAppropriateTasks.push_front(otask);
-										}
+										//}
+										//else
+										//{
+										//	logc("ma else !>6\n");
+										//	lessAppropriateTasks.push_front(otask);
+										//}
 									}
 								}
 								else
@@ -145,17 +145,17 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 									logc("ma currentsize <= 9\n");
 									if(otask.enemyMilitarySize > 4)
 									{
-										logc("ma military>6\n");
+										/*logc("ma military>6\n");
 										if(zk==2 || wk!=2)
 										{
 											logc("ma zk2 wk!2\n");
 											lessAppropriateTasks.push_front(otask);
 										}
 										else
-										{
+										{*/
 											logc("ma zk2 wk!2 else\n");
 											appropriateTasks.push_front(otask);
-										}
+										//}
 									}
 									else
 									{
