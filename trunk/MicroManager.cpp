@@ -444,7 +444,7 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 			UnitGroup effectivemining = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition())(Drone)(isGatheringMinerals);
 			UnitGroup mineralsnearby = minerals.inRadius(dist(10), (*it)->getPosition());
 			// idee is: per mineral check of er een hatchery in de buurt is, zo ja, check voor die hatchery of het wel een geldige basis is (i.e. geen enemies in de buurt of allies nearby) EN of er niet al genoeg drones in de buurt aant minen zijn.
-			if (((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>4)) && effectivemining.size()<mineralsnearby.size())
+			if (((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>4)) && effectivemining.size()<(mineralsnearby.size()+2))
 			{
 				// als er niet al genoeg drones zijn voor de minerals && de basis is veilig && slechts per 1 hatchery checken of de mineral in de buurt van een hatchery bevindt.
 				// het wordt erg dubbelop.. maar op deze manier weet ik zeker dat een mineral niet 10x erin komt te staan, dat niet alle drones gewoon naar de dichtsbijzijnde gaat, etc.
@@ -1330,9 +1330,20 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										}
 										else
 										{
-											
-											logx((*unitit), " geen dropship, move naar task\n");
-											(*unitit)->move(currentTask.position);
+											if ((*unitit)->getPosition().getDistance(currentTask.position) < dist(6) && !(*unitit)->isMoving())
+											{
+												int x = (*unitit)->getPosition().x();
+												int y = (*unitit)->getPosition().y();
+												int factor = dist(10);
+												int newx = x + (((rand() % 30)-15)*factor);
+												int newy = y + (((rand() % 30)-15)*factor);
+												(*unitit)->move(BWAPI::Position(newx, newy));
+											}
+											else
+											{
+												logx((*unitit), " geen dropship, move naar task\n");
+												(*unitit)->move(currentTask.position);
+											}
 										}
 									}
 								}
