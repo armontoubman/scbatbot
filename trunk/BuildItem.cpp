@@ -6,6 +6,10 @@ BuildItem::BuildItem()
 {
 	this->priority = 1;
 	this->base = 0;
+	this->typenr = 0;
+	this->buildtype = BWAPI::UnitTypes::None;
+	this->researchtype = BWAPI::TechTypes::None;
+	this->upgradetype = BWAPI::UpgradeTypes::None;
 }
 
 BuildItem::BuildItem(BWAPI::UnitType t, int p)
@@ -14,6 +18,8 @@ BuildItem::BuildItem(BWAPI::UnitType t, int p)
 	this->typenr = 1;
 	this->priority = p;
 	this->base = 0;
+	this->researchtype = BWAPI::TechTypes::None;
+	this->upgradetype = BWAPI::UpgradeTypes::None;
 }
 
 BuildItem::BuildItem(BWAPI::TechType t, int p)
@@ -22,6 +28,8 @@ BuildItem::BuildItem(BWAPI::TechType t, int p)
 	this->typenr = 2;
 	this->priority = p;
 	this->base = 0;
+	this->buildtype = BWAPI::UnitTypes::None;
+	this->upgradetype = BWAPI::UpgradeTypes::None;
 }
 
 BuildItem::BuildItem(BWAPI::UpgradeType t, int p)
@@ -30,6 +38,8 @@ BuildItem::BuildItem(BWAPI::UpgradeType t, int p)
 	this->typenr = 3;
 	this->priority = p;
 	this->base = 0;
+	this->buildtype = BWAPI::UnitTypes::None;
+	this->researchtype = BWAPI::TechTypes::None;
 }
 
 int BuildItem::mineralPrice() {
