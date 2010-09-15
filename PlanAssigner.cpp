@@ -272,13 +272,13 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 				}
 				else
 				{
-					if (tasktype == 5)
+					if (otask.type == 5)
 					{
 						appropriateTasks.push_front(otask);
 					}
 					else
 					{
-						if (tasktype == 1)
+						if (otask.type == 1)
 						{
 							lessAppropriateTasks.push_front(otask);
 						}
