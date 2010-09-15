@@ -603,11 +603,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(9))
 					{
 						logx(eerste, " bij task");
-						logx(eerste, " ik verwacht een crash hier");
 						BWAPI::Unit* nearestAirEnemy = nearestEnemyThatCanAttackAir(eerste);
-						double distanceAE = eerste->getPosition().getDistance(nearestAirEnemy->getPosition());
+						double distanceAE = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestAirEnemy).lastKnownPosition);
 						BWAPI::Unit* nearestNonBuilding = nearestNonBuildingEnemy(eerste);
-						double distanceNB = eerste->getPosition().getDistance(nearestNonBuilding->getPosition());
+						double distanceNB = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestNonBuilding).lastKnownPosition);
 						if(distanceNB < dist(9))
 						{
 							if(distanceAE < distanceNB)
@@ -1551,20 +1550,20 @@ BWAPI::Unit* MicroManager::nearestEnemyThatCanAttackAir(BWAPI::Unit* unit)
 	BWAPI::Unit* enemy = NULL;
 	double distance = -1;
 	
-	UnitGroup enemies = this->eudm->getUG(); // mogelijk heel fout crash
-	for(std::set<BWAPI::Unit*>::iterator it=enemies.begin(); it!=enemies.end(); it++)
+	std::map<BWAPI::Unit*, EnemyUnitData> enemies = this->eudm->getData();
+	for(std::map<BWAPI::Unit*, EnemyUnitData>::iterator it=enemies.begin(); it!=enemies.end(); it++)
 	{
-		double currentDistance = unit->getPosition().getDistance((*it)->getPosition());
-		if((*it)->getType().airWeapon().targetsAir())
+		double currentDistance = unit->getPosition().getDistance(it->second.lastKnownPosition);
+		if(it->second.unitType.airWeapon().targetsAir())
 		{
 			if(distance == -1)
 			{
-				enemy = (*it);
+				enemy = it->first;
 				distance = currentDistance;
 			}
 			else if(currentDistance < distance)
 			{
-				enemy = (*it);
+				enemy = it->first;
 				distance = currentDistance;
 			}
 		}
@@ -1578,20 +1577,20 @@ BWAPI::Unit* MicroManager::nearestNonBuildingEnemy(BWAPI::Unit* unit)
 	BWAPI::Unit* enemy = NULL;
 	double distance = -1;
 	
-	UnitGroup enemies = this->eudm->getUG();
-	for(std::set<BWAPI::Unit*>::iterator it=enemies.begin(); it!=enemies.end(); it++)
+	std::map<BWAPI::Unit*, EnemyUnitData> enemies = this->eudm->getData();
+	for(std::map<BWAPI::Unit*, EnemyUnitData>::iterator it=enemies.begin(); it!=enemies.end(); it++)
 	{
-		double currentDistance = unit->getPosition().getDistance((*it)->getPosition());
-		if(!(*it)->getType().isBuilding())
+		double currentDistance = unit->getPosition().getDistance(it->second.lastKnownPosition);
+		if(!it->second.unitType.isBuilding())
 		{
 			if(distance == -1)
 			{
-				enemy = (*it);
+				enemy = it->first;
 				distance = currentDistance;
 			}
 			else if(currentDistance < distance)
 			{
-				enemy = (*it);
+				enemy = it->first;
 				distance = currentDistance;
 			}
 		}
