@@ -397,28 +397,24 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 				return;
 			}
 		}
-
-		else
+		if (!unit->isGatheringMinerals())
 		{
-			if (!unit->isGatheringMinerals())
+			result = getUnusedMineralsNearHatcheries();
+			if (result.empty() || unit->isCarryingMinerals() || unit->isCarryingGas())
 			{
-				result = getUnusedMineralsNearHatcheries();
-				if (result.empty() || unit->isCarryingMinerals() || unit->isCarryingGas())
+				if (unit->isCarryingMinerals() || unit->isCarryingGas())
 				{
-					if (unit->isCarryingMinerals() || unit->isCarryingGas())
-					{
-						//unit->returnCargo();
-					}
-					else
-					{
-						unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
-					}
+					//unit->returnCargo();
 				}
 				else
 				{
-					unit->gather(nearestUnitInGroup(unit, result));
-					return;
+					unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
 				}
+			}
+			else
+			{
+				unit->gather(nearestUnitInGroup(unit, result));
+				return;
 			}
 		}
 	}
