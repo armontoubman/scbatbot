@@ -75,7 +75,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 	return currentPlan;
 }
 
-int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2)
+int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2) // geschrapt
 {
 	int eigen = 2;
 	if(ug2 == NULL) {
@@ -130,6 +130,54 @@ int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2)
 	}
 }
 
+int PlanAssigner::canAttack(UnitGroup* ug, Task t)
+{
+	if(ug == NULL || ug->size() == 0)
+	{
+		return 0;
+	}
+	if((*ug)(isFlyer).size() > 0)
+	{
+		return 2;
+	}
+	if((*ug)(isFlyer).size() == 0 && t.enemyContainsAir)
+	{
+		if(t.enemyContainsGround)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	return 0;
+}
+
+int PlanAssigner::canAttack(Task t, UnitGroup* ug)
+{
+	if(ug == NULL || ug->size() == 0)
+	{
+		return 0;
+	}
+	if(t.enemyContainsAir)
+	{
+		return 2;
+	}
+	if(t.enemyContainsAir == false && (*ug)(isFlyer).size() > 0)
+	{
+		if((*ug).not(isFlyer).size() > 0)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	return 0;
+}
+
 Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<UnitGroup*, Task> currentPlan)
 {
 	return mostAppropriate(current, tasktype, currentPlan, false);
@@ -144,7 +192,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 	std::list<Task> appropriateTasks;
 	std::list<Task> lessAppropriateTasks;
 
-	lessAppropriateTasks.push_front(Task(5, 1, this->hc->hatchery->getPosition()));
+	lessAppropriateTasks.push_front(Task(5, this->hc->hatchery->getPosition()));
 
 	std::list<Task> originalTasks = this->tm->tasklist;
 	for each(Task otask in originalTasks)
@@ -153,211 +201,88 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 		if(nullwaarde || !containsTask(currentPlan, otask)) // nieuwe functie
 		{
 			logc("ma if nullwaarde\n");
-			if(tasktype == 0 && (otask.type == 5 || otask.type == 2 || otask.type == 3))
+			if(tasktype == 0)
 			{
-				logc("ma if 0523\n");
-				if((!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current)) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
+				if(otask.type == 5 || otask.type == 2 || otask.type == 3)
 				{
-					logc("ma if !air && connected\n");
-					if(otask.enemy == NULL || otask.enemy->size() == 0)
+					logc("ma if 0523\n");
+					if((!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current)) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
 					{
-						lessAppropriateTasks.push_front(otask);
-					}
-					else
-					{
-						//if(otask.enemy == NULL || otask.enemy->size() == 0) // <---- hier staat de ==NULL check, omdat als ie null hij zal crash op ->size()
-						logc("ma enemy=null||size=0\n");
-						int wk = canAttack(current, otask.enemy); // crash
-						int zk = canAttack(otask.enemy, current);
-
-						if(wk!=0)
+						logc("ma if !air && connected\n");
+						if(otask.enemySize == 0)
 						{
-							logc("ma wk!=0\n");
-							if(current->size() > 9)
-							{
-								logc("ma size>9\n");
-								if(this->eudm->nrMilitaryUnits(*otask.enemy)>6) 
-								{
-									logc("ma mil>6\n");
-									idealTasks.push_front(otask);
-								}
-								else
-								{
-									logc("ma else\n");
-									if(otask.enemy->size()>6)
-									{
-										logc("ma size>6\n");
-										appropriateTasks.push_front(otask);
-									}
-									else
-									{
-										logc("ma else !>6\n");
-										lessAppropriateTasks.push_front(otask);
-									}
-								}
-							}
-							else
-							{
-								logc("ma currentsize <= 9\n");
-								if(this->eudm->nrMilitaryUnits(*otask.enemy) > 6)
-								{
-									logc("ma military>6\n");
-									if(zk==2 || wk!=2)
-									{
-										logc("ma zk2 wk!2\n");
-										lessAppropriateTasks.push_front(otask);
-									}
-									else
-									{
-										logc("ma zk2 wk!2 else\n");
-										appropriateTasks.push_front(otask);
-									}
-								}
-								else
-								{
-									logc("ma militar>6 else\n");
-									idealTasks.push_front(otask);
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					// task niet geschikt
-				}
-			}
-			else
-			{
-				logc("ma wel enemy\n");
-				if(tasktype == 5 && otask.type == 5)
-				{
-					logc("ma task 5\n"); // crash
-					if(otask.enemy != NULL)
-					{
-						logc("ma task 5 enemy!=NULL\n");
-						if(current->size() == 0)
-						{
-							logc("current size = 0\n");
+							lessAppropriateTasks.push_front(otask);
 						}
 						else
 						{
-							logc("current size > 0\n");
-						}
-						BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position));
-						logc("isConnected test\n");
-						this->eiugm->onlyAirUnits(*current);
-						logc("onlyAirUnits test\n");
-						if((!this->eiugm->onlyAirUnits(*current) 
-							&& (otask.enemy != NULL && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) )
-							|| (this->eiugm->onlyAirUnits(*current))) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
-						{
-							logc("ma air\n");
-							int wk=canAttack(current, otask.enemy);
-							int zk=canAttack(otask.enemy, current);
+							logc("ma enemy=null||size=0\n");
+							int wk = canAttack(current, otask); // crash
+							int zk = canAttack(otask, current);
+
 							if(wk!=0)
 							{
-								logc("ma !wk=0\n");
-								if(logicaldistance(current, otask.position)<=(this->mm->dist(20)))
+								logc("ma wk!=0\n");
+								if(current->size() > 9)
 								{
-									logc("ma logicaldist\n");
-									if(this->eudm->nrMilitaryUnits(*otask.enemy) >6)
+									logc("ma size>9\n");
+									if(otask.enemyMilitarySize>6) 
 									{
 										logc("ma mil>6\n");
-										if(current->size()>6 || zk==0)
+										idealTasks.push_front(otask);
+									}
+									else
+									{
+										logc("ma else\n");
+										if(otask.enemySize>6)
 										{
-											logc("ma cur>6\n");
-											idealTasks.push_front(otask);
+											logc("ma size>6\n");
+											appropriateTasks.push_front(otask);
 										}
 										else
 										{
-											logc("ma cur!>6\n");
+											logc("ma else !>6\n");
+											lessAppropriateTasks.push_front(otask);
+										}
+									}
+								}
+								else
+								{
+									logc("ma currentsize <= 9\n");
+									if(otask.enemyMilitarySize > 6)
+									{
+										logc("ma military>6\n");
+										if(zk==2 || wk!=2)
+										{
+											logc("ma zk2 wk!2\n");
+											lessAppropriateTasks.push_front(otask);
+										}
+										else
+										{
+											logc("ma zk2 wk!2 else\n");
 											appropriateTasks.push_front(otask);
 										}
 									}
 									else
 									{
-										logc("ma mil!>6\n");
-										if(current->size()>9 || zk==2)
-										{
-											logc("ma size>9 zk=2\n");
-											lessAppropriateTasks.push_front(otask);
-										}
-										else
-										{
-											logc("ma ook niet\n");
-											idealTasks.push_front(otask);
-										}
+										logc("ma militar>6 else\n");
+										idealTasks.push_front(otask);
 									}
-								}
-								else
-								{
-									logc("ma illogical\n");
-									lessAppropriateTasks.push_front(otask);
 								}
 							}
 						}
-						else
-						{
-							logc("faal na canattackair en isconnected enzo\n");
-						}
-					}
-					else
-					{
-						// enemy is wel null dus
-						logc("task 5 faal, enemy==NULL\n");
 					}
 				}
 				else
 				{
-					logc("ma niet 5\n");
-					if(tasktype == 4) // zeker weten?
-					{
-						logc("ma 4\n");
-						if(otask.type == 1)
-						{
-							logc("ma 1\n");
-							appropriateTasks.push_front(otask);
-						}
-						else
-						{
-							logc("ma niet 1\n");
-							if(otask.type == 4)
-							{
-								logc("ma toch wel 4\n");
-								idealTasks.push_front(otask);
-							}
-						}
-					}
-					else // type task == 2 -> scout dus) // alleen is scout 1 hier
-					{
-						logc("ma niet 4\n");
-						if(otask.type == 1)
-						{
-							logc("ma 1 dan\n");
-							if(((*current)(isFlyer).size() == 0 && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position)))
-								|| (*current)(isFlyer).size() > 0)
-							{
-								logc("task bereikbaar\n");
-								idealTasks.push_front(otask);
-							}
-							else
-							{
-								logc("task onbereikbaar voor deze groep\n");
-							}
-						}
-					}
+					lessAppropriateTasks.push_front(otask);
 				}
 			}
+
 		}
 		else
 		{
 			logc("ma niet null\n");
-			if(otask.type == 5 || otask.type == 2)
-			{
-				logc("ma 5 of 2\n");
-				lessAppropriateTasks.push_front(otask);
-			}
+			lessAppropriateTasks.push_front(otask);
 		}
 	}
 	if(idealTasks.size() > 0)
@@ -471,7 +396,7 @@ Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 
 	log("PA::vindTask2() geen task gevonden, geef defend hatchery\n");
 
-	return Task(-1, 1, ug->getCenter());
+	return Task(-1, ug->getCenter());
 }
 
 std::list<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst, int t)

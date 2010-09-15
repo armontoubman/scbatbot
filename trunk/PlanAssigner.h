@@ -25,7 +25,9 @@ public:
 	MicroManager* mm;
 
 	std::map<UnitGroup*, Task> maakPlan();
-	int canAttack(UnitGroup* ug1, UnitGroup* ug2);
+	int canAttack(UnitGroup* ug1, UnitGroup* ug2); // deprecated (BETEKENT NIET GEBRUIKEN)
+	int canAttack(UnitGroup* ug, Task t);
+	int canAttack(Task t, UnitGroup* ug);
 	Task mostAppropriate(UnitGroup* current, int tasktype, std::map<UnitGroup*, Task> currentPlan);
 	Task mostAppropriate(UnitGroup* current, int tasktype, std::map<UnitGroup*, Task> currentPlan, bool nullwaarde);
 	bool containsTask(std::map<UnitGroup*, Task> plan, Task t);

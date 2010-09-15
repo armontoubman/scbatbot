@@ -216,3 +216,43 @@ bool EnemyUnitDataManager::canAttackGround(std::map<BWAPI::Unit*, EnemyUnitData>
 	}
 	return result;
 }
+
+
+bool EnemyUnitDataManager::mapContainsAir(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(enemy.second.unitType.isFlyer())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+bool EnemyUnitDataManager::mapContainsGround(std::map<BWAPI::Unit*, EnemyUnitData> data)
+	{
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(!enemy.second.unitType.isFlyer())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+int EnemyUnitDataManager::mapSize(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	return data.size();
+}
+int EnemyUnitDataManager::mapMilitarySize(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	int result = 0;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(isMilitary(enemy.second.unitType))
+		{
+			result++;
+		}
+	}
+	return result;
+}
