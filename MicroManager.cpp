@@ -684,49 +684,62 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							if (enemies.not(isBuilding).not(Drone).not(Probe).not(SCV).size()==0)
+							BWAPI::Unit* swarm = nearestSwarm((*unitit));
+							if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
 							{
-								if (enemies.size()>0)
+								logx((*unitit), " swarm in de buurt\n");
+								if(!isUnderDarkSwarm((*unitit)) && !(*unitit)->isAttacking())
 								{
-									BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
-									(*unitit)->attackUnit(nearest);
+									logx((*unitit), " naar swarm\n");
+									(*unitit)->attackMove(swarm->getPosition()); // move
 								}
 								else
 								{
-									(*unitit)->attackMove(currentTask.position);
+									logx((*unitit), " onder swarm, attack enemy\n"); // wat als geen enemy? nullpointer!
+									UnitGroup enemiesonderswarm = enemiesInRange((*unitit)->getPosition(), dist(6), 1);
+									if (!(*unitit)->isAttacking() && enemiesonderswarm.size()>0)
+									{
+										(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemiesonderswarm));
+									}
 								}
 							}
 							else
 							{
-								BWAPI::Unit* swarm = nearestSwarm((*unitit));
-								if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
+								if ((allies.size()*2)<enemies.size())
 								{
-									logx((*unitit), " swarm in de buurt\n");
-									if(!isUnderDarkSwarm((*unitit)) && !(*unitit)->isAttacking())
-									{
-										logx((*unitit), " naar swarm\n");
-										(*unitit)->attackMove(swarm->getPosition()); // move
-									}
-									else
-									{
-										logx((*unitit), " onder swarm, attack enemy\n"); // wat als geen enemy? nullpointer!
-										UnitGroup enemiesonderswarm = enemiesInRange((*unitit)->getPosition(), dist(6), 1);
-										if (!(*unitit)->isAttacking() && enemiesonderswarm.size()>0)
-										{
-											(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemiesonderswarm));
-										}
-									}
+									(*unitit)->move(moveAway(*unitit));
 								}
 								else
 								{
-									if ((allies.size()*2)<enemies.size())
-									{
-										(*unitit)->move(moveAway(*unitit));
-									}
-									else
+									if (enemies.size()>0)
 									{
 										BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
 										(*unitit)->attackMove(nearest->getPosition());
+									}
+									else
+									{
+										if (enemiesInRange((*unitit)->getPosition(), dist(3), 1).size()>0)
+										{
+											// nothing AI enzo
+										}
+										else
+										{
+											if (tooSplitUp)
+											{
+												(*unitit)->attackMove(this->hc->eigenUnitGroupManager->findUnitGroupWithUnit((*unitit))->getCenter());
+											}
+											else
+											{
+												if ((allies.size()*2)<enemies.size())
+												{
+													(*unitit)->move(moveAway(*unitit));
+												}
+												else
+												{
+													(*unitit)->attackMove(currentTask.position);
+												}
+											}
+										}
 									}
 								}
 							}
@@ -747,10 +760,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7), 0);
+								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(3), 0);
 								if(enemies.size() > 0)
 								{
-									(*unitit)->attackUnit(*enemies.begin());
+
 								}
 								else
 								{
@@ -835,7 +848,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 											{
 												if(nearestUnit((*unitit)->getPosition(), enemies)->getPosition().getDistance((*unitit)->getPosition()) < dist(3))
 												{
-													(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemies));
+													(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemies)); // mogelijke changen
 												}
 												else
 												{
