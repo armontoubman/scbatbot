@@ -73,14 +73,14 @@ Task TaskManager::highestPriorityTask()
 
 Task TaskManager::findTaskWithUnitGroup(UnitGroup* ug)
 {
-	return this->pa->vindTask(ug);
+	return this->pa->vindTask(this->hc->hcplan, ug);
 }
 
 Task TaskManager::findTaskWithUnit(BWAPI::Unit* unit)
 {
 	UnitGroup* group = this->eugm->findUnitGroupWithUnit(unit);
 	if(group==NULL) log("TM:fTWU group==NULL\n");
-	return this->pa->vindTask(group);
+	return this->pa->vindTask(this->hc->hcplan, group);
 }
 
 void TaskManager::update()
