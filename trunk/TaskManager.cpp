@@ -210,8 +210,7 @@ void TaskManager::update()
 								}
 								insertTask(createTask(2, enemy.second.position, this->eudm->getMapFromUG(&enemyUG3))); // huge
 								log(std::string("***** enemyInRange ").append(this->hc->wantBuildManager->intToString(enemyInRange.size())).append(" ").c_str());
-								log(std::string("enemyUG3 ").append(this->hc->wantBuildManager->intToString(enemyUG3.size())).append(" ").c_str());
-								log(std::string("&enemyUG3 ").append(this->hc->wantBuildManager->intToString((int) &enemyUG3)).append("\n").c_str());
+								log(std::string("enemyUG3 ").append(this->hc->wantBuildManager->intToString(enemyUG3.size())).append("\n").c_str());
 							}
 						}
 					}

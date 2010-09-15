@@ -2088,7 +2088,7 @@ void WantBuildManager::logBuildList(BuildList bl)
 
 void WantBuildManager::logc(const char* msg)
 {
-	if(false)
+	if(true)
 	{
 		log(msg);
 	}
