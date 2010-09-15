@@ -76,6 +76,8 @@ int EnemyUnitDataManager::count(BWAPI::UnitType unittype)
 			i++;
 		}
 	}
+	log("EUDM count: ");
+	log(intToString(i).append("\n").c_str());
 	return i;
 }
 

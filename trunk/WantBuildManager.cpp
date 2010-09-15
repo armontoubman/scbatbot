@@ -19,6 +19,8 @@ WantBuildManager::WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b
 	this->bm = ba;
 	this->hc = h;
 	this->mm = m;
+
+	this->stap = 1;
 }
 
 int WantBuildManager::nrOfEnemy(BWAPI::UnitType unittype)
@@ -319,7 +321,9 @@ int WantBuildManager::nrOfEnemyBases()
 void WantBuildManager::update()
 {
 	logc("WantBuildManager::update()\n");
+	logc("WANTLIST: ");
 	logBuildList(this->wantList);
+	logc("BUILDLIST: ");
 	logBuildList(this->buildList);
 	logc("stap: ");
 	logc(intToString(this->stap).append("\n").c_str());
@@ -707,8 +711,6 @@ void WantBuildManager::update()
 void WantBuildManager::doLists()
 {
 	BWAPI::Race enemyRace = BWAPI::Broodwar->enemy()->getRace();
-
-	stap = 1;
 
 	logc("doLists\n\n");
 
@@ -2080,14 +2082,6 @@ void WantBuildManager::logBuildList(BuildList bl)
 std::string WantBuildManager::bouwlistString(BuildList bl)
 {
 	std::string result = "";
-	if(&bl == &this->buildList)
-	{
-		result.append("BUILDLIST: ");
-	}
-	if(&bl == &this->wantList)
-	{
-		result.append("WANTLIST: ");
-	}
 	for each(BuildItem bi in bl.buildlist)
 	{
 		result.append("[");
