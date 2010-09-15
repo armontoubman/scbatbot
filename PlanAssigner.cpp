@@ -192,8 +192,6 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 	std::list<Task> appropriateTasks;
 	std::list<Task> lessAppropriateTasks;
 
-	lessAppropriateTasks.push_front(Task(5, this->hc->hatchery->getPosition()));
-
 	std::list<Task> originalTasks = this->tm->tasklist;
 	for each(Task otask in originalTasks)
 	{
@@ -343,6 +341,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 		return this->tm->nearestTask(current, lessAppropriateTasks);
 	}
 	log("PA::mostAppropriate() laatste return, hier mag hij nooit komen\n");
+	lessAppropriateTasks.push_front(Task(5, this->hc->hatchery->getPosition()));
 	return this->tm->nearestTask(current, lessAppropriateTasks);
 }
 
