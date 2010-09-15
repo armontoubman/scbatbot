@@ -108,7 +108,7 @@ std::map<BWAPI::Unit*, EnemyUnitData> EnemyUnitDataManager::getEnemyUnitsInRadiu
 	std::map<BWAPI::Unit*, EnemyUnitData> result;
 	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in enemyUnitsMap)
 	{
-		if(enemy.second.position.getDistance(pos) <= radius)
+		if(enemy.second.lastKnownPosition.getDistance(pos) <= radius)
 		{
 			result.insert(enemy);
 		}
