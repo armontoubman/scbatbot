@@ -705,7 +705,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								if ((allies.size()*2)<enemies.size())
+								if ((allies.size())<enemies.size())
 								{
 									(*unitit)->move(moveAway(*unitit));
 								}
@@ -730,14 +730,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 											}
 											else
 											{
-												if ((allies.size()*2)<enemies.size())
-												{
-													(*unitit)->move(moveAway(*unitit));
-												}
-												else
-												{
-													(*unitit)->attackMove(currentTask.position);
-												}
+												(*unitit)->attackMove(currentTask.position);
 											}
 										}
 									}
