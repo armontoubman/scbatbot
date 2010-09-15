@@ -329,10 +329,14 @@ void EigenUnitGroupManager::update()
 				if ((*lit)->size() < 5 && (**lit)(GetType, BWAPI::UnitTypes::Zerg_Overlord).size()==0 && (**lit)(GetType, BWAPI::UnitTypes::Zerg_Mutalisk).size()==0)
 				{
 					logc("teklein\n");
-					if (findOtherUG((*(**lit).begin())) != NULL)
+					if((*lit)->size() > 0)
 					{
-						logc("findotherUGgevondenremove\n");
-						removeUG(*lit); // if there exists a ug with similar units DAT NIET DEZE UG is, disband deze groep OF drop alle units hierin daarin -> new methode ofzo maken voor checke
+						logc("teklein size>0\n");
+						if (findOtherUG((*(**lit).begin())) != NULL)
+						{
+							logc("findotherUGgevondenremove\n");
+							removeUG(*lit); // if there exists a ug with similar units DAT NIET DEZE UG is, disband deze groep OF drop alle units hierin daarin -> new methode ofzo maken voor checke
+						}
 					}
 				}
 				else
@@ -347,6 +351,24 @@ void EigenUnitGroupManager::update()
 			}
 		}
 	}
+
+	// cleanup lege groepen behalve de vaste 6
+    std::set<UnitGroup*> teDeleten;
+    for(std::set<UnitGroup*>::iterator pit=unitGroups.begin(); pit!=unitGroups.end(); pit++)
+    {
+            if((**pit).empty())
+            {
+                    if(*pit != droneUG)
+                    {
+                            teDeleten.insert(*pit);
+                    }
+            }
+    }
+    for(std::set<UnitGroup*>::iterator dit=teDeleten.begin(); dit!=teDeleten.end(); dit++)
+    {
+            removeUG(*dit);
+    }
+
 }
 
 BWAPI::Unit* EigenUnitGroupManager::nearestUnitInGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units)
@@ -424,7 +446,7 @@ void EigenUnitGroupManager::logug(UnitGroup* group, char* msg)
 
 void EigenUnitGroupManager::logc(const char* msg)
 {
-	if(true)
+	if(false)
 	{
 		log(msg);
 	}
