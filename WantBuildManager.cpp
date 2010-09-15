@@ -695,11 +695,11 @@ void WantBuildManager::update()
 					}
 				}
 			}
-			if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && b.buildtype.isBuilding())))
+			/*if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && b.buildtype.isBuilding())))
 			{
 				buildList.removeSecond();
 				return;
-			}
+			}*/
 		}
 	}
 	else
@@ -799,13 +799,16 @@ void WantBuildManager::doLists()
 					logc("dl p 1-8\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
+				}
+				if(  (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2))
+				{
 					stap = 3;
 				}
 			}
 		}
 		if( stap == 3)
 		{
-			if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<3)
+			if (((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<3) && nrOfOwn(BWAPI::UnitTypes::Zerg_Spire)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0)
 			{
 				buildExpand();
 			}
@@ -837,7 +840,7 @@ void WantBuildManager::doLists()
 			{
 				addWant(BWAPI::TechTypes::Lurker_Aspect);
 			}
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 15) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 40) && wantListContains(BWAPI::UnitTypes::Zerg_Spire) && wantListContains(BWAPI::UnitTypes::Zerg_Hydralisk_Den) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)  > (3*(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)))))
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 15) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 30) && wantListContains(BWAPI::UnitTypes::Zerg_Spire) && wantListContains(BWAPI::UnitTypes::Zerg_Hydralisk_Den) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)  > (3*(nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)))))
 			{
 				stap = 4;
 			}
