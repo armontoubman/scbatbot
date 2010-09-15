@@ -155,8 +155,12 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		BWAPI::Broodwar->drawLineMap(paar.first->getCenter().x(), paar.first->getCenter().y(), paar.second.position.x(), paar.second.position.y(), BWAPI::Colors::Green);
 		BWAPI::Broodwar->drawCircleMap(paar.first->getCenter().x(), paar.first->getCenter().y(), 5*32, BWAPI::Colors::Green);
 		BWAPI::Broodwar->drawCircleMap(paar.second.position.x(), paar.second.position.y(), 3*32, BWAPI::Colors::Green);
-		BWAPI::Broodwar->drawTextMap(paar.second.position.x(), paar.second.position.y(), this->taskManager->getName(paar.second.type).c_str());
-
+		BWAPI::Broodwar->drawTextMap(paar.second.position.x(), paar.second.position.y(), std::string("\ngo ").append(this->taskManager->getName(paar.second.type)).c_str());
+	}
+	for each(Task t in this->taskManager->tasklist)
+	{
+		BWAPI::Broodwar->drawCircleMap(t.position.x(), t.position.y(), 1*32, BWAPI::Colors::Purple);
+		BWAPI::Broodwar->drawTextMap(t.position.x(), t.position.y(), this->taskManager->getName(t.type).c_str());
 	}
 	/////////////
 }
