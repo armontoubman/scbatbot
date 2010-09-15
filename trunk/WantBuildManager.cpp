@@ -880,7 +880,7 @@ void WantBuildManager::doLists()
 							}
 							else
 							{
-								if buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2)
+								if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2)
 								{
 									addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 								}
@@ -924,7 +924,7 @@ void WantBuildManager::doLists()
 					}
 					else
 					{
-						if buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2)
+						if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<2)
 						{
 							addBuild(BWAPI::UnitTypes::Zerg_Zergling);
 						}
