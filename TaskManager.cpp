@@ -244,7 +244,7 @@ void TaskManager::update()
 	{
 		UnitGroup eigenbuildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding);	
 		BWAPI::Position frontline = frontlineBuilding(posset);
-		insertTask(Task(5, frontline));
+		//insertTask(Task(5, frontline));
 	}
 
 	if(this->eudm->getData().size() < 15)
