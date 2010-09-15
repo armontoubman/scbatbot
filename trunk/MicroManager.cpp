@@ -1329,7 +1329,6 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									BWAPI::Unit* neareststealth = nearestUnit((*unitit)->getPosition(), stealths);
 									if(neareststealth != NULL)
 									{
-										
 										logx((*unitit), " stealth gezien\n");
 										(*unitit)->rightClick(neareststealth->getPosition());
 									}
@@ -1339,25 +1338,27 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										dropships = dropships.inRadius(dist(10), (*unitit)->getPosition());
 										if(dropships.size() > 0)
 										{
-											
 											logx((*unitit), " dropship gezien\n");
 											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
 										}
 										else
 										{
-											if ((*unitit)->getPosition().getDistance(currentTask.position) < dist(6) && !(*unitit)->isMoving())
+											if (!(*unitit)->isMoving())
 											{
-												int x = (*unitit)->getPosition().x();
-												int y = (*unitit)->getPosition().y();
-												int factor = dist(10);
-												int newx = x + (((rand() % 30)-15)*factor);
-												int newy = y + (((rand() % 30)-15)*factor);
-												(*unitit)->move(BWAPI::Position(newx, newy));
-											}
-											else
-											{
-												logx((*unitit), " geen dropship, move naar task\n");
-												(*unitit)->move(currentTask.position);
+												if ((*unitit)->getPosition().getDistance(currentTask.position) < dist(6))
+												{
+													int x = (*unitit)->getPosition().x();
+													int y = (*unitit)->getPosition().y();
+													int factor = dist(10);
+													int newx = x + (((rand() % 30)-15)*factor);
+													int newy = y + (((rand() % 30)-15)*factor);
+													(*unitit)->move(BWAPI::Position(newx, newy));
+												}
+												else
+												{
+													logx((*unitit), " geen dropship, move naar task\n");
+													(*unitit)->move(currentTask.position);
+												}
 											}
 										}
 									}
