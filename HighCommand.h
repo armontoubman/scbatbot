@@ -26,6 +26,7 @@ public:
 	BWAPI::Unit* getNearestHatchery(BWAPI::Position pos);
 
 	BWAPI::Unit* hatchery;
+	void chatBuildList();
 //private:
 	std::string intToString(int i);
 	EigenUnitDataManager* eigenUnitDataManager;

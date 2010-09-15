@@ -190,6 +190,10 @@ void BasicAIModule::onSendText(std::string text)
     Broodwar->sendText("%s",text.c_str());
     return;
   }
+  if(text=="b")
+  {
+	  this->highCommand->chatBuildList();
+  }
   /*UnitType type=UnitTypes::getUnitType(text);
   if (text=="debug")
   {

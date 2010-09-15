@@ -99,4 +99,5 @@ public:
 	bool isBeingHandled(BuildItem b);
 
 	void logBuildList(BuildList bl);
+	std::string bouwlistString(BuildList bl);
 };
