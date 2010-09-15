@@ -664,9 +664,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								if (!(*unitit)->isMoving())
+								if ((*unitit)->getDistance(currentTask.position) < dist(4))
 								{
-									if ((*unitit)->getDistance(currentTask.position) < dist(4))
+									if (!(*unitit)->isMoving())
 									{
 										int x = (*unitit)->getPosition().x();
 										int y = (*unitit)->getPosition().y();
@@ -674,11 +674,11 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										int newx = x + (((rand() % 30)-15)*factor);
 										int newy = y + (((rand() % 30)-15)*factor);
 										(*unitit)->move(BWAPI::Position(newx, newy));
-									}							
-									else
-									{
-										(*unitit)->move(currentTask.position);
 									}
+								}							
+								else
+								{
+									(*unitit)->move(currentTask.position);
 								}
 							}
 						}
