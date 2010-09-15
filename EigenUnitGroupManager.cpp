@@ -343,6 +343,7 @@ void EigenUnitGroupManager::update()
 						splitGroup(*lit);// splitup groep
 					}
 				}
+				logc("klaar 1 stap ug\n");
 			}
 		}
 	}
