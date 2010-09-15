@@ -217,3 +217,8 @@ void HighCommand::chatBuildList()
 {
 	BWAPI::Broodwar->printf(this->wantBuildManager->bouwlistString(this->wantBuildManager->buildList).c_str());
 }
+
+void HighCommand::chatWantList()
+{
+	BWAPI::Broodwar->printf(this->wantBuildManager->bouwlistString(this->wantBuildManager->wantList).c_str());
+}

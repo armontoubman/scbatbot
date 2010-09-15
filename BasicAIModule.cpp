@@ -194,6 +194,10 @@ void BasicAIModule::onSendText(std::string text)
   {
 	  this->highCommand->chatBuildList();
   }
+  if(text=="w")
+  {
+	  this->highCommand->chatWantList();
+  }
   /*UnitType type=UnitTypes::getUnitType(text);
   if (text=="debug")
   {
