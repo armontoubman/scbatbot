@@ -433,7 +433,7 @@ void EigenUnitGroupManager::logug(UnitGroup* group, char* msg)
 
 void EigenUnitGroupManager::logc(const char* msg)
 {
-	if(false)
+	if(true)
 	{
 		log(msg);
 	}

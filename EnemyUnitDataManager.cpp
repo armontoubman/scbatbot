@@ -71,7 +71,7 @@ int EnemyUnitDataManager::count(BWAPI::UnitType unittype)
 	int i = 0;
 	for(std::map<BWAPI::Unit*,EnemyUnitData>::iterator it=enemyUnitsMap.begin(); it!=enemyUnitsMap.end(); it++)
 	{
-		if(it->first->getType() == unittype)
+		if(it->second.unitType == unittype)
 		{
 			i++;
 		}
