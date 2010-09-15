@@ -111,57 +111,36 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 						else
 						{
 							logc("ma enemy=null||size=0\n");
-							int wk = canAttack(current, otask);
-							int zk = canAttack(otask, current);
+							//int wk = canAttack(current, otask);
+							//int zk = canAttack(otask, current);
 
-							if(wk!=0)
+							logc("ma wk!=0\n");
+							if(current->size() > 5)
 							{
-								logc("ma wk!=0\n");
-								if(current->size() > 5)
+								logc("ma size>9\n");
+								if(otask.enemyMilitarySize>4) 
 								{
-									logc("ma size>9\n");
-									if(otask.enemyMilitarySize>4) 
-									{
-										logc("ma mil>6\n");
-										idealTasks.push_front(otask);
-									}
-									else
-									{
-										//logc("ma else\n");
-										//if(otask.enemySize>3)
-										//{
-											logc("ma size>6\n");
-											appropriateTasks.push_front(otask);
-										//}
-										//else
-										//{
-										//	logc("ma else !>6\n");
-										//	lessAppropriateTasks.push_front(otask);
-										//}
-									}
+									logc("ma mil>6\n");
+									idealTasks.push_front(otask);
 								}
 								else
 								{
-									logc("ma currentsize <= 9\n");
-									if(otask.enemyMilitarySize > 4)
-									{
-										/*logc("ma military>6\n");
-										if(zk==2 || wk!=2)
-										{
-											logc("ma zk2 wk!2\n");
-											lessAppropriateTasks.push_front(otask);
-										}
-										else
-										{*/
-											logc("ma zk2 wk!2 else\n");
-											appropriateTasks.push_front(otask);
-										//}
-									}
-									else
-									{
-										logc("ma militar>6 else\n");
-										idealTasks.push_front(otask);
-									}
+									logc("ma size>6\n");
+									appropriateTasks.push_front(otask);
+								}
+							}
+							else
+							{
+								logc("ma currentsize <= 9\n");
+								if(otask.enemyMilitarySize > 4)
+								{
+									logc("ma zk2 wk!2 else\n");
+									appropriateTasks.push_front(otask);
+								}
+								else
+								{
+									logc("ma militar>6 else\n");
+									idealTasks.push_front(otask);
 								}
 							}
 						}
