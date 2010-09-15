@@ -566,9 +566,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		{
 			BWAPI::Unit* eerste = *((*it)->begin());
 			logx(eerste, " begin micro");
-			if(eerste->isUnderStorm() || (**it)(Mutalisk).size() < 6) 
+			if(eerste->isUnderStorm()) 
 			{
-				logx(eerste, " is under storm || size < 6");
+				logx(eerste, " is under storm");
 				moveToNearestBase(**it);
 			}
 			else
@@ -591,7 +591,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						else
 						{
 							logx(eerste, " gogo naar task");
-							(*it)->move(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position);	 // move
+							(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position);	 // move
 						}
 					}
 				}
@@ -632,219 +632,6 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		}
 		/* EINDE MUTALISK */
 
-		/* ZERGLING
-		else if((**it)(Zergling).size() > 0)
-		{
-			BWAPI::Unit* eerste = *((*it)->begin());
-			if((**it).size() == 1)
-			{
-				logx(eerste, " group.size()=1\n");
-				if (amountCanAttackGround(enemiesInRange(eerste->getPosition(),dist(8),0))>2)
-				{
-					logx(eerste, " enemy in de buurt, moveToNearestBase\n");
-					moveToNearestBase(**it);
-				}
-				else
-				{
-					Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)); // was this-> tm->findTaskWithUnit(eerste)
-					if (currentTask.type == 1) // <-- deze
-					{
-						logx(eerste, " task.type!=1\n");
-						if (eerste->getPosition().getDistance(currentTask.position) < dist(5) && !eerste->isMoving())
-						{
-							logx(eerste, " dichtbij task, loop random\n");
-							int x = eerste->getPosition().x();
-							int y = eerste->getPosition().y();
-							int factor = dist(10);
-							int newx = x + (((rand() % 30)-15)*factor);
-							int newy = y + (((rand() % 30)-15)*factor);
-							eerste->move(BWAPI::Position(newx, newy));
-						}
-						else
-						{
-							logx(eerste, " move naar task\n");
-							(*it)->move(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position); // move
-						}
-					}
-					else
-					{
-						logx(eerste, " task.type=1 moveToNearestBase\n"); // ???????????????????
-						moveToNearestBase(**it);
-					}
-				}
-			}
-			else
-			{
-				logx(eerste, " groep is groter dan 1\n");
-				UnitGroup enemies = enemiesInRange(eerste->getPosition(), dist(10), 1);
-				UnitGroup allies = allSelfUnits.inRadius(dist(10), eerste->getPosition());
-				if((**it).size() * 0.8 < enemies.size() && allies.size() < 3)
-				{
-					logx(eerste, " outnumbered\n");
-					moveAway(**it);
-				}
-				else
-				{
-					BWAPI::Unit* swarm = nearestSwarm(eerste);
-					if(swarm != NULL && swarm->getPosition().getDistance(eerste->getPosition()) < dist(9))
-					{
-						logx(eerste, " swarm in de buurt\n");
-						if(!isUnderDarkSwarm(eerste))
-						{
-							logx(eerste, " naar swarm\n");
-							(**it).move(swarm->getPosition()); // move
-						}
-						else
-						{
-							logx(eerste, " onder swarm, attack enemy\n"); // wat als geen enemy? nullpointer!
-							(**it).attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(10), 1)));
-						}
-					}
-					else
-					{
-						logx(eerste, " geen swarm\n");
-						if((**it).size() > 6)
-						{
-							logx(eerste, " group.size()>6\n");
-							UnitGroup enemijes = enemiesInRange(eerste->getPosition(), dist(10), 1);
-							UnitGroup military = enemijes.not(isBuilding).not(isWorker);
-							UnitGroup buildings = enemijes(isBuilding);
-							UnitGroup workers = enemijes(isWorker);
-							if(military.size()>0)
-							{
-								logx(eerste, " enemy in de buurt\n");
-								BWAPI::Unit* nearest = nearestUnit(eerste->getPosition(), military);
-								if(canAttackGround(enemiesInRange(eerste->getPosition(), dist(5), 2)))
-								{
-									logx(eerste, " air enemy in de buurt, moveaway\n");
-									moveAway(**it);
-								}
-								else
-								{
-									logx(eerste, " geen air enemy\n");
-									BWAPI::Unit* enemy = nearestUnit(eerste->getPosition(), military);
-									UnitGroup enemyUG = enemiesInRange(enemy->getPosition(), dist(6), 1);
-									
-									BWAPI::Position center = enemyUG.getCenter();
-									(*it)->attackMove(center);
-									/*BWAPI::Position eigencenter = (**it).getCenter();
-									if(enemyUG.size() > 0 && center.getDistance(eigencenter) < dist(3))
-									{
-										logx(eerste, " attackMove center\n");
-										(*it)->attackMove(center);
-									}
-									else
-									{
-										logx(eerste, " naar enemy position\n");
-										(*it)->move(enemy->getPosition()); // move
-									}
-								}
-							}
-							else
-							{
-								logx(eerste, " geen enemy in range\n");
-								if(buildings.size() > 0)
-								{
-									logx(eerste, " wel buildings\n");
-									if(workers.size() > 0)
-									{
-										logx(eerste, " wel workers\n");
-										(*it)->attackUnit(*(workers).begin());
-									}
-									else
-									{
-										logx(eerste, " geen workers\n");
-										(*it)->attackUnit(*(buildings).begin());
-									}
-								}
-								else
-								{
-									logx(eerste, " geen buildings\n");
-									if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(6))
-									{
-										logx(eerste, " task in de buurt, splitUp\n");
-										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
-										{
-											(*zergit)->attackMove(splitUp(*zergit));
-										}
-									}
-									else
-									{
-										if (tooSplitUp(dist(15), *it))
-										{
-											logx(eerste, " breng zerg samen\n");
-											(*it)->attackMove((*it)->getCenter().makeValid()); // move
-										}
-										else
-										{
-											logx(eerste, " move naar task\n");
-											(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position); // move
-										}
-									}
-								}
-							}
-						}
-						else
-						{
-							logx(eerste, " group.size()<=7\n");
-							UnitGroup enemies = enemiesInRange(eerste->getPosition(), dist(10), 1);
-							if(enemies.size() > 0)
-							{
-								logx(eerste, " enemies in de buurt\n");
-								(*it)->attackMove(enemies.getCenter());
-							}
-							else
-							{
-								logx(eerste, " geen enemies in de buurt\n");
-								UnitGroup buildings = enemiesInRange(eerste->getPosition(), dist(7), 1)(isBuilding);
-								UnitGroup workers = enemiesInRange(eerste->getPosition(), dist(10), 1)(isWorker);
-								if(buildings.size() > 0)
-								{
-									logx(eerste, " wel buildings\n");
-									if(workers.size() > 0)
-									{
-										logx(eerste, " wel workers\n");
-										(*it)->attackUnit(*(workers).begin());
-									}
-									else
-									{
-										logx(eerste, " geen workers\n");
-										(*it)->attackUnit(*(buildings).begin());
-									}
-								}
-								else
-								{
-									logx(eerste, " geen buildings\n");
-									if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(6))
-									{
-										logx(eerste, " in de buurt van task, splitUp\n");
-										for(std::set<BWAPI::Unit*>::iterator zergit=(**it).begin(); zergit!=(**it).end(); zergit++)
-										{
-											(*zergit)->attackMove(splitUp(*zergit));
-										}
-									}
-									else
-									{
-										if (tooSplitUp(dist(15), *it))
-										{
-											logx(eerste, " breng zerg samen\n");
-											(*it)->attackMove((*it)->getCenter().makeValid()); // move
-										}
-										else
-										{
-											logx(eerste, " move naar task\n");
-											(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position); // move
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		EINDE ZERGLING */
-
 		else
 		{
 			Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, *it);
@@ -877,18 +664,21 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
+								if (!(*unitit)->isMoving())
 								{
-									int x = (*unitit)->getPosition().x();
-									int y = (*unitit)->getPosition().y();
-									int factor = dist(10);
-									int newx = x + (((rand() % 30)-15)*factor);
-									int newy = y + (((rand() % 30)-15)*factor);
-									(*unitit)->move(BWAPI::Position(newx, newy));
-								}							
-								else
-								{
-									(*unitit)->move(currentTask.position);
+									if ((*unitit)->getDistance(currentTask.position) < dist(4))
+									{
+										int x = (*unitit)->getPosition().x();
+										int y = (*unitit)->getPosition().y();
+										int factor = dist(10);
+										int newx = x + (((rand() % 30)-15)*factor);
+										int newy = y + (((rand() % 30)-15)*factor);
+										(*unitit)->move(BWAPI::Position(newx, newy));
+									}							
+									else
+									{
+										(*unitit)->move(currentTask.position);
+									}
 								}
 							}
 						}
@@ -899,42 +689,11 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								if (enemies.size()>0)
 								{
 									BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
-									if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
-									{
-										if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
-										{
-											int x = (*unitit)->getPosition().x();
-											int y = (*unitit)->getPosition().y();
-											int factor = dist(10);
-											int newx = x + (((rand() % 30)-15)*factor);
-											int newy = y + (((rand() % 30)-15)*factor);
-											(*unitit)->move(BWAPI::Position(newx, newy));
-										}
-										else
-										{
-											(*unitit)->move(currentTask.position);
-										}
-									}
-									else
-									{
-										(*unitit)->attackUnit(nearest);
-									}
+									(*unitit)->attackUnit(nearest);
 								}
 								else
 								{
-									if ((*unitit)->getDistance(currentTask.position) < dist(6) && !(*unitit)->isMoving())
-									{
-										int x = (*unitit)->getPosition().x();
-										int y = (*unitit)->getPosition().y();
-										int factor = dist(10);
-										int newx = x + (((rand() % 30)-15)*factor);
-										int newy = y + (((rand() % 30)-15)*factor);
-										(*unitit)->move(BWAPI::Position(newx, newy));
-									}
-									else
-									{
-										(*unitit)->attackMove(currentTask.position);
-									}
+									(*unitit)->attackMove(currentTask.position);
 								}
 							}
 							else
@@ -960,60 +719,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									if (allies.size()<enemies.size())
+									if ((allies.size()*2)<enemies.size())
 									{
 										(*unitit)->move(moveAway(*unitit));
 									}
 									else
 									{
 										BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
-										if (!(*unitit)->isAttacking() && nearest->getPosition().getDistance((*unitit)->getPosition()) > dist(1)) // als het goed is gaat ie vanzelf autoattacken dan
-										{
-											UnitGroup attackingug = allies(GetOrder, BWAPI::Orders::AttackUnit);
-											if (attackingug.size()>0)
-											{
-												(*unitit)->attackMove(nearestUnit((*unitit)->getPosition(),attackingug)->getTargetPosition());
-											}
-											else
-											{
-												UnitGroup alliesdichtbij = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), (*unitit)->getPosition());
-												if (alliesdichtbij.size()<3 && allies.size()>2)
-												{
-													(*unitit)->attackMove(nearestUnit((*unitit)->getPosition(), (allies-alliesdichtbij))->getPosition()); // dit moet je zien Armon
-												}
-												else
-												{
-													if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(1),(*unitit)->getPosition()).size()>3)
-													{
-														(*unitit)->move(splitUp(*unitit));
-													}
-													else
-													{
-														BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
-														if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
-														{
-															if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
-															{
-																int x = (*unitit)->getPosition().x();
-																int y = (*unitit)->getPosition().y();
-																int factor = dist(10);
-																int newx = x + (((rand() % 30)-15)*factor);
-																int newy = y + (((rand() % 30)-15)*factor);
-																(*unitit)->move(BWAPI::Position(newx, newy));
-															}
-															else
-															{
-																(*unitit)->move(currentTask.position);
-															}
-														}
-														else
-														{
-															(*unitit)->attackUnit(nearest);
-														}
-													}
-												}
-											}
-										}
+										(*unitit)->attackMove(nearest->getPosition());
 									}
 								}
 							}
