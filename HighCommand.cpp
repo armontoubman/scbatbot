@@ -183,7 +183,7 @@ void HighCommand::onUnitShow(BWAPI::Unit* unit)
 
 BWAPI::Unit* HighCommand::getNearestHatchery(BWAPI::Position pos)
 {
-	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive);
+	UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive)(isCompleted);
 
 	BWAPI::Unit* bestHatchery = NULL;
 	double bestDistance = -1.00;
