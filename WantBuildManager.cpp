@@ -1724,6 +1724,7 @@ void WantBuildManager::doLists()
 		}
 		if((*it).typenr == 2)
 		{
+			logc("for wantlist type==2\n");
 			if(buildList.count((*it).researchtype) == 0 && !BWAPI::Broodwar->self()->hasResearched((*it).researchtype))
 			{
 				logc("dl generiek research\n");
@@ -1732,11 +1733,16 @@ void WantBuildManager::doLists()
 		}
 		if((*it).typenr == 3)
 		{
+			logc("for wantlist type==3\n");
 			if(buildList.count((*it).upgradetype) == 0 && BWAPI::Broodwar->self()->getUpgradeLevel((*it).upgradetype  < (*it).upgradetype.maxRepeats()))
 			{
 				logc("dl generiek upgrade\n");
 				addBuild((*it).upgradetype);
 			}
+		}
+		if((*it).typenr == 4)
+		{
+			logc("for wantlist type==4\n");
 		}
 	}
 }
