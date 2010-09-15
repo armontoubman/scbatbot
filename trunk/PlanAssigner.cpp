@@ -33,7 +33,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 			continue;
 		}
 		logc("PA for each\n");
-		if(ug->size()<2)
+		if(ug->size()<3)
 		{
 			logc("PA if\n");
 			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Drone)) // nieuwe functie
@@ -61,7 +61,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 				else
 				{
 					logc("PA if else else\n");
-					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
+					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 1, currentPlan)));
 				}
 			}
 		}
@@ -277,7 +277,39 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 					lessAppropriateTasks.push_front(otask);
 				}
 			}
+			else
+			{
+				if (tasktype == 4) // kan enkel overlord zijn
+				{
+					if (otask.type == 1 && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+					{
+						appropriateTasks.push_front(otask);
+					}
+					else
+					{
+						if (otask.type == 4 && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+						{
+							idealTasks.push_front(otask);
+							
+						}
+						else
+						{
+							if ((otask.type == 5 || otask.type == 2 || otask.type == 3) && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+							{
+								lessAppropriateTasks.push_front(otask);
+							}
+						}
 
+					}
+				}
+				else // type task == 2 -> scout dus) // of al het andere
+				{
+					if (otask.type == 1 && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+					{
+						idealTasks.push_front(otask);
+					}
+				}
+			}
 		}
 		else
 		{
