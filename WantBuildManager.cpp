@@ -756,14 +756,14 @@ void WantBuildManager::doLists()
 					addWant(BWAPI::UnitTypes::Zerg_Hydralisk,10);
 					stap = 3;
 				}
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) > 7) || ((nrOfEnemy(BWAPI::UnitTypes::Protoss_Gateway) > 2)  && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) == 0)))
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) > 4) || ((nrOfEnemy(BWAPI::UnitTypes::Protoss_Gateway) > 2)  && (nrOfEnemy(BWAPI::UnitTypes::Protoss_Cybernetics_Core) == 0)))
 				{
 					logc("dl p 1-4\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					addWant(BWAPI::UnitTypes::Zerg_Spire);
 					stap = 3;
 				}
-				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 5)) // *7*
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Photon_Cannon) > 3)) // *7*
 				{
 					logc("dl p 1-5\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
@@ -794,7 +794,7 @@ void WantBuildManager::doLists()
 						addWant(BWAPI::UnitTypes::Zerg_Extractor);
 					}
 				}
-				if(  (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && !wantListContains(BWAPI::UnitTypes::Zerg_Extractor))
+				if(  (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2))
 				{
 					logc("dl p 1-8\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
