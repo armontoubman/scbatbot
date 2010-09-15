@@ -139,19 +139,19 @@ bool EnemyUnitDataManager::isMilitary(BWAPI::UnitType unittype)
 
 std::map<BWAPI::Unit*, EnemyUnitData> EnemyUnitDataManager::getMapFromUG(UnitGroup* ug)
 {
-	log("EUDM gmFUG\n");
+	/*log("EUDM gmFUG\n");
 	log("size ug: ");
 	log(this->intToString(ug->size()).c_str());
-	log("\n");
+	log("\n");*/
 	std::map<BWAPI::Unit*, EnemyUnitData> result;
 	for(std::set<BWAPI::Unit*>::iterator it=ug->begin(); it!=ug->end(); it++)
 	{
 		//result.insert(std::pair<BWAPI::Unit*, EnemyUnitData>(*it, getEnemyUnitData(*it)));
 		result.insert(std::make_pair(*it, getEnemyUnitData(*it)));
 	}
-	log("size result: ");
+	/*log("size result: ");
 	log(this->intToString(result.size()).c_str());
-	log("\n");
+	log("\n");*/
 	return result;
 }
 

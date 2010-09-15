@@ -373,6 +373,7 @@ void PlanAssigner::update()
 
 Task PlanAssigner::vindTask(UnitGroup* ug)
 {
+	log("vindTask ALS JE DIT LEEST IS ER IETS FOUT\n");
 	logc("PA::vindTask()\n");
 	int lolsize = this->hc->hcplan.size();
 	logc("PAlolololool\n");
@@ -403,9 +404,9 @@ Task PlanAssigner::vindTask(UnitGroup* ug)
 
 Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 {
-	log("PA::vindTask2()\n");
+	//log("PA::vindTask2()\n");
 	int lolsize = lijst.size();
-	log("zoek task voor: ");
+	//log("zoek task voor: ");
 	//logc(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
 	log(this->hc->eigenUnitGroupManager->getName(ug).append("\n").c_str());
 	if(lolsize == 0)
@@ -421,12 +422,12 @@ Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 		//logc("plan iteratie\n");
 		if(paar.first == ug)
 		{
-			log("PA::vindTask2() bijbehorende task gevonden\n");
+			//log("PA::vindTask2() bijbehorende task gevonden\n");
 			return paar.second;
 		}
 	}
 
-	log("PA::vindTask2() geen task gevonden, geef defend hatchery\n");
+	//log("PA::vindTask2() geen task gevonden, geef defend hatchery\n");
 
 	return Task(-1, ug->getCenter());
 }
