@@ -108,9 +108,12 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		this->wantBuildManager->doLists();
 	}
 
-	BWAPI::Position pos1 = this->hatchery->getPosition();
-	BWAPI::Position pos2 = this->wantBuildManager->nearestUnit(pos1, UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone))->getPosition();
-	BWAPI::Broodwar->drawLineMap(pos1.x(), pos1.y(), pos2.x(), pos2.y(), BWAPI::Colors::Orange);
+	if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone).size() > 0)
+	{
+		BWAPI::Position pos1 = this->hatchery->getPosition();
+		BWAPI::Position pos2 = this->wantBuildManager->nearestUnit(pos1, UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone))->getPosition();
+		BWAPI::Broodwar->drawLineMap(pos1.x(), pos1.y(), pos2.x(), pos2.y(), BWAPI::Colors::Orange);
+	}
 
 	this->tick++;
 	if(this->tick == 10)
