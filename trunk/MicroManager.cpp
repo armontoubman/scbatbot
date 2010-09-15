@@ -62,7 +62,7 @@ BWAPI::Position MicroManager::splitUp(BWAPI::Unit* unit)
 	BWAPI::Position current = unit->getPosition();
 	
 	// alle enemies in de gekozen radius
-	UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(5), current);
+	UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), current);
 	allies.erase(unit);
 	BWAPI::Position alliescenter = allies.getCenter();
 	
@@ -904,7 +904,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
+									if ((*unitit)->getDistance(currentTask.position) < dist(6) && !(*unitit)->isMoving())
 									{
 										int x = (*unitit)->getPosition().x();
 										int y = (*unitit)->getPosition().y();

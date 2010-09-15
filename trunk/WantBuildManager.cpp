@@ -688,6 +688,11 @@ void WantBuildManager::update()
 					}
 				}
 			}
+			if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && b.buildtype.isBuilding())))
+			{
+				buildList.removeSecond();
+				return;
+			}
 		}
 	}
 	else

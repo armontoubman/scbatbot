@@ -176,34 +176,43 @@ void EigenUnitGroupManager::dropInEenUG(BWAPI::Unit* unit)
 UnitGroup* EigenUnitGroupManager::findOtherUG(BWAPI::Unit* unit)
 {
 	UnitGroup* ug;
+	UnitGroup* alin = findUnitGroupWithUnit(unit);
+
 	for(std::set<UnitGroup*>::iterator it=unitGroups.begin(); it!=unitGroups.end(); it++)
 	{
-		ug = *it;
-		if (unit->getType() == BWAPI::UnitTypes::Zerg_Zergling || unit->getType() == BWAPI::UnitTypes::Zerg_Ultralisk || unit->getType() == BWAPI::UnitTypes::Zerg_Defiler)
+		if ((alin)!=(*it))
 		{
-			if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Zergling).size()>0 && ug->size()<20)
+			ug = *it;
+			if (unit->getType() == BWAPI::UnitTypes::Zerg_Zergling || unit->getType() == BWAPI::UnitTypes::Zerg_Ultralisk || unit->getType() == BWAPI::UnitTypes::Zerg_Defiler)
 			{
-				return ug;
-			}
-			else
-			{
-				if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Ultralisk).size()>0 && ug->size()<20)
+				if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Zergling).size()>0 && ug->size()<20)
 				{
+					logc("findotherUGgevonden1\n");
 					return ug;
 				}
 				else
 				{
-					if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Defiler).size()>0 && ug->size()<20)
+					if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Ultralisk).size()>0 && ug->size()<20)
 					{
+						logc("findotherUGgevonden2\n");
 						return ug;
+					}
+					else
+					{
+						if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Defiler).size()>0 && ug->size()<20)
+						{
+							logc("findotherUGgevonden3\n");
+							return ug;
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			if((*ug)(GetType, unit->getType()).size()>0 && ug->size()<20) {
-				return ug;
+			else
+			{
+				if((*ug)(GetType, unit->getType()).size()>0 && ug->size()<20) {
+					logc("findotherUGgevonden4\n");
+					return ug;
+				}
 			}
 		}
 	}
@@ -231,14 +240,16 @@ void EigenUnitGroupManager::update()
 
 	// Pak alle unassigned units en drop ze in een UG waar je over heen itereert:
 	UnitGroup assigned;
+	logc("preassign\n");
 	for(std::set<UnitGroup*>::iterator kit=unitGroups.begin(); kit!=unitGroups.end(); kit++)
 	{
 		assigned = assigned + (**kit);
 	}
+	logc("assignklaar\n");
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).not(Egg).not(isBuilding).not(Larva);
-
+	logc("allunitsklaar\n");
 	UnitGroup unassigned = allUnits - assigned;
-
+	logc("unassigned\n");
 	// Assign unassigned to ugs die niet size>=20
 	/*	lurkers bij lurkers
 	hydras bij hydras
@@ -253,20 +264,24 @@ void EigenUnitGroupManager::update()
 		BWAPI::UnitType type = (*unas)->getType();
 		if(type != BWAPI::UnitTypes::Zerg_Larva || type != BWAPI::UnitTypes::Zerg_Egg || !type.isBuilding())
 		{
+			logc("magassigned\n");
 			if ((*unas)->getType() == BWAPI::UnitTypes::Zerg_Drone)
 			{
+				logc("droneinUG\n");
 				this->droneUG->insert((*unas));
 			}
 			else
 			{
 				if ((*unas)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 				{
+					logc("overlrodeigengroep\n");
 					UnitGroup* newgroep = new UnitGroup();
 					(*newgroep).insert((*unas));
 					addUG(newgroep);
 				}
 				else
 				{
+					logc("begindrop1unit\n");
 					dropInEenUG((*unas));
 				}
 			}
@@ -289,7 +304,7 @@ void EigenUnitGroupManager::update()
 		addUG(newmuta);
 				
 				*/
-	
+	logc("assignklaarnugroepzelf\n");
 	for(std::set<UnitGroup*>::iterator lit=unitGroups.begin(); lit!=unitGroups.end(); lit++)
 	{
 		if ((**lit)(GetType, BWAPI::UnitTypes::Zerg_Drone).size()==0)
@@ -310,11 +325,13 @@ void EigenUnitGroupManager::update()
 			}
 			else
 			{
+				logc("preteklein\n");
 				if ((*lit)->size() < 5 && (**lit)(GetType, BWAPI::UnitTypes::Zerg_Overlord).size()==0)
 				{
-
+					logc("teklein\n");
 					if (findOtherUG((*(**lit).begin())) != NULL)
 					{
+						logc("findotherUGgevondenremove\n");
 						removeUG(*lit); // if there exists a ug with similar units DAT NIET DEZE UG is, disband deze groep OF drop alle units hierin daarin -> new methode ofzo maken voor checke
 					}
 				}
@@ -322,6 +339,7 @@ void EigenUnitGroupManager::update()
 				{
 					if ((*lit)->size()>20) // te groot
 					{
+						logc("tegrootsplitup\n");
 						splitGroup(*lit);// splitup groep
 					}
 				}
