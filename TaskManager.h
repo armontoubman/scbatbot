@@ -30,6 +30,8 @@ public:
 	Task nearestTask(UnitGroup* ug, std::list<Task> tasks);
 	std::string getName(int type);
 
+	Task createTask(int type, BWAPI::Position pos, std::map<BWAPI::Unit*, EnemyUnitData> data);
+
 	void update();
 
 	std::list<Task> tasklist;

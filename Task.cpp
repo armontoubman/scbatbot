@@ -6,28 +6,32 @@ Task::Task()
 	this->type = -999;
 }
 
-Task::Task(int t, int p, BWAPI::Position pos)
+Task::Task(int t, BWAPI::Position pos)
 {
 	this->type = t;
-	this->priority = p;
 	this->position = pos;
-	this->enemy = NULL;
+	this->enemyContainsAir = 0;
+	this->enemyContainsGround = 0;
+	this->enemySize = 0;
+	this->enemyMilitarySize = 0;
 }
 
-Task::Task(int t, int p, BWAPI::Position pos, UnitGroup* e)
+Task::Task(int t, BWAPI::Position pos, bool eCA, bool eCG, int eS, int eMS)
 {
 	this->type = t;
-	this->priority = p;
 	this->position = pos;
-	this->enemy = e;
+	this->enemyContainsAir = eCA;
+	this->enemyContainsGround = eCG;
+	this->enemySize = eS;
+	this->enemyMilitarySize = eMS;
 }
 
 bool Task::operator==(const Task& param) const
 {
-	return param.type == type && param.priority == priority && param.position == position && param.enemy == enemy;
+	return param.type == type && param.position == position;
 }
 
 bool Task::operator<(const Task& rhs) const
 {
-	return priority > rhs.priority; // hogere prioriteit (>) is eerder in de lijst (<)
+	return type > rhs.type;
 }

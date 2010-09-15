@@ -25,6 +25,11 @@ public:
 	bool canAttackGround(BWAPI::UnitType unittype);
 	bool canAttackAir(std::map<BWAPI::Unit*, EnemyUnitData> data);
 	bool canAttackGround(std::map<BWAPI::Unit*, EnemyUnitData> data);
+
+	bool mapContainsAir(std::map<BWAPI::Unit*, EnemyUnitData> data);
+	bool mapContainsGround(std::map<BWAPI::Unit*, EnemyUnitData> data);
+	int mapSize(std::map<BWAPI::Unit*, EnemyUnitData> data);
+	int mapMilitarySize(std::map<BWAPI::Unit*, EnemyUnitData> data);
 private:
 	std::string intToString(int i);
 	std::map<BWAPI::Unit*,EnemyUnitData> enemyUnitsMap;
