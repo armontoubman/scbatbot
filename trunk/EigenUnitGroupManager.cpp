@@ -16,22 +16,22 @@ EigenUnitGroupManager::EigenUnitGroupManager(HighCommand* hc, EigenUnitDataManag
 	this->tm = t;
 	this->pa = p;
 
-	this->defendlingUG = new UnitGroup();
-	this->overlordUG = new UnitGroup();
+	//this->defendlingUG = new UnitGroup();
+	//this->overlordUG = new UnitGroup();
 	this->droneUG = new UnitGroup();
-	this->defendmutaUG = new UnitGroup();
-	this->defendgroepUG = new UnitGroup();
-	this->lurkergroepUG = new UnitGroup();
+	//this->defendmutaUG = new UnitGroup();
+	//this->defendgroepUG = new UnitGroup();
+	//this->lurkergroepUG = new UnitGroup();
 
-	addUG(this->defendlingUG);
-	addUG(this->overlordUG);
+	//addUG(this->defendlingUG);
+	//addUG(this->overlordUG);
 	addUG(this->droneUG);
-	addUG(this->defendmutaUG);
+	/*addUG(this->defendmutaUG);
 	addUG(this->defendgroepUG);
-	addUG(this->lurkergroepUG);
+	addUG(this->lurkergroepUG);*/
 
-	std::set<BWAPI::Unit*> units = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	assignUnits(units);
+	//std::set<BWAPI::Unit*> units = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+	//assignUnits(units);
 }
 
 bool EigenUnitGroupManager::canAttackAir(UnitGroup unitGroup)
@@ -155,6 +155,61 @@ UnitGroup* EigenUnitGroupManager::findUnitGroupWithUnit(BWAPI::Unit* unit)
 	return NULL;
 }
 
+void EigenUnitGroupManager::dropInEenUG(BWAPI::Unit* unit)
+{
+	// drop een unit in een ug die er al is of juist in zijn eigen groep
+	UnitGroup* andere = findOtherUG(unit);
+	if (andere != NULL)
+	{
+		(*andere).insert(unit);
+		// drop unit in de ug
+	}
+	else
+	{
+		UnitGroup* newgroep = new UnitGroup();
+		(*newgroep).insert(unit);
+		addUG(newgroep);
+		// in eigen groep
+	}
+}
+
+UnitGroup* EigenUnitGroupManager::findOtherUG(BWAPI::Unit* unit)
+{
+	UnitGroup* ug;
+	for(std::set<UnitGroup*>::iterator it=unitGroups.begin(); it!=unitGroups.end(); it++)
+	{
+		ug = *it;
+		if (unit->getType() == BWAPI::UnitTypes::Zerg_Zergling || unit->getType() == BWAPI::UnitTypes::Zerg_Ultralisk || unit->getType() == BWAPI::UnitTypes::Zerg_Defiler)
+		{
+			if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Zergling).size()>0 && ug->size()<20)
+			{
+				return ug;
+			}
+			else
+			{
+				if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Ultralisk).size()>0 && ug->size()<20)
+				{
+					return ug;
+				}
+				else
+				{
+					if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Defiler).size()>0 && ug->size()<20)
+					{
+						return ug;
+					}
+				}
+			}
+		}
+		else
+		{
+			if((*ug)(GetType, unit->getType()).size()>0 && ug->size()<20) {
+				return ug;
+			}
+		}
+	}
+	return NULL;
+}
+
 void EigenUnitGroupManager::assignUnits(std::set<BWAPI::Unit*> units)
 {
 	for each(BWAPI::Unit* u in units)
@@ -165,43 +220,7 @@ void EigenUnitGroupManager::assignUnits(std::set<BWAPI::Unit*> units)
 
 void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
 {
-	BWAPI::UnitType type = unit->getType();
-	if(type == BWAPI::UnitTypes::Zerg_Larva || type == BWAPI::UnitTypes::Zerg_Egg || type.isBuilding())
-	{
-		return;
-	}
-	if(type == BWAPI::UnitTypes::Zerg_Zergling)
-	{
-		if(this->defendlingUG->count(unit) == 0)
-		{
-			this->defendlingUG->insert(unit);
-			logc("ASSIGN ZERGLING -> DEFENDLINGUG\n");
-		}
-	}
-	else if(type == BWAPI::UnitTypes::Zerg_Overlord)
-	{
-		this->overlordUG->insert(unit);
-		logc("overlordUG size: ");
-		logc(this->highCommand->wantBuildManager->intToString(overlordUG->size()).append("\n").c_str());
-	}
-	else if(type == BWAPI::UnitTypes::Zerg_Drone)
-	{
-		this->droneUG->insert(unit);
-	}
-	else if(type == BWAPI::UnitTypes::Zerg_Mutalisk)
-	{
-		this->defendmutaUG->insert(unit);
-	}
-	else if(type == BWAPI::UnitTypes::Zerg_Lurker)
-	{
-		this->lurkergroepUG->insert(unit);
-	}
-	else
-	{
-		this->defendgroepUG->insert(unit);
-	}
 
-	logc(std::string("EUGM assignUnit ").append(unit->getType().getName()).append("\n").c_str());
 }
 
 void EigenUnitGroupManager::update()
@@ -210,311 +229,105 @@ void EigenUnitGroupManager::update()
 
 	if(BWAPI::Broodwar->getFrameCount() > 3000) printGroepen();
 
-	//van defend naar actievolle UGs
-	bool defendmutaconditie = false;
-	UnitGroup* defendmutaconditiegroep;
-
-	bool othermutaconditie = false;
-	UnitGroup* othermutagroep;
-
-	bool geenmutalingconditie = false;
-	UnitGroup* geenmutalinggroep;
-
-	bool anderelurkergroepconditie = false;
-	UnitGroup* anderelurkergroep;
-
-	UnitGroup* currentGroup;
-
-	for(std::set<UnitGroup*>::iterator it=unitGroups.begin(); it!=unitGroups.end(); it++)
-	{
-		currentGroup = *it;
-		logug(currentGroup, "for elke unitgroup\n");
-		if((**it)(Mutalisk).size() > 0 && (**it)(Overlord).size() > 0 && (*it)->size() < 12)
-		{
-			logug(currentGroup, "\tmutas en overlords en <12\n");
-			defendmutaconditie = true;
-			defendmutaconditiegroep = *it;
-		}
-
-		if((**it)(Mutalisk).size() > 0 && (**it).size() == 12)
-		{
-			logug(currentGroup, "\t12 mutas\n");
-			othermutaconditie = true;
-			othermutagroep = *it;
-		}
-
-		if((**it)(Mutalisk).size() == 0 && (**it)(Zergling).size() == 0 && (**it).size() < 8)
-		{
-			logug(currentGroup, "\t0 mutas en 0 zerglings en <8\n");
-			geenmutalingconditie = true;
-			geenmutalinggroep = *it;
-		}
-
-		if((**it)(Lurker).size() > 0 && *it != this->lurkergroepUG)
-		{
-			logug(currentGroup, "\tlurkers\n");
-			anderelurkergroepconditie = true;
-			anderelurkergroep = *it;
-		}
-
-		(**it) = (**it) - (**it)(isBuilding);
-		logug(currentGroup, "eind for elke unitgroup\n");
-	}
-
-	if(this->defendmutaUG->size() > 0 && defendmutaconditie)
-	{
-		logc("defendmutaconditie, zet eerste muta over\n");
-		BWAPI::Unit* firstmuta = *(*defendmutaUG)(Mutalisk).begin();
-		moveUnitBetweenGroups(defendmutaUG, firstmuta, defendmutaconditiegroep);
-	}
-	
-	if(this->defendmutaUG->size() > 2 && othermutaconditie)
-	{
-		logc("othermutaconfitie\n");
-		UnitGroup* newmuta = new UnitGroup();
-		moveAll(defendmutaUG, newmuta);
-		addUG(newmuta);
-	}
-	
-	int aantalhatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery,Lair,Hive).size();
-	if((defendgroepUG->size()+defendlingUG->size()+defendmutaUG->size() > 2* aantalhatcheries) && defendgroepUG->size()>2)
-	{
-		logc("meer def dan hatcheries");
-		if(defendgroepUG->size() < 10 && geenmutalingconditie)
-		{
-			logc("\tgeen mutas en zerglings def\n");
-			if(geenmutalinggroep->size() < 8)
-			{
-				logc("\t\tmoveall def naar groep zonder zerglings en mutas\n");
-				moveAll(defendgroepUG, geenmutalinggroep);
-			}
-		}
-		else
-		{
-			logc("\tnewdefendgroep\n");
-			UnitGroup* newdefendgroep = new UnitGroup();
-			moveAll(defendgroepUG, newdefendgroep);
-			addUG(newdefendgroep);
-		}
-	}
-
-	if(lurkergroepUG->size() > 1)
-	{
-		logc(">1 lurker\n");
-		if(anderelurkergroepconditie)
-		{
-			logc("\tmoveall lurkers\n");
-			moveAll(lurkergroepUG, anderelurkergroep);
-		}
-		else
-		{
-			logc("\tnewlurkergroep\n");
-			UnitGroup* newlurkergroep = new UnitGroup();
-			moveAll(lurkergroepUG, newlurkergroep);
-			addUG(newlurkergroep);
-		}
-	}
-
-	int aantaloverlords = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Overlord).size();
-	if(aantaloverlords/2 < overlordUG->size())
-	{
-		logc("new overlord groep\n");
-		BWAPI::Unit* firstoverlord = *(*overlordUG)(Overlord).begin();
-		UnitGroup* newoverlordgroep = new UnitGroup();
-		moveUnitBetweenGroups(overlordUG, firstoverlord, newoverlordgroep);
-		addUG(newoverlordgroep);
-	}
-
-
-	//Groepen samenvoegen/units toevoegen
+	// Pak alle unassigned units en drop ze in een UG waar je over heen itereert:
+	UnitGroup assigned;
 	for(std::set<UnitGroup*>::iterator kit=unitGroups.begin(); kit!=unitGroups.end(); kit++)
 	{
-		currentGroup = *kit;
-		logug(currentGroup, "for groepen samenvoegen/units toevoegen\n");
-		if((**kit)(Mutalisk).size() > 0 && (**kit)(Overlord).size() == 0)
-		{
-			logug(currentGroup, "\tmuta>0 overlord==0\n");
-			BWAPI::Unit* eerste = *(**kit)(Mutalisk).begin();
-			UnitGroup overlords = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Overlord);
-			BWAPI::Unit* besteoverlord = nearestUnitInGroup(eerste, overlords);
-			moveUnitBetweenGroups(findUnitGroupWithUnit(besteoverlord), besteoverlord, *kit);
-		}
-
-		bool zerglingmergeconditie = false;
-		UnitGroup* zerglingmergegroep;
-		bool hydramergeconditie = false;
-		UnitGroup* hydramergegroep;
-		bool nogeenlurkerconditie = false;
-		UnitGroup* nogeenlurkergroep;
-		logug(currentGroup, "\t(zit) for binnen for:\n");
-		for(std::set<UnitGroup*>::iterator zit=unitGroups.begin(); zit!=unitGroups.end(); zit++)
-		{
-			currentGroup = *zit;
-			logug(currentGroup, "\t\tfor zit\n");
-			if((**zit)(Zergling).size() > 0 && (**zit).size() > 1)
-			{
-				logug(currentGroup, "\t\t\tzerglings>0 en size >1\n");
-				zerglingmergeconditie = true;
-				zerglingmergegroep = *zit;
-			}
-			if((**zit)(Hydralisk).size() > 0)
-			{
-				logug(currentGroup, "\t\t\thydralisks >0\n");
-				hydramergeconditie = true;
-				hydramergegroep = *zit;
-			}
-			if((**zit)(Lurker).size() > 0 && (**zit).not(Lurker).size() > 0)
-			{
-				logug(currentGroup, "\t\t\tlurker>0 en !lurker>0\n");
-				nogeenlurkerconditie = true;
-				nogeenlurkergroep = *zit;
-			}
-			logug(currentGroup, "\t\teinde for zit\n");
-		}
-		currentGroup = *kit;
-		logug(currentGroup, "\t(zit) einde for binnen for:\n");
-		
-		if((**kit)(Zergling).size() > 0 && (**kit).size() < 5 && zerglingmergeconditie)
-		{
-			logug(currentGroup, "\tzerglingmergeconditie\n");
-			int size = this->defendlingUG->size();
-			moveAll(*kit, zerglingmergegroep);
-			if(size == 2 && this->defendlingUG->size() == 0) {
-				logug(*kit, " moveall van deze\n");
-				logug(zerglingmergegroep, " naar deze\n");
-				//BWAPI::Broodwar->leaveGame();
-			}
-		}
-
-		if((**kit)(Zergling).size() == 0 && (**kit)(Mutalisk).size() == 0 && hydramergeconditie)
-		{
-			logug(currentGroup, "\thydramergeconditie\n");
-			moveAll(*kit, hydramergegroep);
-		}
-
-		if((**kit).size() > 20 && (**kit)(Lurker).size() == 0)
-		{
-			logug(currentGroup, "\t>20 split\n");
-			splitGroup(*kit);
-		}
-
-		if((**kit)(Lurker).size() > 0 && (**kit).not(Lurker).size() > 0)
-		{
-			logug(currentGroup, "\tlurkers en not-lurkers\n");
-			BWAPI::Unit* lollurker = *(**kit)(Lurker).begin();
-			if(nogeenlurkerconditie)
-			{
-				logug(currentGroup, "\t\tnogeenlurkerconditie\n");
-				moveUnitBetweenGroups(*kit, lollurker, nogeenlurkergroep);
-			}
-			else
-			{
-				logug(currentGroup, "\t\tnieuwelurkergroep\n");
-				UnitGroup* nieuwelurkergroep = new UnitGroup();
-				moveUnitBetweenGroups(*kit, lollurker, nieuwelurkergroep);
-				addUG(nieuwelurkergroep);
-			}
-		}
-
-		if((**kit).size() > 5 && (**kit)(Lurker).size() > 1)
-		{
-			logug(currentGroup, "\t>5 lurker>1 split\n");
-			splitGroup(*kit);
-		}
-
-		int militaryunits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).not(isBuilding).not(Overlord).not(Drone).not(SCV).not(Probe).not(Observer).size();
-		int aantalzerglings = (**kit)(Zergling).size();
-		int aantalscouttasks = 0;
-		logug(currentGroup, "\tcheck tasks\n");
-		for each(std::pair<UnitGroup*, Task> paar in this->highCommand->hcplan)
-		{
-			logug(currentGroup, "\t\tfor task\n");
-			if(paar.second.type == 1)
-			{
-				logug(currentGroup, "\t\t\tis een scouttask\n");
-				aantalscouttasks++;
-			}
-		}
-		logug(currentGroup, "\teinde check tasks\n");
-		int aantalscoutgroups = 0;
-
-		logug(currentGroup, "\t(rit) for binnen for:\n");
-		for(std::set<UnitGroup*>::iterator rit=unitGroups.begin(); rit!=unitGroups.end(); rit++)
-		{
-			logug(currentGroup, "\t\tfor rit\n");
-			if(
-				(	(((**rit)(Zergling).size() == 1
-					|| (**rit)(Overlord).size() == 1)
-					&& (**rit).size() == 1)
-					||
-					(((**rit)(Zergling).size() == 2
-					|| (**rit)(Overlord).size() == 2 )
-					&& (**rit).size() == 2 ))
-			)
-			{
-				logug(currentGroup, "\t\t\t <-- deze groep 1ling 1lord 1size of 2ling 2lord 2size\n");
-				aantalscoutgroups++;
-			}
-			else
-			{
-				logug(currentGroup, "\t\t\tdeze groep is geen scoutgroep\n");
-			}
-			logug(currentGroup, "\t\teinde for rit\n");
-		}
-		currentGroup = *kit;
-		logug(currentGroup, "\t(rit) einde for binnen for:\n");
-
-		if(aantalzerglings >9 && militaryunits > 25 && aantalscouttasks/2 > aantalscoutgroups)
-		{
-			logug(currentGroup, "\t\tnewzergiegroep\n");
-			BWAPI::Unit* zergie = *(**kit)(Zergling).begin();
-			UnitGroup* newzergiegroep = new UnitGroup();
-			moveUnitBetweenGroups(*kit, zergie, newzergiegroep);
-			addUG(newzergiegroep);
-		}
-		logug(currentGroup, "\teinde 2e grote for\n");
+		assigned = assigned + (**kit);
 	}
+	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).not(Egg).not(isBuilding).not(Larva);
 
-	// cleanup lege groepen behalve de vaste 6
-	std::set<UnitGroup*> teDeleten;
-	logug(currentGroup, "\t(pit) for binnen for:\n");
-	for(std::set<UnitGroup*>::iterator pit=unitGroups.begin(); pit!=unitGroups.end(); pit++)
+	UnitGroup unassigned = allUnits - assigned;
+
+	// Assign unassigned to ugs die niet size>=20
+	/*	lurkers bij lurkers
+	hydras bij hydras
+	defiler bij defiler/zerglings/ultralisks -> gewoon samen in 1 dus met volgende 2:
+	ultralisks bij zerglings/ultralisks/defiler
+	zerglings bij zerglings/defiler/ultralisks
+	overlord bij overlord
+	drones bij drones
+	mutalisk bij mutalisks*/
+	for(std::set<BWAPI::Unit*>::iterator unas=unassigned.begin(); unas!=unassigned.end(); unas++)
 	{
-		currentGroup = *pit;
-		if((**pit).empty())
+		BWAPI::UnitType type = (*unas)->getType();
+		if(type != BWAPI::UnitTypes::Zerg_Larva || type != BWAPI::UnitTypes::Zerg_Egg || !type.isBuilding())
 		{
-			logug(currentGroup, "\t\t\tlege groep\n");
-			if(
-				*pit != defendlingUG
-				&& *pit != overlordUG
-				&& *pit != droneUG
-				&& *pit != defendmutaUG
-				&& *pit != defendgroepUG
-				&& *pit != lurkergroepUG
-				)
+			if ((*unas)->getType() == BWAPI::UnitTypes::Zerg_Drone)
 			{
-				logug(currentGroup, "\t\t\t\tte verwijderen\n");
-				teDeleten.insert(*pit);
+				this->droneUG->insert((*unas));
 			}
 			else
 			{
-				logug(currentGroup, "\t\t\t\tvaste groep\n");
+				if ((*unas)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
+				{
+					UnitGroup* newgroep = new UnitGroup();
+					(*newgroep).insert((*unas));
+					addUG(newgroep);
+				}
+				else
+				{
+					dropInEenUG((*unas));
+				}
 			}
 		}
 	}
-	logug(currentGroup, "\t(pit) for binnen for:\n");
 
-	for(std::set<UnitGroup*>::iterator dit=teDeleten.begin(); dit!=teDeleten.end(); dit++)
+
+	/*for each unitgroup in listUG (aka = assigned) -> met uitzondering van drones
+	if overlord && there is a mutagroep with no overlord
+		drop 1 overlord in mutagroep
+	else
+		if teklein (<5 ofzo)
+			disband (ze worde hopelijk vanzelf opnew in een groep gedumpt), simpelweg delete groep van listUG (hopelijk crasht het dan niet lol)
+		else
+			if te groot (>20 units)
+				split up in 2 same size groups
+				
+				UnitGroup* newmuta = new UnitGroup();
+		moveAll(defendmutaUG, newmuta);
+		addUG(newmuta);
+				
+				*/
+	
+	for(std::set<UnitGroup*>::iterator lit=unitGroups.begin(); lit!=unitGroups.end(); lit++)
 	{
-		logug(currentGroup, "\t\tverwijder\n");
-		removeUG(*dit);
-	}
-	logug(currentGroup, "EIUGM aantal UGs: ");
-	logc(this->highCommand->wantBuildManager->intToString(this->unitGroups.size()).c_str());
-	logug(currentGroup, "\n");
-	if(BWAPI::Broodwar->getFrameCount() > 3000) logug(currentGroup, "einde van EIUGM::update()\n");
+		if ((**lit)(GetType, BWAPI::UnitTypes::Zerg_Drone).size()==0)
+		{
+			if ((**lit)(GetType, BWAPI::UnitTypes::Zerg_Overlord).size()>0)
+			{
+				for(std::set<UnitGroup*>::iterator kit=unitGroups.begin(); kit!=unitGroups.end(); kit++)
+				{
+					if((**kit)(Mutalisk).size() > 0 && (**kit)(Overlord).size() == 0)
+					{
+						logug(*kit, "\tmuta>0 overlord==0\n");
+						BWAPI::Unit* eerste = *(**kit)(Mutalisk).begin();
+						BWAPI::Unit* besteoverlord = nearestUnitInGroup(eerste, **lit);
+						moveUnitBetweenGroups(*lit, besteoverlord, *kit);
+						break;
+					}
+				}
+			}
+			else
+			{
+				if ((*lit)->size() < 5 && (**lit)(GetType, BWAPI::UnitTypes::Zerg_Overlord).size()==0)
+				{
 
-	if(BWAPI::Broodwar->getFrameCount() > 3000) printGroepen();
+					if (findOtherUG((*(**lit).begin())) != NULL)
+					{
+						removeUG(*lit); // if there exists a ug with similar units DAT NIET DEZE UG is, disband deze groep OF drop alle units hierin daarin -> new methode ofzo maken voor checke
+					}
+				}
+				else
+				{
+					if ((*lit)->size()>20) // te groot
+					{
+						splitGroup(*lit);// splitup groep
+					}
+				}
+			}
+		}
+	}
 }
 
 BWAPI::Unit* EigenUnitGroupManager::nearestUnitInGroup(BWAPI::Unit* unit, std::set<BWAPI::Unit*> units)
@@ -576,12 +389,7 @@ bool EigenUnitGroupManager::groupContainsType(std::set<BWAPI::Unit*>* ug, BWAPI:
 std::string EigenUnitGroupManager::getName(UnitGroup* group)
 {
 	std::string unitmsg;
-	if(group == this->defendlingUG) { unitmsg = "defendlingUG"; }
-	else if(group == this->overlordUG) { unitmsg = "overlordUG"; }
-	else if(group == this->droneUG) { unitmsg = "droneUG"; }
-	else if(group == this->defendmutaUG) { unitmsg = "defendmutaUG"; }
-	else if(group == this->defendgroepUG) { unitmsg = "defendgroepUG"; }
-	else if(group == this->lurkergroepUG) { unitmsg = "lurkergroepUG"; }
+	if(group == this->droneUG) { unitmsg = "droneUG"; }
 	else { unitmsg = this->highCommand->wantBuildManager->intToString((int) group); }
 	return unitmsg;
 }
