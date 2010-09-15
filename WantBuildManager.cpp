@@ -766,7 +766,7 @@ void WantBuildManager::doLists()
 					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
 					stap = 3;
 				}
-				//if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0)) // deze was gecomment
+				if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Robotics_Facility) > 0) || (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle)>0)) // deze was gecomment
 				{
 					logc("dl p 1-6\n");
 					addWant(BWAPI::UnitTypes::Zerg_Extractor);
@@ -1619,13 +1619,13 @@ void WantBuildManager::doLists()
 		buildExpand();
 	}
 
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 300 && enemiesNearNatural == 0 && !buildList.containsExpand())
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 400 && enemiesNearNatural == 0 && !buildList.containsExpand())
 	{
 		logc("dl v expand 2\n");
 		buildExpand();
 	}
 
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 300 && enemiesNearNatural > 0 && !buildList.containsExpand())
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 3 && BWAPI::Broodwar->self()->minerals() >= 400 && enemiesNearNatural > 0 && !buildList.containsExpand())
 	{
 		logc("dl v extrahatch req\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
@@ -1638,7 +1638,7 @@ void WantBuildManager::doLists()
 		addWant(BWAPI::UnitTypes::Zerg_Lair);
 	}
 
-	if( BWAPI::Broodwar->self()->minerals() > 300 && wantList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den) == 0 && wantList.count(BWAPI::UnitTypes::Zerg_Spire) == 0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) >10) // toegevoegd
+	if( BWAPI::Broodwar->self()->minerals() > 400 && wantList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den) == 0 && wantList.count(BWAPI::UnitTypes::Zerg_Spire) == 0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) >10) // toegevoegd
 	{
 		logc("dl v expand 3\n");
 		if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery)(isBeingConstructed).size() + UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery,Lair,Hive).size() <3)
