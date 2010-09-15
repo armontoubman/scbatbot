@@ -447,7 +447,7 @@ std::list<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst
 
 void PlanAssigner::logc(const char* msg)
 {
-	if(false)
+	if(true)
 	{
 		log(msg);
 	}

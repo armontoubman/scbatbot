@@ -112,18 +112,18 @@ void TaskManager::update()
 				{
 					if(enemy.second.unitType.isCloakable() || enemy.second.unitType.hasPermanentCloak())
 					{
-						insertTask(Task(4, enemy.second.position));
+						insertTask(Task(4, enemy.second.lastKnownPosition));
 					}
 					else
 					{
-						insertTask(Task(1, enemy.second.position));
+						insertTask(Task(1, enemy.second.lastKnownPosition));
 					}
 				}
 				else
 				{
 					if(enemy.second.unitType.isCloakable() || enemy.second.unitType.hasPermanentCloak())
 					{
-						insertTask(createTask(4, enemy.second.position, enemyMap));
+						insertTask(createTask(4, enemy.second.lastKnownPosition, enemyMap));
 					}
 					if((enemy.second.unitType == BWAPI::UnitTypes::Zerg_Overlord
 						|| enemy.second.unitType == BWAPI::UnitTypes::Zerg_Drone
@@ -134,11 +134,11 @@ void TaskManager::update()
 						UnitGroup eigenInRange = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding).inRadius(dist(10), enemy.second.position);
 						if(eigenInRange.size() > 0)
 						{
-							insertTask(createTask(5, enemy.second.position, enemyMap));
+							insertTask(createTask(5, enemy.second.lastKnownPosition, enemyMap));
 						}
 						else
 						{
-							insertTask(createTask(2, enemy.second.position, enemyMap));
+							insertTask(createTask(2, enemy.second.lastKnownPosition, enemyMap));
 						}
 					}
 					else
@@ -156,11 +156,11 @@ void TaskManager::update()
 							{
 								if(enemypair.second.position != BWAPI::Positions::Unknown)
 								{
-									posset.insert(enemypair.second.position);
+									posset.insert(enemypair.second.lastKnownPosition);
 									enemyUG2.insert(enemypair.first);
 								}
 							}
-							BWAPI::Position taskpos = enemy.second.position;
+							BWAPI::Position taskpos = enemy.second.lastKnownPosition;
 							if(posset.size() > 0)
 							{
 								taskpos = getCenterPosition(posset);
@@ -189,7 +189,7 @@ void TaskManager::update()
 							}
 							if(buildingnear)
 							{
-								insertTask(createTask(2, enemy.second.position, this->eudm->getMapFromUG(&enemyBuildingsUG)));
+								insertTask(createTask(2, enemy.second.lastKnownPosition, this->eudm->getMapFromUG(&enemyBuildingsUG)));
 							}
 							else
 							{
@@ -205,7 +205,7 @@ void TaskManager::update()
 								if(enemy.second.unitType == BWAPI::UnitTypes::Terran_Dropship || enemy.second.unitType == BWAPI::UnitTypes::Protoss_Shuttle)
 								{
 									UnitGroup eigenbuildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding);
-									BWAPI::Unit* nearestbuilding = nearestUnit(enemy.second.position, eigenbuildings);
+									BWAPI::Unit* nearestbuilding = nearestUnit(enemy.second.lastKnownPosition, eigenbuildings);
 									insertTask(createTask(5, nearestbuilding->getPosition(), this->eudm->getMapFromUG(&enemyUG3)));
 								}
 								insertTask(createTask(2, enemy.second.position, this->eudm->getMapFromUG(&enemyUG3))); // huge
@@ -218,7 +218,7 @@ void TaskManager::update()
 			}
 			else
 			{
-				std::map<BWAPI::Unit*, EnemyUnitData> enemyInRange = this->eudm->getEnemyUnitsInRadius(dist(10), enemy.second.position);
+				std::map<BWAPI::Unit*, EnemyUnitData> enemyInRange = this->eudm->getEnemyUnitsInRadius(dist(10), enemy.second.lastKnownPosition);
 				UnitGroup enemyUG4;
 				for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemypair in enemyInRange)
 				{
@@ -229,9 +229,9 @@ void TaskManager::update()
 				}
 				if(BWAPI::Broodwar->getFrameCount() - enemy.second.lastSeen > 30*24)
 				{
-					insertTask(createTask(1, enemy.second.position, this->eudm->getMapFromUG(&enemyUG4)));
+					insertTask(createTask(1, enemy.second.lastKnownPosition, this->eudm->getMapFromUG(&enemyUG4)));
 				}
-				insertTask(createTask(2, enemy.second.position, this->eudm->getMapFromUG(&enemyUG4))); // huge
+				insertTask(createTask(2, enemy.second.lastKnownPosition, this->eudm->getMapFromUG(&enemyUG4))); // huge
 			}
 		}
 	}
