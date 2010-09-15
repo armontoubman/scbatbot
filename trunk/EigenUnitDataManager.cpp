@@ -34,8 +34,6 @@ void EigenUnitDataManager::update(std::set<BWAPI::Unit*> units, std::set<BWAPI::
 			{
 				this->hc->eigenUnitGroupManager->onRemoveUnit(*i);
 			}
-			// sowieso opnieuw assignen
-			this->hc->eigenUnitGroupManager->assignUnit(*i);
 
 			currentUnitData.hitPoints = currentHitPoints;
 			currentUnitData.unit = *i;

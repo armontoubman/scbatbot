@@ -75,109 +75,6 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 	return currentPlan;
 }
 
-int PlanAssigner::canAttack(UnitGroup* ug1, UnitGroup* ug2) // geschrapt
-{
-	int eigen = 2;
-	if(ug2 == NULL) {
-		logc("ca ug2=null\n");
-		return 2;
-	}
-	if(ug1 == NULL) {
-		logc("ca ug1=null\n");
-		return 0;
-	}
-	if((*ug1->begin())->getPlayer() == BWAPI::Broodwar->self())
-	{
-		logc("ca ug1=self\n");
-		eigen = 1;
-		std::map<BWAPI::Unit*, EnemyUnitData> data = this->eudm->getMapFromUG(ug2);
-		logc("ca ug1=self, ok opgezocht\n");
-		if(this->mm->canAttackAir(*ug1) && this->mm->canAttackGround(*ug1) || this->mm->canAttackAir(*ug1) && this->eudm->onlyAirUnits(data) || this->mm->canAttackGround(*ug1) && this->eudm->onlyGroundUnits(data))
-		{
-			logc("ca ug1=self airconditie\n");
-			return 2;
-		}
-		else
-		{
-			if(!this->eudm->onlyGroundUnits(data) && !this->eudm->onlyAirUnits(data))
-			{
-				logc("ca ug1=self mixed\n");
-				return 1;
-			}
-			return 0;
-		}
-	}
-	else
-	{
-		logc("ca ug2=self\n");
-		eigen = 2;
-		std::map<BWAPI::Unit*, EnemyUnitData> data = this->eudm->getMapFromUG(ug1);
-		logc("ca ug2=self, ok opgezocht\n");
-		if(this->eudm->canAttackAir(data) && this->eudm->canAttackGround(data) || this->eudm->canAttackAir(data) && (*ug2)(isFlyer).size() == ug2->size() || this->eudm->canAttackGround(data) && (*ug2)(isFlyer).size() == 0)
-		{
-			logc("ca ug2=self airconditie\n");
-			return 2;
-		}
-		else
-		{
-			if((*ug2)(isFlyer).size() > 0 && (*ug2).not(isFlyer).size() > 0)
-			{
-				logc("ca ug2=self mixed\n");
-				return 1;
-			}
-			return 0;
-		}
-	}
-}
-
-int PlanAssigner::canAttack(UnitGroup* ug, Task t)
-{
-	if(ug == NULL || ug->size() == 0)
-	{
-		return 0;
-	}
-	if((*ug)(isFlyer).size() > 0)
-	{
-		return 2;
-	}
-	if((*ug)(isFlyer).size() == 0 && t.enemyContainsAir)
-	{
-		if(t.enemyContainsGround)
-		{
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-	return 0;
-}
-
-int PlanAssigner::canAttack(Task t, UnitGroup* ug)
-{
-	if(ug == NULL || ug->size() == 0)
-	{
-		return 0;
-	}
-	if(t.enemyContainsAir)
-	{
-		return 2;
-	}
-	if(t.enemyContainsAir == false && (*ug)(isFlyer).size() > 0)
-	{
-		if((*ug).not(isFlyer).size() > 0)
-		{
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-	return 0;
-}
-
 Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<UnitGroup*, Task> currentPlan)
 {
 	return mostAppropriate(current, tasktype, currentPlan, false);
@@ -380,52 +277,9 @@ void PlanAssigner::update()
 	logc(this->hc->wantBuildManager->intToString(this->plan.size()).append("\n").c_str());
 }
 
-Task PlanAssigner::vindTask(UnitGroup* ug)
-{
-	log("vindTask ALS JE DIT LEEST IS ER IETS FOUT\n");
-	logc("PA::vindTask()\n");
-	int lolsize = this->hc->hcplan.size();
-	logc("PAlolololool\n");
-	logc(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
-	if(lolsize == 0)
-	{
-		logc("plan is leeg...\n");
-	}
-	if(lolsize > 0) {
-		logc("plan is niet leeg\n");
-	}
-	/*for each(std::pair<UnitGroup*, Task> paar in this->plan)
-	{
-		logc("plan iteratie\n");
-		if(paar.first == ug)
-		{
-			logc("PA::vindTask() bijbehorende task gevonden\n");
-			return paar.second;
-		}
-	}*/
-
-	logc("PA::vindTask() geen task gevonden, geef defend hatchery\n");
-
-	return this->hc->hcplan[ug];
-
-	//return Task(-1, 1, this->hc->hatchery->getPosition());
-}
-
 Task PlanAssigner::vindTask(std::map<UnitGroup*, Task> lijst, UnitGroup* ug)
 {
-	//log("PA::vindTask2()\n");
-	int lolsize = lijst.size();
-	//log("zoek task voor: ");
-	//logc(this->hc->wantBuildManager->intToString(lolsize).append("\n").c_str());
 	log(this->hc->eigenUnitGroupManager->getName(ug).append("\n").c_str());
-	if(lolsize == 0)
-	{
-		logc("plan is leeg...\n");
-	}
-	if(lolsize > 0)
-	{
-		logc("plan is niet leeg\n");
-	}
 	for each(std::pair<UnitGroup*, Task> paar in lijst)
 	{
 		//logc("plan iteratie\n");
@@ -452,6 +306,54 @@ std::list<Task> PlanAssigner::findTasksWithType(std::map<UnitGroup*, Task> lijst
 		}
 	}
 	return result;
+}
+
+int PlanAssigner::canAttack(UnitGroup* ug, Task t)
+{
+	if(ug == NULL || ug->size() == 0)
+	{
+		return 0;
+	}
+	if((*ug)(isFlyer).size() > 0)
+	{
+		return 2;
+	}
+	if((*ug)(isFlyer).size() == 0 && t.enemyContainsAir)
+	{
+		if(t.enemyContainsGround)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	return 0;
+}
+
+int PlanAssigner::canAttack(Task t, UnitGroup* ug)
+{
+	if(ug == NULL || ug->size() == 0)
+	{
+		return 0;
+	}
+	if(t.enemyContainsAir)
+	{
+		return 2;
+	}
+	if(t.enemyContainsAir == false && (*ug)(isFlyer).size() > 0)
+	{
+		if((*ug).not(isFlyer).size() > 0)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+	return 0;
 }
 
 void PlanAssigner::logc(const char* msg)

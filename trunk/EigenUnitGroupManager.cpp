@@ -219,19 +219,6 @@ UnitGroup* EigenUnitGroupManager::findOtherUG(BWAPI::Unit* unit)
 	return NULL;
 }
 
-void EigenUnitGroupManager::assignUnits(std::set<BWAPI::Unit*> units)
-{
-	for each(BWAPI::Unit* u in units)
-	{
-		assignUnit(u);
-	}
-}
-
-void EigenUnitGroupManager::assignUnit(BWAPI::Unit* unit)
-{
-
-}
-
 void EigenUnitGroupManager::update()
 {
 	if(BWAPI::Broodwar->getFrameCount() > 3000) logc("begin van EIUGM::update()\n");
