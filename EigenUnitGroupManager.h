@@ -26,9 +26,6 @@ public:
 	UnitGroup* findOtherUG(BWAPI::Unit* unit);
 	void dropInEenUG(BWAPI::Unit* unit);
 
-	void assignUnit(BWAPI::Unit* unit);
-	void assignUnits(std::set<BWAPI::Unit*> units);
-
 	void onRemoveUnit(BWAPI::Unit* unit);
 
 	void splitGroup(UnitGroup* ug);
