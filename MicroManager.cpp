@@ -880,7 +880,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							{
 								if (enemies.size()>0)
 								{
-									BWAPI::Unit nearest = nearestUnit((*unitit)->getPosition(), enemies);
+									BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
 									if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
 									{
 										if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
@@ -948,7 +948,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										BWAPI::Unit nearest = nearestUnit((*unitit)->getPosition(), enemies);
+										BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
 										if (!(*unitit)->isAttacking() && nearest->getPosition().getDistance((*unitit)->getPosition()) > dist(2)) // als het goed is gaat ie vanzelf autoattacken dan
 										{
 											UnitGroup alliesdichtbij = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(5), (*unitit)->getPosition());
@@ -964,7 +964,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 												}
 												else
 												{
-													BWAPI::Unit nearest = nearestUnit((*unitit)->getPosition(), enemies);
+													BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
 													if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
 													{
 														if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())

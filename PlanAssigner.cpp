@@ -33,7 +33,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 			continue;
 		}
 		logc("PA for each\n");
-		if(ug->size()<2 && ug != this->eiugm->defendlingUG && ug != this->eiugm->defendgroepUG)
+		if(ug->size()<2)
 		{
 			logc("PA if\n");
 			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Drone)) // nieuwe functie
@@ -68,25 +68,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 		else
 		{
 			logc("PA else\n");
-			if(ug == this->eiugm->defendgroepUG || ug == this->eiugm->defendlingUG || ug == this->eiugm->defendmutaUG)
-			{
-				logc("PA else if\n");
-				currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
-			}
-			else
-			{
-				logc("PA else else\n");
-				if(this->tm->existsTaskWithPriority(5))
-				{
-					logc("PA else else if\n");
-					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 5, currentPlan, true)));
-				}
-				else
-				{
-					logc("PA else else else\n");
-					currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 0, currentPlan, true)));
-				}
-			}
+			currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 0, currentPlan, true)));
 		}
 	}
 	logc("PA::maakPlan() einde\n");
