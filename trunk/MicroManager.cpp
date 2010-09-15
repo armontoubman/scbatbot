@@ -400,7 +400,14 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 				result = getUnusedMineralsNearHatcheries();
 				if (result.empty() || unit->isCarryingMinerals() || unit->isCarryingGas())
 				{
-					unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
+					if (unit->isCarryingMinerals() || unit->isCarryingGas())
+					{
+						unit->returnCargo();
+					}
+					else
+					{
+						unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
+					}
 				}
 				else
 				{
@@ -444,12 +451,12 @@ UnitGroup MicroManager::getUnusedMineralsNearHatcheries()
 			UnitGroup effectivemining = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*it)->getPosition())(Drone)(isGatheringMinerals);
 			UnitGroup mineralsnearby = minerals.inRadius(dist(10), (*it)->getPosition());
 			// idee is: per mineral check of er een hatchery in de buurt is, zo ja, check voor die hatchery of het wel een geldige basis is (i.e. geen enemies in de buurt of allies nearby) EN of er niet al genoeg drones in de buurt aant minen zijn.
-			if (((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>4)) && effectivemining.size()<(mineralsnearby.size()+2))
+			if (((amountCanAttackGround(enemiesInRange((*it)->getPosition(), dist(10), 0)) < 5) || (allies.size()>4)) && effectivemining.size()<mineralsnearby.size())
 			{
 				// als er niet al genoeg drones zijn voor de minerals && de basis is veilig && slechts per 1 hatchery checken of de mineral in de buurt van een hatchery bevindt.
 				// het wordt erg dubbelop.. maar op deze manier weet ik zeker dat een mineral niet 10x erin komt te staan, dat niet alle drones gewoon naar de dichtsbijzijnde gaat, etc.
 				//if((*it)->getDistance(*mit) <= dist(13) && !(*mit)->isBeingGathered())
-				if((*it)->getDistance(*mit) <= dist(13) && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *mit).size() == 0)
+				if((*it)->getDistance(*mit) <= dist(13) && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *mit).size() < 2)
 				{
 					result.insert(*mit);
 					break;
@@ -953,48 +960,56 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									if (allies.size()<enemies.size() && allies.size()<11)
+									if (allies.size()<enemies.size())
 									{
 										(*unitit)->move(moveAway(*unitit));
 									}
 									else
 									{
 										BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
-										if (!(*unitit)->isAttacking() && nearest->getPosition().getDistance((*unitit)->getPosition()) > dist(2)) // als het goed is gaat ie vanzelf autoattacken dan
+										if (!(*unitit)->isAttacking() && nearest->getPosition().getDistance((*unitit)->getPosition()) > dist(1)) // als het goed is gaat ie vanzelf autoattacken dan
 										{
-											UnitGroup alliesdichtbij = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(5), (*unitit)->getPosition());
-											if (alliesdichtbij.size()<3 && allies.size()>2)
+											UnitGroup attackingug = allies(GetOrder, BWAPI::Orders::AttackUnit);
+											if (attackingug.size()>0)
 											{
-												(*unitit)->attackMove(nearestUnit((*unitit)->getPosition(), (allies-alliesdichtbij))->getPosition()); // dit moet je zien Armon
+												(*unitit)->attackMove(nearestUnit((*unitit)->getPosition(),attackingug)->getTargetPosition());
 											}
 											else
 											{
-												if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3),(*unitit)->getPosition()).size()>3)
+												UnitGroup alliesdichtbij = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), (*unitit)->getPosition());
+												if (alliesdichtbij.size()<3 && allies.size()>2)
 												{
-													(*unitit)->move(splitUp(*unitit));
+													(*unitit)->attackMove(nearestUnit((*unitit)->getPosition(), (allies-alliesdichtbij))->getPosition()); // dit moet je zien Armon
 												}
 												else
 												{
-													BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
-													if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
+													if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(1),(*unitit)->getPosition()).size()>3)
 													{
-														if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
-														{
-															int x = (*unitit)->getPosition().x();
-															int y = (*unitit)->getPosition().y();
-															int factor = dist(10);
-															int newx = x + (((rand() % 30)-15)*factor);
-															int newy = y + (((rand() % 30)-15)*factor);
-															(*unitit)->move(BWAPI::Position(newx, newy));
-														}
-														else
-														{
-															(*unitit)->move(currentTask.position);
-														}
+														(*unitit)->move(splitUp(*unitit));
 													}
 													else
 													{
-														(*unitit)->attackUnit(nearest);
+														BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
+														if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
+														{
+															if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
+															{
+																int x = (*unitit)->getPosition().x();
+																int y = (*unitit)->getPosition().y();
+																int factor = dist(10);
+																int newx = x + (((rand() % 30)-15)*factor);
+																int newy = y + (((rand() % 30)-15)*factor);
+																(*unitit)->move(BWAPI::Position(newx, newy));
+															}
+															else
+															{
+																(*unitit)->move(currentTask.position);
+															}
+														}
+														else
+														{
+															(*unitit)->attackUnit(nearest);
+														}
 													}
 												}
 											}
