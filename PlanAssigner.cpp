@@ -203,7 +203,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 			logc("ma if nullwaarde\n");
 			if(tasktype == 0)
 			{
-				if(otask.type == 5 || otask.type == 2 || otask.type == 3)
+				if(otask.type == 2 || otask.type == 3)
 				{
 					logc("ma if 0523\n");
 					if((!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current)) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
@@ -274,7 +274,17 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 				}
 				else
 				{
-					lessAppropriateTasks.push_front(otask);
+					if (tasktype == 5)
+					{
+						appropriateTasks.push_front(otask);
+					}
+					else
+					{
+						if (tasktype == 1)
+						{
+							lessAppropriateTasks.push_front(otask);
+						}
+					}
 				}
 			}
 			else
