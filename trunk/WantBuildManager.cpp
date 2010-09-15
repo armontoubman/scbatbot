@@ -695,6 +695,10 @@ void WantBuildManager::update()
 					}
 				}
 			}
+			if (v.typenr == 4 && (buildList.count(BWAPI::UnitTypes::Zerg_Spawning_Pool) || buildList.count(BWAPI::UnitTypes::Zerg_Spire) || buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den)))
+			{
+				buildList.removeSecond();
+			}
 			/*if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && b.buildtype.isBuilding())))
 			{
 				buildList.removeSecond();
