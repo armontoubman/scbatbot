@@ -409,6 +409,7 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 			}
 		}
 	}
+	logc("einde gatherwhere\n");
 }
 
 UnitGroup MicroManager::getHatcheriesWithMinerals()
