@@ -40,7 +40,7 @@ BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit, double radius)
 	int newx = current.x() - (enemiescenter.x() - current.x());
 	int newy = current.y() - (enemiescenter.y() - current.y());
 	// mogelijk een verdere afstand als de onderlinge afstand klein is. Maar wellicht vuurt dit vaak genoeg.
-	return BWAPI::Position(newx, newy);
+	return BWAPI::Position(newx, newy).makeValid();
 }
 
 BWAPI::Position MicroManager::moveAway(BWAPI::Unit* unit)
@@ -62,14 +62,14 @@ BWAPI::Position MicroManager::splitUp(BWAPI::Unit* unit)
 	BWAPI::Position current = unit->getPosition();
 	
 	// alle enemies in de gekozen radius
-	UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(4), current);
+	UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(5), current);
 	allies.erase(unit);
 	BWAPI::Position alliescenter = allies.getCenter();
 	
 	int newx = current.x() - (alliescenter.x() - current.x());
 	int newy = current.y() - (alliescenter.y() - current.y());
 	// mogelijk een verdere afstand als de onderlinge afstand klein is. Maar wellicht vuurt dit vaak genoeg.
-	return BWAPI::Position(newx, newy);
+	return BWAPI::Position(newx, newy).makeValid();
 }
 
 void MicroManager::splitUp(std::set<BWAPI::Unit*> units)
@@ -614,7 +614,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		}
 		/* EINDE MUTALISK */
 
-		/* ZERGLING */
+		/* ZERGLING
 		else if((**it)(Zergling).size() > 0)
 		{
 			BWAPI::Unit* eerste = *((*it)->begin());
@@ -719,7 +719,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										logx(eerste, " naar enemy position\n");
 										(*it)->move(enemy->getPosition()); // move
-									}*/
+									}
 								}
 							}
 							else
@@ -825,7 +825,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				}
 			}
 		}
-		/* EINDE ZERGLING */
+		EINDE ZERGLING */
 
 		else
 		{
@@ -839,198 +839,201 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				//Task currentTask = this->hc->planAssigner->vindTask(this->hc->hcplan, this->hc->eigenUnitGroupManager->findUnitGroupWithUnit(*unitit));
 				logc("doMicro selecteer unittype\n");
 
-				/* ULTRALISK */
-				if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Ultralisk)
+				/* NEW ZERGLING */
+				if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Zergling)
 				{
-					if((*unitit)->isIrradiated())
+					UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(10), (*unitit)->getPosition());
+					UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(10), 1);
+					UnitGroup enemiesair = enemiesInRange((*unitit)->getPosition(), dist(7), 2);
+					if (MicroManager::amountCanAttackGround(enemiesair)>0 && MicroManager::amountCanAttackAir(allies)==0)
 					{
-						if(allSelfUnits.inRadius(dist(3), (*unitit)->getPosition()).size() > 0)
-						{
-							BWAPI::Position base = BWAPI::Broodwar->enemy()->getStartLocation();
-							(*unitit)->attackMove(base);
-						}
-						else
-						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7), 0);
-							if(enemies.size() > 0)
-							{
-								(*unitit)->attackUnit(*enemies.begin());
-							}
-							else
-							{
-								BWAPI::Position base = BWAPI::Broodwar->enemy()->getStartLocation();
-								(*unitit)->attackMove(base);
-							}
-						}
+						(*unitit)->move(moveAway(*unitit));
 					}
 					else
 					{
-						if((*unitit)->isUnderStorm())
+						if (currentTask.type == 1)
 						{
-							(*unitit)->attackMove(moveAway(*unitit));
-						}
-						else
-						{
-							UnitGroup swarms = UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits())(Dark_Swarm).inRadius(dist(9), (*unitit)->getPosition());
-							if(swarms.size() > 0)
+							if (enemiesInRange((*unitit)->getPosition(), dist(4), 0).not(isBuilding).size()>0)
 							{
-								if(isUnderDarkSwarm(*unitit))
-								{
-									// doe niks Game AI lost zelf op
-								}
-								else
-								{
-									(*unitit)->move(nearestSwarm(*unitit)->getPosition());
-								}
+								(*unitit)->move(moveAway(*unitit));
 							}
 							else
 							{
-								if(currentTask.type != -1 && (*unitit)->getDistance(currentTask.position) < dist(8))
+								if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
 								{
-									(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), dist(8), 0).begin());
-								}
+									int x = (*unitit)->getPosition().x();
+									int y = (*unitit)->getPosition().y();
+									int factor = dist(10);
+									int newx = x + (((rand() % 30)-15)*factor);
+									int newy = y + (((rand() % 30)-15)*factor);
+									(*unitit)->move(BWAPI::Position(newx, newy));
+								}							
 								else
 								{
-									(*unitit)->attackMove(currentTask.position);
+									(*unitit)->move(currentTask.position);
 								}
 							}
 						}
-					}
-				}
-				/* EINDE ULTRALISK */
-
-				/* LURKER */
-				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Lurker)
-				{
-					if(!(*unitit)->isBurrowed())
-					{
-						if((*unitit)->isUnderStorm())
-						{
-							moveToNearestBase(*unitit);
-						}
 						else
 						{
-							if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6) && enemiesInRange((*unitit)->getPosition(), dist(13), 0).size() == 0)
+							if (enemies.not(isBuilding).not(Drone).not(Probe).not(SCV).size()==0)
 							{
-								(*unitit)->move(currentTask.position);
-							}
-							else
-							{
-								(*unitit)->burrow();
-							}
-						}
-					}
-					else
-					{
-						if((*unitit)->isUnderStorm())
-						{
-							(*unitit)->unburrow();
-						}
-						else
-						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(6), 0);
-							if(enemiesInRange((*unitit)->getPosition(), dist(13), 0).size() > 0)
-							{
-								if(!this->eiudm->unitIsSeen(*unitit))
+								if (enemies.size()>0)
 								{
-									if(enemies.size() > 3)
+									BWAPI::Unit nearest = nearestUnit((*unitit)->getPosition(), enemies);
+									if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
 									{
-										if(enemies(Marine).size() > 0 || enemies(isWorker).size() > 0 || enemies(Zealot).size() > 0 || enemies(Medic).size() > 0 || enemies(Zergling).size() > 0)
+										if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
 										{
-											if(nearestUnit((*unitit)->getPosition(), enemies)->getPosition().getDistance((*unitit)->getPosition()) < dist(3))
-											{
-												(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemies));
-											}
-											else
-											{
-												// hold lurker
-												std::set<BWAPI::Unit*> holdset;
-												holdset.insert(*unitit);
-												UnitGroup olords = allSelfUnits(Overlord)(isIdle);
-												if(olords.size() > 0)
-												{
-													holdset.insert(*olords.begin());
-													UnitGroup holdgroup = UnitGroup::getUnitGroup(holdset);
-													holdgroup.holdPosition();
-												}
-											}
+											int x = (*unitit)->getPosition().x();
+											int y = (*unitit)->getPosition().y();
+											int factor = dist(10);
+											int newx = x + (((rand() % 30)-15)*factor);
+											int newy = y + (((rand() % 30)-15)*factor);
+											(*unitit)->move(BWAPI::Position(newx, newy));
 										}
 										else
 										{
-											(*unitit)->attackUnit(*enemies.begin());
+											(*unitit)->move(currentTask.position);
 										}
 									}
 									else
 									{
-										UnitGroup structures = allSelfUnits(isBuilding);
-										BWAPI::Unit* neareststructure = nearestUnit((*unitit)->getPosition(), structures);
-										if((*it)->getCenter().getDistance(neareststructure->getPosition()) < dist(10))
+										(*unitit)->attackUnit(nearest);
+									}
+								}
+								else
+								{
+									if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
+									{
+										int x = (*unitit)->getPosition().x();
+										int y = (*unitit)->getPosition().y();
+										int factor = dist(10);
+										int newx = x + (((rand() % 30)-15)*factor);
+										int newy = y + (((rand() % 30)-15)*factor);
+										(*unitit)->move(BWAPI::Position(newx, newy));
+									}
+									else
+									{
+										(*unitit)->attackMove(currentTask.position);
+									}
+								}
+							}
+							else
+							{
+								BWAPI::Unit* swarm = nearestSwarm((*unitit));
+								if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
+								{
+									logx((*unitit), " swarm in de buurt\n");
+									if(!isUnderDarkSwarm((*unitit)) && !(*unitit)->isAttacking())
+									{
+										logx((*unitit), " naar swarm\n");
+										(*unitit)->attackMove(swarm->getPosition()); // move
+									}
+									else
+									{
+										logx((*unitit), " onder swarm, attack enemy\n"); // wat als geen enemy? nullpointer!
+										UnitGroup enemiesonderswarm = enemiesInRange((*unitit)->getPosition(), dist(6), 1);
+										if (!(*unitit)->isAttacking() && enemiesonderswarm.size()>0)
 										{
-											(*unitit)->attackUnit(*enemies.begin());
+											(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemiesonderswarm));
 										}
 									}
 								}
 								else
 								{
-									(*unitit)->stop(); // mogelijk moet dit anders als de micro zo vaak hier langs komt dat hij gewoon niet eens aanvalt
-								}
-							}
-							else
-							{
-								if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6))
-								{
-									(*unitit)->unburrow();
-								}
-								else
-								{
-									// hold lurker
-									std::set<BWAPI::Unit*> holdset;
-									holdset.insert(*unitit);
-									UnitGroup olords = allSelfUnits(Overlord)(isIdle);
-									if(olords.size() > 0)
+									if (allies.size()<enemies.size() && allies.size()<11)
 									{
-										holdset.insert(*olords.begin());
-										UnitGroup holdgroup = UnitGroup::getUnitGroup(holdset);
-										holdgroup.holdPosition();
+										(*unitit)->move(moveAway(*unitit));
+									}
+									else
+									{
+										BWAPI::Unit nearest = nearestUnit((*unitit)->getPosition(), enemies);
+										if (!(*unitit)->isAttacking() && nearest->getPosition().getDistance((*unitit)->getPosition()) > dist(2)) // als het goed is gaat ie vanzelf autoattacken dan
+										{
+											UnitGroup alliesdichtbij = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(5), (*unitit)->getPosition());
+											if (alliesdichtbij.size()<3 && allies.size()>2)
+											{
+												(*unitit)->attackMove(nearestUnit((*unitit)->getPosition(), (allies-alliesdichtbij))->getPosition()); // dit moet je zien Armon
+											}
+											else
+											{
+												if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3),(*unitit)->getPosition()).size()>3)
+												{
+													(*unitit)->move(splitUp(*unitit));
+												}
+												else
+												{
+													BWAPI::Unit nearest = nearestUnit((*unitit)->getPosition(), enemies);
+													if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(3), nearest->getPosition()).size()>5)
+													{
+														if ((*unitit)->getDistance(currentTask.position) < dist(4) && !(*unitit)->isMoving())
+														{
+															int x = (*unitit)->getPosition().x();
+															int y = (*unitit)->getPosition().y();
+															int factor = dist(10);
+															int newx = x + (((rand() % 30)-15)*factor);
+															int newy = y + (((rand() % 30)-15)*factor);
+															(*unitit)->move(BWAPI::Position(newx, newy));
+														}
+														else
+														{
+															(*unitit)->move(currentTask.position);
+														}
+													}
+													else
+													{
+														(*unitit)->attackUnit(nearest);
+													}
+												}
+											}
+										}
 									}
 								}
 							}
 						}
 					}
 				}
-				/* EINDE LURKER */
-
-				/* DEFILER */
-				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Defiler)
+				else
 				{
-					if((*unitit)->isUnderStorm())
+					/* ULTRALISK */
+					if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Ultralisk)
 					{
-						moveToNearestBase(*unitit);
-					}
-					else
-					{
-						if(allSelfUnits.inRadius(dist(10), (*unitit)->getPosition()).not(Defiler).size() > 3)
+						if((*unitit)->isIrradiated())
 						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(9), 0);
-							bool atleastoneunderswarm = false;
-							for(std::set<BWAPI::Unit*>::iterator swarmit=enemies.begin(); swarmit!=enemies.end(); swarmit++)
+							if(allSelfUnits.inRadius(dist(3), (*unitit)->getPosition()).size() > 0)
 							{
-								if(isUnderDarkSwarm(*swarmit))
+								BWAPI::Position base = BWAPI::Broodwar->enemy()->getStartLocation();
+								(*unitit)->attackMove(base);
+							}
+							else
+							{
+								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7), 0);
+								if(enemies.size() > 0)
 								{
-									atleastoneunderswarm = true;
+									(*unitit)->attackUnit(*enemies.begin());
+								}
+								else
+								{
+									BWAPI::Position base = BWAPI::Broodwar->enemy()->getStartLocation();
+									(*unitit)->attackMove(base);
 								}
 							}
-							if(!atleastoneunderswarm)
+						}
+						else
+						{
+							if((*unitit)->isUnderStorm())
 							{
-								int energy = (*unitit)->getEnergy();
-								int energynodig = BWAPI::TechTypes::Dark_Swarm.energyUsed();
-								if(energy < energynodig)
+								(*unitit)->attackMove(moveAway(*unitit));
+							}
+							else
+							{
+								UnitGroup swarms = UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits())(Dark_Swarm).inRadius(dist(9), (*unitit)->getPosition());
+								if(swarms.size() > 0)
 								{
-									UnitGroup zerglings = allSelfUnits(Zergling);
-									if(zerglings.size() > 0)
+									if(isUnderDarkSwarm(*unitit))
 									{
-										BWAPI::Unit* slachtoffer = nearestUnitInGroup((*unitit), zerglings);
-										(*unitit)->useTech(BWAPI::TechTypes::Consume, slachtoffer);
+										// doe niks Game AI lost zelf op
 									}
 									else
 									{
@@ -1039,380 +1042,546 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									BWAPI::Unit* nenuds = nearestEnemyNotUnderDarkSwarm(*unitit);
-									BWAPI::Unit* swarm = nearestSwarm(nenuds);
-									if(nenuds != NULL && swarm != NULL)
+									if(currentTask.type != -1 && (*unitit)->getDistance(currentTask.position) < dist(8))
 									{
-										if(nenuds->getPosition().getDistance(swarm->getPosition()) > dist(5))
-										{
-											int x = abs(nenuds->getPosition().x() - swarm->getPosition().x());
-											int y = abs(nenuds->getPosition().y() - swarm->getPosition().y());
-											BWAPI::Position pos = BWAPI::Position(x, y);
-											(*unitit)->useTech(BWAPI::TechTypes::Dark_Swarm, pos);
-										}
-										else
-										{
-											(*unitit)->useTech(BWAPI::TechTypes::Dark_Swarm, nenuds);
-										}
+										(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), dist(8), 0).begin());
+									}
+									else
+									{
+										(*unitit)->attackMove(currentTask.position);
 									}
 								}
 							}
-							else
-							{
-								// niks
-							}
-						}
-						else
-						{
-							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(9), 0);
-							if(enemies.size() > 0)
-							{
-								UnitGroup buildings = allSelfUnits(isBuilding).inRadius(dist(5), (*unitit)->getPosition());
-								if(buildings.size() > 0)
-								{
-									(*unitit)->useTech(BWAPI::TechTypes::Dark_Swarm, (*unitit));
-								}
-								else
-								{
-									moveToNearestBase(*unitit);
-								}
-							}
-							else
-							{
-								(*unitit)->move(currentTask.position);
-							}
 						}
 					}
-				}
-				/* EINDE DEFILER */
+					/* EINDE ULTRALISK */
 
-				/* OVERLORD */
-				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
-				{
-					logx((*unitit), "\n"); 
-					if((*unitit)->isUnderStorm())
+					/* LURKER */
+					else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Lurker)
 					{
-						logx((*unitit), " under storm moveAway\n");
-						(*unitit)->move(moveAway(*unitit));
-					}
-					else
-					{						
-						logx((*unitit), std::string(" task.type=").append(intToString(currentTask.type)).append("\n").c_str());
-						if(currentTask.type == 1 || currentTask.type == 4)
+						if(!(*unitit)->isBurrowed())
 						{
-							logx((*unitit), " type=1||4\n");
-							BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
-							// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
-							if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9), 0)))
+							if((*unitit)->isUnderStorm())
 							{
-								logx((*unitit), " air enemy dichtbij\n");
-								if(overlordSupplyProvidedSoon() && currentTask.type == 1)
-								{
-									
-									logx((*unitit), " overlordSupplySoon\n");
-									UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(dist(8), currentTask.position);
-									if(buildings.size() == 0)
-									{
-										logx((*unitit), " geen buildings\n");
-										(*unitit)->move(moveAway(*unitit));
-									}
-									else
-									{
-										
-										logx((*unitit), " wel buildings\n");
-										if((*unitit)->getPosition().getDistance(currentTask.position) < dist(2))
-										{
-											
-											logx((*unitit), " moveAway\n");
-											(*unitit)->move(moveAway(*unitit));
-										}
-										else
-										{
-											
-											logx((*unitit), " move naar task\n");
-											(*unitit)->move(currentTask.position);
-										}
-									}
-								}
-								else
-								{
-									logx((*unitit), " moveAway\n");
-									(*unitit)->move(moveAway(*unitit));
-								}
+								moveToNearestBase(*unitit);
 							}
 							else
 							{
-								UnitGroup stealths = allEnemyUnits(isCloaked);
-								BWAPI::Unit* neareststealth = nearestUnit((*unitit)->getPosition(), stealths);
-								if(neareststealth != NULL)
+								if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6) && enemiesInRange((*unitit)->getPosition(), dist(13), 0).size() == 0)
 								{
-										
-									logx((*unitit), " stealth gezien\n");
-									(*unitit)->rightClick(neareststealth->getPosition());
+									(*unitit)->move(currentTask.position);
 								}
 								else
 								{
-									UnitGroup dropships = allEnemyUnits(Dropship) + allEnemyUnits(Shuttle);
-									dropships = dropships.inRadius(dist(10), (*unitit)->getPosition());
-									if(dropships.size() > 0)
-									{
-											
-										logx((*unitit), " dropship gezien\n");
-										(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
-									}
-									else
-									{
-											
-										logx((*unitit), " geen dropship, move naar task\n");
-										(*unitit)->move(currentTask.position);
-									}
+									(*unitit)->burrow();
 								}
 							}
 						}
 						else
 						{
-							/*logx((*unitit), " hydratask deel\n");
-							std::list<Task> hydratasks = this->tm->findTasksWithUnitType(BWAPI::UnitTypes::Zerg_Hydralisk);
-							Task* hydratask = NULL;
-							for(std::list<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
+							if((*unitit)->isUnderStorm())
 							{
-								if((*taskit).type == 2 || (*taskit).type == 3 && allSelfUnits(Overlord).inRadius(dist(10), (*(*taskit).unitGroup->begin())->getPosition()).size() == 0)
-								{
-									Task loltask = *taskit;
-									hydratask = &loltask;
-									break;
-								}
+								(*unitit)->unburrow();
 							}
-							if(hydratask != NULL)
+							else
 							{
-								
-								logx((*unitit), " hydratask\n");
-								BWAPI::Unit* volghydra = *(hydratask->unitGroup->begin());
-								(*unitit)->rightClick(volghydra->getPosition());
-							}
-							else*/
-							{
-								UnitGroup overlordsnearby = allSelfUnits(Overlord).inRadius(dist(10), (*unitit)->getPosition());
-								if(overlordsnearby.size() > 1)
+								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(6), 0);
+								if(enemiesInRange((*unitit)->getPosition(), dist(13), 0).size() > 0)
 								{
-									
-									logx((*unitit), " andere overlord\n");
-									if(canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(8), 0)))
+									if(!this->eiudm->unitIsSeen(*unitit))
 									{
-										
-										logx((*unitit), " canAttackAir moveAway\n");
-										(*unitit)->move(moveAway(*unitit));
+										if(enemies.size() > 3)
+										{
+											if(enemies(Marine).size() > 0 || enemies(isWorker).size() > 0 || enemies(Zealot).size() > 0 || enemies(Medic).size() > 0 || enemies(Zergling).size() > 0)
+											{
+												if(nearestUnit((*unitit)->getPosition(), enemies)->getPosition().getDistance((*unitit)->getPosition()) < dist(3))
+												{
+													(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemies));
+												}
+												else
+												{
+													// hold lurker
+													std::set<BWAPI::Unit*> holdset;
+													holdset.insert(*unitit);
+													UnitGroup olords = allSelfUnits(Overlord)(isIdle);
+													if(olords.size() > 0)
+													{
+														holdset.insert(*olords.begin());
+														UnitGroup holdgroup = UnitGroup::getUnitGroup(holdset);
+														holdgroup.holdPosition();
+													}
+												}
+											}
+											else
+											{
+												(*unitit)->attackUnit(*enemies.begin());
+											}
+										}
+										else
+										{
+											UnitGroup structures = allSelfUnits(isBuilding);
+											BWAPI::Unit* neareststructure = nearestUnit((*unitit)->getPosition(), structures);
+											if((*it)->getCenter().getDistance(neareststructure->getPosition()) < dist(10))
+											{
+												(*unitit)->attackUnit(*enemies.begin());
+											}
+										}
 									}
 									else
 									{
-										if (!(*unitit)->isMoving())
+										(*unitit)->stop(); // mogelijk moet dit anders als de micro zo vaak hier langs komt dat hij gewoon niet eens aanvalt
+									}
+								}
+								else
+								{
+									if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6))
+									{
+										(*unitit)->unburrow();
+									}
+									else
+									{
+										// hold lurker
+										std::set<BWAPI::Unit*> holdset;
+										holdset.insert(*unitit);
+										UnitGroup olords = allSelfUnits(Overlord)(isIdle);
+										if(olords.size() > 0)
 										{
-											logx((*unitit), " splitUp\n");
-											(*unitit)->move(splitUp(*unitit));
+											holdset.insert(*olords.begin());
+											UnitGroup holdgroup = UnitGroup::getUnitGroup(holdset);
+											holdgroup.holdPosition();
+										}
+									}
+								}
+							}
+						}
+					}
+					/* EINDE LURKER */
+
+					/* DEFILER */
+					else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Defiler)
+					{
+						if((*unitit)->isUnderStorm())
+						{
+							moveToNearestBase(*unitit);
+						}
+						else
+						{
+							if(allSelfUnits.inRadius(dist(10), (*unitit)->getPosition()).not(Defiler).size() > 3)
+							{
+								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(9), 0);
+								bool atleastoneunderswarm = false;
+								for(std::set<BWAPI::Unit*>::iterator swarmit=enemies.begin(); swarmit!=enemies.end(); swarmit++)
+								{
+									if(isUnderDarkSwarm(*swarmit))
+									{
+										atleastoneunderswarm = true;
+									}
+								}
+								if(!atleastoneunderswarm)
+								{
+									int energy = (*unitit)->getEnergy();
+									int energynodig = BWAPI::TechTypes::Dark_Swarm.energyUsed();
+									if(energy < energynodig)
+									{
+										UnitGroup zerglings = allSelfUnits(Zergling);
+										if(zerglings.size() > 0)
+										{
+											BWAPI::Unit* slachtoffer = nearestUnitInGroup((*unitit), zerglings);
+											(*unitit)->useTech(BWAPI::TechTypes::Consume, slachtoffer);
+										}
+										else
+										{
+											(*unitit)->move(nearestSwarm(*unitit)->getPosition());
+										}
+									}
+									else
+									{
+										BWAPI::Unit* nenuds = nearestEnemyNotUnderDarkSwarm(*unitit);
+										BWAPI::Unit* swarm = nearestSwarm(nenuds);
+										if(nenuds != NULL && swarm != NULL)
+										{
+											if(nenuds->getPosition().getDistance(swarm->getPosition()) > dist(5))
+											{
+												int x = abs(nenuds->getPosition().x() - swarm->getPosition().x());
+												int y = abs(nenuds->getPosition().y() - swarm->getPosition().y());
+												BWAPI::Position pos = BWAPI::Position(x, y);
+												(*unitit)->useTech(BWAPI::TechTypes::Dark_Swarm, pos);
+											}
+											else
+											{
+												(*unitit)->useTech(BWAPI::TechTypes::Dark_Swarm, nenuds);
+											}
 										}
 									}
 								}
 								else
 								{
-									UnitGroup buildings = allSelfUnits(isBuilding).inRadius(dist(15), (*unitit)->getPosition());
+									// niks
+								}
+							}
+							else
+							{
+								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(9), 0);
+								if(enemies.size() > 0)
+								{
+									UnitGroup buildings = allSelfUnits(isBuilding).inRadius(dist(5), (*unitit)->getPosition());
 									if(buildings.size() > 0)
 									{
-										if (!(*unitit)->isMoving())
-										{
-											logx((*unitit), " building random\n");
-											// als dit elk frame gebeurt, krijgt hij elk frame een nieuwe positie -> stuiterbal
-											int x = (*unitit)->getPosition().x();
-											int y = (*unitit)->getPosition().y();
-											int factor = dist(10);
-											int newx = x + (((rand() % 30)-15)*factor);
-											int newy = y + (((rand() % 30)-15)*factor);
-											(*unitit)->move(BWAPI::Position(newx, newy));
-										}
+										(*unitit)->useTech(BWAPI::TechTypes::Dark_Swarm, (*unitit));
 									}
 									else
 									{
-										
-										logx((*unitit), " eigen building\n");
-										BWAPI::Unit* nearestbuilding = nearestUnit((*unitit)->getPosition(), allSelfUnits(isBuilding));
-										(*unitit)->move(nearestbuilding->getPosition());
-									}
-								}
-							}
-						}
-					}
-				}
-				/* EINDE OVERLORD */
-
-				/* DRONE */
-				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Drone)
-				{
-					/*logx("\n\ndoMicro drone ", (*unitit), "\n");
-					if(this->wbm->bouwdrones.count(*unitit) > 0)
-					{
-						logx((*unitit), " drone is aan het bouwen, skip\n");
-						continue;
-					}*/
-					if((*unitit)->isUnderStorm())
-					{
-						logx((*unitit), " under storm moveAway\n");
-						moveToNearestBase(*unitit);
-					}
-					else
-					{
-						if(currentTask.type != 1)
-						{
-							logx((*unitit), " task.type != 1\n");
-							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(5), 0)) || this->eiudm->lostHealthThisFrame(*unitit))
-							{
-								logx((*unitit), " ground enemies of geraakt\n");
-								UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(dist(7), (*unitit)->getPosition());
-								UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(dist(7), (*unitit)->getPosition());
-								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7), 0);
-								if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
-								{
-									logx((*unitit), " drone rage\n");
-									BWAPI::Unit* target = getVisibleUnit(enemies);
-									if(target != NULL)
-									{
-										(*unitit)->attackUnit(target);
-									}
-									else
-									{
-										(*unitit)->move(this->eudm->getEnemyUnitData(*enemies.begin()).lastKnownPosition);
+										moveToNearestBase(*unitit);
 									}
 								}
 								else
 								{
-									UnitGroup detectorsInRange = enemiesInRange((*unitit)->getPosition(), dist(10), 0)(isDetector);
-									if(BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Burrowing) && detectorsInRange.size() == 0)
-									{
-										logx((*unitit), " geen detectors, wel burrow\n");
-										(*unitit)->burrow();
-									}
-									else
-									{
-										UnitGroup militaryInRange = allSelfUnits.inRadius(dist(14), (*unitit)->getPosition()).not(isWorker)(canAttack);
-										if(militaryInRange.size() > 0)
-										{
-											logx((*unitit), " military \n");
-											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), militaryInRange)->getPosition());
-										}
-										else
-										{
-											logx((*unitit), " geen military moveAway\n");
-											(*unitit)->move(moveAway(*unitit));
-										}
-									}
-								}
-							}
-							else
-							{
-								logx((*unitit), " harvestcheck\n");
-								UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
-								gatherWhere(*unitit);
-								logx((*unitit), " harvestdone\n");							
-							}
-						}
-						else
-						{
-							logx((*unitit), " task.type = 1\n");
-							if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(7), 0)))
-							{
-								logx((*unitit), " enemies moveAway\n");
-								(*unitit)->move(moveAway(*unitit));
-							}
-							else
-							{
-								if((*unitit)->getPosition().getDistance(currentTask.position) < dist(7))
-								{
-									logx((*unitit), " moveToNearestBase\n");
-									moveToNearestBase(*unitit);
-								}
-								else
-								{
-									logx((*unitit), " naar task\n");
 									(*unitit)->move(currentTask.position);
 								}
 							}
 						}
 					}
-					if((*unitit)->isIdle()==true || (*unitit)->getOrder() == BWAPI::Orders::None || (*unitit)->getOrder() == BWAPI::Orders::Nothing)
-					{
-						logx((*unitit), " harvestcheckidle\n");
-						UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
-						gatherWhere(*unitit);
-						logx((*unitit), " harvestdonewasidle\n");	
-					}
-				}
-				/* EINDE DRONE */
+					/* EINDE DEFILER */
 
-				/* HYDRALISK */
-				else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Hydralisk)
-				{
-					if((*unitit)->isUnderStorm())
+					/* OVERLORD */
+					else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 					{
-						(*unitit)->move(moveAway(*unitit, dist(10)));
-					}
-					else
-					{
-						UnitGroup allEnemies = allEnemyUnits;
-						UnitGroup allMelee = allEnemies(Drone) + allEnemies(Zealot) + allEnemies(Zergling) + allEnemies(SCV) + allEnemies(Probe) + allEnemies(Ultralisk);
-						allMelee = allMelee.inRadius(dist(6), (*unitit)->getPosition());
-						BWAPI::Unit* swarm = nearestSwarm(*unitit);
-						if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(10) && allMelee.size() == 0)
+						logx((*unitit), "\n"); 
+						if((*unitit)->isUnderStorm())
 						{
-							BWAPI::Unit* swarm = nearestSwarm(*unitit);
-							if(!isUnderDarkSwarm(*unitit) && swarm != NULL)
-							{
-								(*unitit)->attackMove(swarm->getPosition());
-							}
-							else
-							{
-								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(10), 0);
-								BWAPI::Unit* target = NULL;
-								for(std::set<BWAPI::Unit*>::iterator enit=enemies.begin(); enit!=enemies.end(); enit++)
-								{
-									if(!isUnderDarkSwarm(*enit))
-									{
-										target = *enit;
-										break;
-									}
-								}
-								if(target != NULL)
-								{
-									(*unitit)->attackUnit(target);
-								}
-							}
+							logx((*unitit), " under storm moveAway\n");
+							(*unitit)->move(moveAway(*unitit));
 						}
 						else
-						{
-							if(allSelfUnits(Hydralisk).inRadius(dist(8), (*unitit)->getPosition()).size() > 0)
+						{						
+							logx((*unitit), std::string(" task.type=").append(intToString(currentTask.type)).append("\n").c_str());
+							if(currentTask.type == 1 || currentTask.type == 4)
 							{
-								int allies = allSelfUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
-								int enemies = allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
-								if(enemies * 1.5 > allies)
+								logx((*unitit), " type=1||4\n");
+								BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
+								// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
+								if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9), 0)))
 								{
-									if((*unitit)->getGroundWeaponCooldown() != 0)
+									logx((*unitit), " air enemy dichtbij\n");
+									if(overlordSupplyProvidedSoon() && currentTask.type == 1)
 									{
-										(*unitit)->move(moveAway(*unitit));
+									
+										logx((*unitit), " overlordSupplySoon\n");
+										UnitGroup buildings = allEnemyUnits(isBuilding).inRadius(dist(8), currentTask.position);
+										if(buildings.size() == 0)
+										{
+											logx((*unitit), " geen buildings\n");
+											(*unitit)->move(moveAway(*unitit));
+										}
+										else
+										{
+										
+											logx((*unitit), " wel buildings\n");
+											if((*unitit)->getPosition().getDistance(currentTask.position) < dist(2))
+											{
+											
+												logx((*unitit), " moveAway\n");
+												(*unitit)->move(moveAway(*unitit));
+											}
+											else
+											{
+											
+												logx((*unitit), " move naar task\n");
+												(*unitit)->move(currentTask.position);
+											}
+										}
 									}
 									else
 									{
-										(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition())));
+										logx((*unitit), " moveAway\n");
+										(*unitit)->move(moveAway(*unitit));
 									}
 								}
 								else
 								{
-									if((*unitit)->getPosition().getDistance(currentTask.position) > dist(8))
+									UnitGroup stealths = allEnemyUnits(isCloaked);
+									BWAPI::Unit* neareststealth = nearestUnit((*unitit)->getPosition(), stealths);
+									if(neareststealth != NULL)
 									{
-										if(enemiesInRange((*unitit)->getPosition(), dist(9), 0).size() > 0)
+										
+										logx((*unitit), " stealth gezien\n");
+										(*unitit)->rightClick(neareststealth->getPosition());
+									}
+									else
+									{
+										UnitGroup dropships = allEnemyUnits(Dropship) + allEnemyUnits(Shuttle);
+										dropships = dropships.inRadius(dist(10), (*unitit)->getPosition());
+										if(dropships.size() > 0)
 										{
-											BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()));
-											if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
+											
+											logx((*unitit), " dropship gezien\n");
+											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
+										}
+										else
+										{
+											
+											logx((*unitit), " geen dropship, move naar task\n");
+											(*unitit)->move(currentTask.position);
+										}
+									}
+								}
+							}
+							else
+							{
+								/*logx((*unitit), " hydratask deel\n");
+								std::list<Task> hydratasks = this->tm->findTasksWithUnitType(BWAPI::UnitTypes::Zerg_Hydralisk);
+								Task* hydratask = NULL;
+								for(std::list<Task>::iterator taskit=hydratasks.begin(); taskit!=hydratasks.end(); taskit++)
+								{
+									if((*taskit).type == 2 || (*taskit).type == 3 && allSelfUnits(Overlord).inRadius(dist(10), (*(*taskit).unitGroup->begin())->getPosition()).size() == 0)
+									{
+										Task loltask = *taskit;
+										hydratask = &loltask;
+										break;
+									}
+								}
+								if(hydratask != NULL)
+								{
+								
+									logx((*unitit), " hydratask\n");
+									BWAPI::Unit* volghydra = *(hydratask->unitGroup->begin());
+									(*unitit)->rightClick(volghydra->getPosition());
+								}
+								else*/
+								{
+									UnitGroup overlordsnearby = allSelfUnits(Overlord).inRadius(dist(10), (*unitit)->getPosition());
+									if(overlordsnearby.size() > 1)
+									{
+									
+										logx((*unitit), " andere overlord\n");
+										if(canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(8), 0)))
+										{
+										
+											logx((*unitit), " canAttackAir moveAway\n");
+											(*unitit)->move(moveAway(*unitit));
+										}
+										else
+										{
+											if (!(*unitit)->isMoving())
 											{
-												if(allSelfUnits(Hydralisk).inRadius(dist(9), nearesttarget->getPosition()).size() > 0)
+												logx((*unitit), " splitUp\n");
+												(*unitit)->move(splitUp(*unitit));
+											}
+										}
+									}
+									else
+									{
+										UnitGroup buildings = allSelfUnits(isBuilding).inRadius(dist(15), (*unitit)->getPosition());
+										if(buildings.size() > 0)
+										{
+											if (!(*unitit)->isMoving())
+											{
+												logx((*unitit), " building random\n");
+												// als dit elk frame gebeurt, krijgt hij elk frame een nieuwe positie -> stuiterbal
+												int x = (*unitit)->getPosition().x();
+												int y = (*unitit)->getPosition().y();
+												int factor = dist(10);
+												int newx = x + (((rand() % 30)-15)*factor);
+												int newy = y + (((rand() % 30)-15)*factor);
+												(*unitit)->move(BWAPI::Position(newx, newy));
+											}
+										}
+										else
+										{
+										
+											logx((*unitit), " eigen building\n");
+											BWAPI::Unit* nearestbuilding = nearestUnit((*unitit)->getPosition(), allSelfUnits(isBuilding));
+											(*unitit)->move(nearestbuilding->getPosition());
+										}
+									}
+								}
+							}
+						}
+					}
+					/* EINDE OVERLORD */
+
+					/* DRONE */
+					else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Drone)
+					{
+						/*logx("\n\ndoMicro drone ", (*unitit), "\n");
+						if(this->wbm->bouwdrones.count(*unitit) > 0)
+						{
+							logx((*unitit), " drone is aan het bouwen, skip\n");
+							continue;
+						}*/
+						if((*unitit)->isUnderStorm())
+						{
+							logx((*unitit), " under storm moveAway\n");
+							moveToNearestBase(*unitit);
+						}
+						else
+						{
+							if(currentTask.type != 1)
+							{
+								logx((*unitit), " task.type != 1\n");
+								if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(5), 0)) || this->eiudm->lostHealthThisFrame(*unitit))
+								{
+									logx((*unitit), " ground enemies of geraakt\n");
+									UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(dist(7), (*unitit)->getPosition());
+									UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(dist(7), (*unitit)->getPosition());
+									UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7), 0);
+									if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
+									{
+										logx((*unitit), " drone rage\n");
+										BWAPI::Unit* target = getVisibleUnit(enemies);
+										if(target != NULL)
+										{
+											(*unitit)->attackUnit(target);
+										}
+										else
+										{
+											(*unitit)->move(this->eudm->getEnemyUnitData(*enemies.begin()).lastKnownPosition);
+										}
+									}
+									else
+									{
+										UnitGroup detectorsInRange = enemiesInRange((*unitit)->getPosition(), dist(10), 0)(isDetector);
+										if(BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Burrowing) && detectorsInRange.size() == 0)
+										{
+											logx((*unitit), " geen detectors, wel burrow\n");
+											(*unitit)->burrow();
+										}
+										else
+										{
+											UnitGroup militaryInRange = allSelfUnits.inRadius(dist(14), (*unitit)->getPosition()).not(isWorker)(canAttack);
+											if(militaryInRange.size() > 0)
+											{
+												logx((*unitit), " military \n");
+												(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), militaryInRange)->getPosition());
+											}
+											else
+											{
+												logx((*unitit), " geen military moveAway\n");
+												(*unitit)->move(moveAway(*unitit));
+											}
+										}
+									}
+								}
+								else
+								{
+									logx((*unitit), " harvestcheck\n");
+									UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
+									gatherWhere(*unitit);
+									logx((*unitit), " harvestdone\n");							
+								}
+							}
+							else
+							{
+								logx((*unitit), " task.type = 1\n");
+								if(canAttackGround(enemiesInRange((*unitit)->getPosition(), dist(7), 0)))
+								{
+									logx((*unitit), " enemies moveAway\n");
+									(*unitit)->move(moveAway(*unitit));
+								}
+								else
+								{
+									if((*unitit)->getPosition().getDistance(currentTask.position) < dist(7))
+									{
+										logx((*unitit), " moveToNearestBase\n");
+										moveToNearestBase(*unitit);
+									}
+									else
+									{
+										logx((*unitit), " naar task\n");
+										(*unitit)->move(currentTask.position);
+									}
+								}
+							}
+						}
+						if((*unitit)->isIdle()==true || (*unitit)->getOrder() == BWAPI::Orders::None || (*unitit)->getOrder() == BWAPI::Orders::Nothing)
+						{
+							logx((*unitit), " harvestcheckidle\n");
+							UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
+							gatherWhere(*unitit);
+							logx((*unitit), " harvestdonewasidle\n");	
+						}
+					}
+					/* EINDE DRONE */
+
+					/* HYDRALISK */
+					else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Hydralisk)
+					{
+						if((*unitit)->isUnderStorm())
+						{
+							(*unitit)->move(moveAway(*unitit, dist(10)));
+						}
+						else
+						{
+							UnitGroup allEnemies = allEnemyUnits;
+							UnitGroup allMelee = allEnemies(Drone) + allEnemies(Zealot) + allEnemies(Zergling) + allEnemies(SCV) + allEnemies(Probe) + allEnemies(Ultralisk);
+							allMelee = allMelee.inRadius(dist(6), (*unitit)->getPosition());
+							BWAPI::Unit* swarm = nearestSwarm(*unitit);
+							if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(10) && allMelee.size() == 0)
+							{
+								BWAPI::Unit* swarm = nearestSwarm(*unitit);
+								if(!isUnderDarkSwarm(*unitit) && swarm != NULL)
+								{
+									(*unitit)->attackMove(swarm->getPosition());
+								}
+								else
+								{
+									UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(10), 0);
+									BWAPI::Unit* target = NULL;
+									for(std::set<BWAPI::Unit*>::iterator enit=enemies.begin(); enit!=enemies.end(); enit++)
+									{
+										if(!isUnderDarkSwarm(*enit))
+										{
+											target = *enit;
+											break;
+										}
+									}
+									if(target != NULL)
+									{
+										(*unitit)->attackUnit(target);
+									}
+								}
+							}
+							else
+							{
+								if(allSelfUnits(Hydralisk).inRadius(dist(8), (*unitit)->getPosition()).size() > 0)
+								{
+									int allies = allSelfUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
+									int enemies = allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
+									if(enemies * 1.5 > allies)
+									{
+										if((*unitit)->getGroundWeaponCooldown() != 0)
+										{
+											(*unitit)->move(moveAway(*unitit));
+										}
+										else
+										{
+											(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition())));
+										}
+									}
+									else
+									{
+										if((*unitit)->getPosition().getDistance(currentTask.position) > dist(8))
+										{
+											if(enemiesInRange((*unitit)->getPosition(), dist(9), 0).size() > 0)
+											{
+												BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()));
+												if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
 												{
-													(*unitit)->move(moveAway(*unitit));
+													if(allSelfUnits(Hydralisk).inRadius(dist(9), nearesttarget->getPosition()).size() > 0)
+													{
+														(*unitit)->move(moveAway(*unitit));
+													}
+													else
+													{
+														if((*unitit)->getGroundWeaponCooldown() != 0)
+														{
+															(*unitit)->move(currentTask.position);
+														}
+														else
+														{
+															(*unitit)->attackUnit(nearesttarget);
+														}
+													}
 												}
 												else
 												{
@@ -1422,37 +1591,37 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 													}
 													else
 													{
-														(*unitit)->attackUnit(nearesttarget);
+														(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
 													}
 												}
 											}
 											else
 											{
-												if((*unitit)->getGroundWeaponCooldown() != 0)
-												{
-													(*unitit)->move(currentTask.position);
-												}
-												else
-												{
-													(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
-												}
+												(*unitit)->attackMove(currentTask.position);
 											}
 										}
 										else
 										{
-											(*unitit)->attackMove(currentTask.position);
-										}
-									}
-									else
-									{
-										if(enemiesInRange((*unitit)->getPosition(), dist(9), 0).size() > 0)
-										{
-											BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()));
-											if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
+											if(enemiesInRange((*unitit)->getPosition(), dist(9), 0).size() > 0)
 											{
-												if(allSelfUnits(Hydralisk).inRadius(dist(9), nearesttarget->getPosition()).size() > 0)
+												BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()));
+												if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
 												{
-													(*unitit)->move(moveAway(*unitit));
+													if(allSelfUnits(Hydralisk).inRadius(dist(9), nearesttarget->getPosition()).size() > 0)
+													{
+														(*unitit)->move(moveAway(*unitit));
+													}
+													else
+													{
+														if((*unitit)->getGroundWeaponCooldown() != 0)
+														{
+															(*unitit)->move(moveAway(*unitit));
+														}
+														else
+														{
+															(*unitit)->attackUnit(nearesttarget);
+														}
+													}
 												}
 												else
 												{
@@ -1462,45 +1631,34 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 													}
 													else
 													{
-														(*unitit)->attackUnit(nearesttarget);
+														(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
 													}
 												}
 											}
 											else
 											{
-												if((*unitit)->getGroundWeaponCooldown() != 0)
-												{
-													(*unitit)->move(moveAway(*unitit));
-												}
-												else
-												{
-													(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
-												}
+												(*unitit)->move(moveAway(*unitit));
 											}
-										}
-										else
-										{
-											(*unitit)->move(moveAway(*unitit));
 										}
 									}
 								}
-							}
-							else
-							{
-								UnitGroup nearEnemies = enemiesInRange((*unitit)->getPosition(), dist(9), 0);
-								if(nearEnemies.size() > 0 && canAttackGround(nearEnemies))
-								{
-									(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), nearEnemies));
-								}
 								else
 								{
-									moveToNearestBase(*unitit);
+									UnitGroup nearEnemies = enemiesInRange((*unitit)->getPosition(), dist(9), 0);
+									if(nearEnemies.size() > 0 && canAttackGround(nearEnemies))
+									{
+										(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), nearEnemies));
+									}
+									else
+									{
+										moveToNearestBase(*unitit);
+									}
 								}
 							}
 						}
 					}
+					/* EINDE HYDRALISK */
 				}
-				/* EINDE HYDRALISK */
 			}
 		}
 	}
