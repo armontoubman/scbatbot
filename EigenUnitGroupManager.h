@@ -23,6 +23,8 @@ public:
 	void moveAll(UnitGroup* ug1, UnitGroup* ug2);
 	void moveUnitBetweenGroups(UnitGroup* ug1, BWAPI::Unit* unit, UnitGroup* ug2);
 	UnitGroup* findUnitGroupWithUnit(BWAPI::Unit* unit);
+	UnitGroup* findOtherUG(BWAPI::Unit* unit);
+	void dropInEenUG(BWAPI::Unit* unit);
 
 	void assignUnit(BWAPI::Unit* unit);
 	void assignUnits(std::set<BWAPI::Unit*> units);
@@ -49,10 +51,5 @@ public:
 	TaskManager* tm;
 	PlanAssigner* pa;
 
-	UnitGroup* defendlingUG;
-	UnitGroup* overlordUG;
 	UnitGroup* droneUG;
-	UnitGroup* defendmutaUG;
-	UnitGroup* defendgroepUG;
-	UnitGroup* lurkergroepUG;
 };
