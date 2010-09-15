@@ -83,7 +83,7 @@ void EigenUnitDataManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void EigenUnitDataManager::eventHitPointsChanged(BWAPI::Unit* unit, int difference)
 {
-	BWAPI::Broodwar->printf("eventHitPointsChanged");
+	//BWAPI::Broodwar->printf("eventHitPointsChanged");
 	log("eventHitPointsChanged: ");
 	log(unit->getType().getName().c_str());
 	log("\n");
@@ -93,7 +93,7 @@ void EigenUnitDataManager::eventHitPointsChanged(BWAPI::Unit* unit, int differen
 
 void EigenUnitDataManager::eventUnitSeen(BWAPI::Unit* unit)
 {
-	BWAPI::Broodwar->printf("eventSeen");
+	//BWAPI::Broodwar->printf("eventSeen");
 	log("eventSeen: ");
 	log(unit->getType().getName().c_str());
 	log("\n");

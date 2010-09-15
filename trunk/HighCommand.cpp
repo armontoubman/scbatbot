@@ -72,8 +72,9 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	{
 		BWAPI::Broodwar->leaveGame();
 	}
-	
-	if(this->hatchery->getHitPoints() < 100) this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
+	else {
+		if(this->hatchery->getHitPoints() < 100) this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
+	}
 	
 	log("HC::update eigenUnitDataManager\n");
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
@@ -106,13 +107,6 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	{
 		log("HC::update doLists\n");
 		this->wantBuildManager->doLists();
-	}
-
-	if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone).size() > 0)
-	{
-		BWAPI::Position pos1 = this->hatchery->getPosition();
-		BWAPI::Position pos2 = this->wantBuildManager->nearestUnit(pos1, UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone))->getPosition();
-		BWAPI::Broodwar->drawLineMap(pos1.x(), pos1.y(), pos2.x(), pos2.y(), BWAPI::Colors::Orange);
 	}
 
 	this->tick++;
