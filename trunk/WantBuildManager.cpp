@@ -320,6 +320,8 @@ void WantBuildManager::update()
 {
 	logc("WantBuildManager::update()\n");
 	logBuildList(this->buildList);
+	logc("stap: ");
+	logc(intToString(this->stap).append("\n").c_str());
 	// Actual building of items
 	if(buildList.size() > 0)
 	{
