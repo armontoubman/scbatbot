@@ -2065,35 +2065,42 @@ bool WantBuildManager::isBeingHandled(BuildItem b)
 
 void WantBuildManager::logBuildList(BuildList bl)
 {
-	logc("BUILDLIST: ");
+	logc(bouwlistString(bl).c_str());
+}
+
+std::string WantBuildManager::bouwlistString(BuildList bl)
+{
+	std::string result = "";
+	result.append("BUILDLIST: ");
 	for each(BuildItem bi in bl.buildlist)
 	{
-		logc("[");
-		logc(intToString(bi.typenr).append(" ").c_str());
+		result.append("[");
+		result.append(intToString(bi.typenr).append(" ").c_str());
 		if(bi.typenr == 1)
 		{
-			logc(bi.buildtype.getName().c_str());
+			result.append(bi.buildtype.getName().c_str());
 		}
 		if(bi.typenr == 2)
 		{
-			logc(bi.researchtype.getName().c_str());
+			result.append(bi.researchtype.getName().c_str());
 		}
 		if(bi.typenr == 3)
 		{
-			logc(bi.upgradetype.getName().c_str());
+			result.append(bi.upgradetype.getName().c_str());
 		}
 		if(bi.typenr == 4)
 		{
-			logc("expand");
+			result.append("expand");
 		}
-		logc("]");
+		result.append("]");
 	}
-	logc("\n");
+	result.append("\n");
+	return result;
 }
 
 void WantBuildManager::logc(const char* msg)
 {
-	if(false)
+	if(true)
 	{
 		log(msg);
 	}

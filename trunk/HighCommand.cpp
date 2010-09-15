@@ -212,3 +212,8 @@ BWAPI::Unit* HighCommand::getNearestHatchery(BWAPI::Position pos)
 
 	return bestHatchery;
 }
+
+void HighCommand::chatBuildList()
+{
+	BWAPI::Broodwar->printf(this->wantBuildManager->bouwlistString(this->wantBuildManager->buildList).c_str());
+}
