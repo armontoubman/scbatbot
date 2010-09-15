@@ -376,23 +376,28 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 		logc("(result = extractors) aantal extractors: ");
 		logc(this->hc->wantBuildManager->intToString(result.size()).c_str());
 		logc("\n");
-		for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
+		if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone).size()>5)
 		{
-			if(((UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()+UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *it).size()) > 2))
+			for(std::set<BWAPI::Unit*>::iterator it=extractors.begin(); it!=extractors.end(); it++)
 			{
-				logc("erase extractor\n");
-				result.erase(*it); // ug met een unit ehh
+				if(((UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), (*it)->getPosition()).size()+UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(GetTarget, *it).size()) > 2))
+				{
+					logc("erase extractor\n");
+					result.erase(*it); // ug met een unit ehh
+				}
+			}
+
+			if (!result.empty())
+			{
+				logc("!result.empty() gaat gas\n");
+				logc("!result.empty() aantal extractors: ");
+				logc(this->hc->wantBuildManager->intToString(result.size()).c_str());
+				logc("\n");
+				unit->gather(nearestUnitInGroup(unit, result)); // ga eerst naar extractor
+				return;
 			}
 		}
 
-		if (!result.empty())
-		{
-			logc("!result.empty() gaat gas\n");
-			logc("!result.empty() aantal extractors: ");
-			logc(this->hc->wantBuildManager->intToString(result.size()).c_str());
-			logc("\n");
-			unit->gather(nearestUnitInGroup(unit, result)); // ga eerst naar extractor
-		}
 		else
 		{
 			if (!unit->isGatheringMinerals())
@@ -402,7 +407,7 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 				{
 					if (unit->isCarryingMinerals() || unit->isCarryingGas())
 					{
-						unit->returnCargo();
+						//unit->returnCargo();
 					}
 					else
 					{
@@ -412,6 +417,7 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 				else
 				{
 					unit->gather(nearestUnitInGroup(unit, result));
+					return;
 				}
 			}
 		}
@@ -726,7 +732,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										{
 											if (tooSplitUp(dist(20), *it))
 											{
-												(*unitit)->attackMove(this->hc->eigenUnitGroupManager->findUnitGroupWithUnit((*unitit))->getCenter());
+												(*unitit)->attackMove(nearestUnit((*it)->getCenter()->getPosition(), (*it))->getPosition());
 											}
 											else
 											{
