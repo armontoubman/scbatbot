@@ -27,6 +27,7 @@ public:
 
 	BWAPI::Unit* hatchery;
 	void chatBuildList();
+	void chatWantList();
 //private:
 	std::string intToString(int i);
 	EigenUnitDataManager* eigenUnitDataManager;

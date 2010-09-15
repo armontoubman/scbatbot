@@ -319,6 +319,7 @@ int WantBuildManager::nrOfEnemyBases()
 void WantBuildManager::update()
 {
 	logc("WantBuildManager::update()\n");
+	logBuildList(this->wantList);
 	logBuildList(this->buildList);
 	logc("stap: ");
 	logc(intToString(this->stap).append("\n").c_str());
@@ -2079,7 +2080,14 @@ void WantBuildManager::logBuildList(BuildList bl)
 std::string WantBuildManager::bouwlistString(BuildList bl)
 {
 	std::string result = "";
-	result.append("BUILDLIST: ");
+	if(&bl == &this->buildList)
+	{
+		result.append("BUILDLIST: ");
+	}
+	if(&bl == &this->wantList)
+	{
+		result.append("WANTLIST: ");
+	}
 	for each(BuildItem bi in bl.buildlist)
 	{
 		result.append("[");
