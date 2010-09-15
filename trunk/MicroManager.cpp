@@ -1265,7 +1265,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						else
 						{						
 							logx((*unitit), std::string(" task.type=").append(intToString(currentTask.type)).append("\n").c_str());
-							if(currentTask.type == 1 || currentTask.type == 4)
+							if(currentTask.type == 1 || currentTask.type == 4 || currentTask.type == 2)
 							{
 								logx((*unitit), " type=1||4\n");
 								BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
