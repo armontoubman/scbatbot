@@ -31,6 +31,7 @@ public:
 	Task mostAppropriate(UnitGroup* current, int tasktype, std::map<UnitGroup*, Task> currentPlan, bool nullwaarde);
 	bool containsTask(std::map<UnitGroup*, Task> plan, Task t);
 	double logicaldistance(UnitGroup* ug, BWAPI::Position pos);
+	bool canReach(UnitGroup* ug, BWAPI::Position pos);
 	
 	std::map<UnitGroup*, Task> plan;
 	void update();

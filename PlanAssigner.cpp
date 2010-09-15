@@ -36,7 +36,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 		if(ug->size()<3)
 		{
 			logc("PA if\n");
-			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Drone)) // nieuwe functie
+			if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Zergling) || this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Drone))
 			{
 				logc("PA if if\n");
 				currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 1, currentPlan)));
@@ -47,7 +47,7 @@ std::map<UnitGroup*, Task> PlanAssigner::maakPlan()
 				if(this->eiugm->groupContainsType(ug, BWAPI::UnitTypes::Zerg_Overlord))
 				{
 					logc("PA if else if\n");
-					if(this->tm->existsTaskWithType(4)) // nieuwe functie
+					if(this->tm->existsTaskWithType(4))
 					{
 						logc("PA if else if if\n");
 						currentPlan.insert(std::make_pair(ug, mostAppropriate(ug, 4, currentPlan)));
@@ -93,7 +93,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 	for each(Task otask in originalTasks)
 	{
 		logc("ma for each\n");
-		if(nullwaarde || !containsTask(currentPlan, otask)) // nieuwe functie
+		if(nullwaarde || !containsTask(currentPlan, otask))
 		{
 			logc("ma if nullwaarde\n");
 			if(tasktype == 0)
@@ -101,7 +101,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 				if(otask.type == 2 || otask.type == 3)
 				{
 					logc("ma if 0523\n");
-					if((!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current)) // nieuwe functie, en enemybegin mogelijk ongeldig KAN NULL ZIJN
+					if(canReach(current, otask.position))
 					{
 						logc("ma if !air && connected\n");
 						if(otask.enemySize == 0)
@@ -111,7 +111,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 						else
 						{
 							logc("ma enemy=null||size=0\n");
-							int wk = canAttack(current, otask); // crash
+							int wk = canAttack(current, otask);
 							int zk = canAttack(otask, current);
 
 							if(wk!=0)
@@ -186,20 +186,20 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 			{
 				if (tasktype == 4) // kan enkel overlord zijn
 				{
-					if (otask.type == 1 && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+					if (otask.type == 1 && canReach(current, otask.position))
 					{
 						appropriateTasks.push_front(otask);
 					}
 					else
 					{
-						if (otask.type == 4 && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+						if (otask.type == 4 && canReach(current, otask.position))
 						{
 							idealTasks.push_front(otask);
 							
 						}
 						else
 						{
-							if ((otask.type == 5 || otask.type == 2 || otask.type == 3) && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+							if ((otask.type == 5 || otask.type == 2 || otask.type == 3) && canReach(current, otask.position))
 							{
 								lessAppropriateTasks.push_front(otask);
 							}
@@ -209,7 +209,7 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 				}
 				else // type task == 2 -> scout dus) // of al het andere
 				{
-					if (otask.type == 1 && (!this->eiugm->onlyAirUnits(*current) && BWTA::isConnected((*current->begin())->getTilePosition(), BWAPI::TilePosition(otask.position))) || this->eiugm->onlyAirUnits(*current))
+					if (otask.type == 1 && canReach(current, otask.position))
 					{
 						idealTasks.push_front(otask);
 					}
@@ -354,6 +354,19 @@ int PlanAssigner::canAttack(Task t, UnitGroup* ug)
 		}
 	}
 	return 0;
+}
+
+bool PlanAssigner::canReach(UnitGroup* ug, BWAPI::Position pos)
+{
+	if(!this->eiugm->onlyAirUnits(*ug) && BWTA::isConnected((*ug->begin())->getTilePosition(), BWAPI::TilePosition(pos)))
+	{
+		return true;
+	}
+	if(this->eiugm->onlyAirUnits(*ug))
+	{
+		return true;
+	}
+	return false;
 }
 
 void PlanAssigner::logc(const char* msg)
