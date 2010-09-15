@@ -423,7 +423,7 @@ void EigenUnitGroupManager::logug(UnitGroup* group, char* msg)
 
 void EigenUnitGroupManager::logc(const char* msg)
 {
-	if(BWAPI::Broodwar->getFrameCount() > 3000 && false)
+	if(true)
 	{
 		log(msg);
 	}

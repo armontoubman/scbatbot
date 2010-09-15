@@ -143,14 +143,11 @@ void TaskManager::update()
 					}
 					else
 					{
-						log("tm1\n");
 						UnitGroup eigenInRange = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding).inRadius(dist(10), enemy.second.position);
-						log("tm2\n");
 						if(eigenInRange.size() > 0)
 						{
 							UnitGroup enemyUG2;
 							std::map<BWAPI::Unit*, EnemyUnitData> enemyInRange = this->eudm->getEnemyUnitsInRadius(dist(10), enemy.second.position);
-							log("tm3\n");
 							std::set<BWAPI::Position> posset;
 							for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemypair in enemyInRange)
 							{
@@ -208,9 +205,7 @@ void TaskManager::update()
 									BWAPI::Unit* nearestbuilding = nearestUnit(enemy.second.lastKnownPosition, eigenbuildings);
 									insertTask(createTask(5, nearestbuilding->getPosition(), this->eudm->getMapFromUG(&enemyUG3)));
 								}
-								insertTask(createTask(2, enemy.second.position, this->eudm->getMapFromUG(&enemyUG3))); // huge
-								log(std::string("***** enemyInRange ").append(this->hc->wantBuildManager->intToString(enemyInRange.size())).append(" ").c_str());
-								log(std::string("enemyUG3 ").append(this->hc->wantBuildManager->intToString(enemyUG3.size())).append("\n").c_str());
+								insertTask(createTask(2, enemy.second.position, this->eudm->getMapFromUG(&enemyUG3)));
 							}
 						}
 					}
