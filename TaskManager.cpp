@@ -251,7 +251,7 @@ void TaskManager::update()
 	*/
 
 	// scout tasks op alle baselocations
-	if(this->eudm->getData().size() < 15)
+	if(this->eudm->getData().size() < 60)
 	{
 		std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
 		for each(BWTA::BaseLocation* baseloc in baselocs)
