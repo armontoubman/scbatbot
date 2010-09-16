@@ -125,9 +125,9 @@ void BasicAIModule::onFrame()
           color = inactiveColor;
         }
       }
-    }*/
+    }
+  }*/
 	///////////////////
-  }
 
   /*UnitGroup myPylonsAndGateways = SelectAll()(Pylon,Gateway)(HitPoints,"<=",200);
   for each(Unit* u in myPylonsAndGateways)
