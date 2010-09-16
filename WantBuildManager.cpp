@@ -16,7 +16,7 @@ WantBuildManager::WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b
 {
 	this->eudm = e;
 	this->bom = b;
-	this->bm = ba;S
+	this->bm = ba;
 	this->hc = h;
 	this->mm = m;
 
@@ -2337,6 +2337,9 @@ void WantBuildManager::logc(const char* msg)
 
 void WantBuildManager::eigenResearch(BWAPI::TechType techtype)
 {
+	log("eigenResearch ");
+	log(techtype.getName().c_str());
+	log("\n");
 	BWAPI::UnitType soortunit = techtype.whatResearches();
 	UnitGroup dezesoort = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, soortunit);
 	if(dezesoort.size() == 0)
@@ -2366,6 +2369,9 @@ void WantBuildManager::eigenResearch(BWAPI::TechType techtype)
 
 void WantBuildManager::eigenUpgrade(BWAPI::UpgradeType upgradetype)
 {
+	log("eigenResearch ");
+	log(upgradetype.getName().c_str());
+	log("\n");
 	BWAPI::UnitType soortunit = upgradetype.whatUpgrades();
 	UnitGroup dezesoort = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, soortunit);
 	if(dezesoort.size() == 0)
