@@ -725,7 +725,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										}
 										else
 										{
-											if (tooSplitUp(dist(20), *it))
+											if (tooSplitUp(dist(10), *it))
 											{
 												(*unitit)->attackMove(nearestUnit((*it)->getCenter(), (**it))->getPosition());
 											}
