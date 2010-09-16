@@ -587,6 +587,7 @@ void WantBuildManager::update()
 				}
 			}
 		}
+		logc("buildlist bf 4\n");
 		if(b.typenr == 4)
 		{
 			if(requirementsSatisfied(BWAPI::UnitTypes::Zerg_Hatchery) && canBeMade(BWAPI::UnitTypes::Zerg_Hatchery))
@@ -599,6 +600,7 @@ void WantBuildManager::update()
 		// als eerste een gebouw is en 2e een unit = oke, 1=unit+2=gebouw, wordt wat lastiger moet je weer het 'buildstuff' doen, mogelijk aparte methode gewoon voor maken. Als je beide build hebt, dan wordt het maybe nog erger, moge we nog meer checks doen... zoals pak geen drone die al buildorder heeft. Maja zo vaak bouw je geen 2 dinge tegelijk als zerg.
 		if (buildList.size()>1)
 		{
+			logc("buildlist bs start\n");
 			BuildItem v = buildList.getSecond();
 			if (v.typenr == 1 && b.typenr == 1 && !v.buildtype.isBuilding() && b.buildtype.isBuilding())
 			{
@@ -640,6 +642,7 @@ void WantBuildManager::update()
 					}
 				}
 			}
+			logc("buildlist bs pre 1, lair\n");
 			if (v.typenr == 1 && (v.buildtype==BWAPI::UnitTypes::Zerg_Lair || v.buildtype == BWAPI::UnitTypes::Zerg_Hive) && (b.buildtype.isBuilding() || b.typenr == 4))
 			{
 				if (v.buildtype==BWAPI::UnitTypes::Zerg_Lair)
@@ -704,6 +707,7 @@ void WantBuildManager::update()
 					}
 				}
 			}
+			logc("buildlist bs pre 4, 1\n");
 			if (v.typenr == 1 && b.typenr == 4)
 				{
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
@@ -757,6 +761,7 @@ void WantBuildManager::update()
 					} 
 				}
 			}
+			logc("buildlist bs pre 4, 2\n");
 			if (v.typenr == 2 && b.typenr == 4)
 			{
 				if(!requirementsSatisfied(v.researchtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
@@ -829,6 +834,7 @@ void WantBuildManager::update()
 	{
 		logc("buildlist is leeg\n");
 	}
+	logc("buildlist update done\n");
 }
 
 void WantBuildManager::doLists()
@@ -1802,7 +1808,7 @@ void WantBuildManager::doLists()
 	logc("dl v extrac\n");
 	for(std::set<BWAPI::Unit*>::iterator hit=hatcheries.begin(); hit!=hatcheries.end(); hit++)
 	{
-		if(geysers.inRadius(dist(10.00), (*hit)->getPosition()).size() > 0 && extractors.inRadius(dist(10.00), (*hit)->getPosition()).size() == 0 && dronesRequiredAll()<3 && nrOfOwn(BWAPI::UnitTypes::Zerg_Extractor)+buildList.count(BWAPI::UnitTypes::Zerg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
+		if(geysers.inRadius(dist(10.00), (*hit)->getPosition()).size() > 0 && extractors.inRadius(dist(10.00), (*hit)->getPosition()).size() == 0 && dronesRequiredAll()<3 && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>9 && nrOfOwn(BWAPI::UnitTypes::Zerg_Extractor)+buildList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
 		{
 			logc("dl v addbuild extrac\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Extractor);
@@ -1841,7 +1847,7 @@ void WantBuildManager::doLists()
 		logc("dl v extrahatch req\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
 	}
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && !buildList.containsExpand() && nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<5 && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && BWAPI::Broodwar->self()->minerals() >= 500)
+	if(!buildList.containsExpand() && nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<5 && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && BWAPI::Broodwar->self()->minerals() >= 500 && BWAPI::Broodwar->self()->gas()<200 )
 	{
 		logc("dl v extrahatch req 2\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
@@ -2001,14 +2007,16 @@ bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::TechType t
 
 bool WantBuildManager::canBeMade(BWAPI::UpgradeType upgradetype)
 {
-	int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(upgradetype);
-	return (((upgradetype.mineralPriceBase()+(lvl*upgradetype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((upgradetype.gasPriceBase()+(lvl*upgradetype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+	//int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(upgradetype);
+	//return (((upgradetype.mineralPriceBase()+(lvl*upgradetype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((upgradetype.gasPriceBase()+(lvl*upgradetype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+	return ((upgradetype.mineralPriceBase() <= BWAPI::Broodwar->self()->minerals()) && upgradetype.gasPriceBase() <= BWAPI::Broodwar->self()->gas());
 }
 
 bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UpgradeType researchtype)
 {
-	int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(researchtype);
-	return (((unittype.mineralPrice()+researchtype.mineralPriceBase()+(lvl*researchtype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+researchtype.gasPriceBase()+(lvl*researchtype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+	//int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(researchtype);
+	//return (((unittype.mineralPrice()+researchtype.mineralPriceBase()+(lvl*researchtype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+researchtype.gasPriceBase()+(lvl*researchtype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+	return (((unittype.mineralPrice()+researchtype.mineralPriceBase())) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+researchtype.gasPriceBase())) <= BWAPI::Broodwar->self()->gas()));
 }
 
 bool WantBuildManager::bothCanBeMadeExpand(BWAPI::UnitType unittype)
@@ -2023,8 +2031,9 @@ bool WantBuildManager::bothCanBeMadeExpand(BWAPI::TechType techtype)
 
 bool WantBuildManager::bothCanBeMadeExpand(BWAPI::UpgradeType researchtype)
 {
-	int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(researchtype);
-	return (((300+researchtype.mineralPriceBase()+(lvl*researchtype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((researchtype.gasPriceBase()+(lvl*researchtype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+	//int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(researchtype);
+	//return (((300+researchtype.mineralPriceBase()+(lvl*researchtype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((researchtype.gasPriceBase()+(lvl*researchtype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
+	return ((300+researchtype.mineralPriceBase()) <= BWAPI::Broodwar->self()->minerals()) && ((researchtype.gasPriceBase()) <= BWAPI::Broodwar->self()->gas());
 }
 
 bool WantBuildManager::requirementsSatisfied(BWAPI::UnitType unittype)
