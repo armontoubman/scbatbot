@@ -122,6 +122,7 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	}
 	log("\n");*/
 
+	log("begin hc cirkeltjes\n");
 	///////////////////
 	//// print berichten op units
 	/////////////////
@@ -157,6 +158,9 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		BWAPI::Broodwar->drawTextMap(t.position.x(), t.position.y(), this->taskManager->getName(t.type).c_str());
 	}
 	/////////////
+	log("einde hc cirkeltjes\n");
+
+	log("einde hc update\n");
 }
 
 void HighCommand::onRemoveUnit(BWAPI::Unit* unit)
