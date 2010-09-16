@@ -4,7 +4,7 @@ using namespace BWAPI;
 
 void BasicAIModule::onStart()
 {
-  this->showManagerAssignments=true;
+  this->showManagerAssignments=false;
   if (Broodwar->isReplay()) return;
   // Enable some cheat flags
   Broodwar->enableFlag(Flag::UserInput);
@@ -105,7 +105,7 @@ void BasicAIModule::onFrame()
 
   ///////////////////
   std::set<Unit*> units=Broodwar->self()->getUnits();
-  if (this->showManagerAssignments)
+  /*if (this->showManagerAssignments)
   {
     for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
     {
@@ -125,7 +125,7 @@ void BasicAIModule::onFrame()
           color = inactiveColor;
         }
       }
-    }
+    }*/
 	///////////////////
   }
 
