@@ -10,7 +10,7 @@ BuildList::BuildList()
 
 void BuildList::addItem(BuildItem b)
 {
-	if (this->buildlist.size()<20)
+	if (this->buildlist.size()<30)
 	{
 	this->buildlist.push_back(b);
 	}
