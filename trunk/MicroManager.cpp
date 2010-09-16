@@ -1031,7 +1031,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							{
 								logx((*unitit), " type=1||4\n");
 								BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
-								logx(*unitit), "nearAir ok\n");
+								logx((*unitit), "nearAir ok\n");
 								// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
 								if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9), 0)))
 								{
