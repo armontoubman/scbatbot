@@ -76,25 +76,25 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		if(this->hatchery->getHitPoints() < 100) this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
 	}
 	
-	log("HC::update eigenUnitDataManager\n");
+	//log("HC::update eigenUnitDataManager\n");
 	this->eigenUnitDataManager->update(myUnits, enemyUnits);
-	log("HC::update enemyUnitDataManager\n");
+	//log("HC::update enemyUnitDataManager\n");
 	this->enemyUnitDataManager->update(enemyUnits);
-	log("HC::update eigenUnitGroupManager\n");
+	//log("HC::update eigenUnitGroupManager\n");
 	this->eigenUnitGroupManager->update();
 
 	if(this->tick == 5)
 	{
-		log("HC::update taskManager\n");
+		//log("HC::update taskManager\n");
 		this->taskManager->update();
-		log("tasklist: ");
+		//log("tasklist: ");
 		log(this->wantBuildManager->intToString(this->taskManager->tasklist.size()).append("\n").c_str());
-		log("HC::update planAssigner\n");
-		log("hcplan: ");
+		//log("HC::update planAssigner\n");
+		//log("hcplan: ");
 		log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
 		//this->planAssigner->update();
 		this->hcplan = this->planAssigner->maakPlan();
-		log("hcplan: ");
+		//log("hcplan: ");
 		log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
 	}
 
@@ -105,7 +105,7 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 
 	if(this->tick == 5)
 	{
-		log("HC::update doLists\n");
+		//log("HC::update doLists\n");
 		this->wantBuildManager->doLists();
 	}
 
@@ -122,7 +122,7 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	}
 	log("\n");*/
 
-	log("begin hc cirkeltjes\n");
+	//log("begin hc cirkeltjes\n");
 	///////////////////
 	//// print berichten op units
 	/////////////////
@@ -158,7 +158,7 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		BWAPI::Broodwar->drawTextMap(t.position.x(), t.position.y(), this->taskManager->getName(t.type).c_str());
 	}
 	/////////////
-	log("einde hc cirkeltjes\n");
+	//log("einde hc cirkeltjes\n");
 
 	log("einde hc update\n");
 }
