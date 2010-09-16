@@ -1947,10 +1947,13 @@ void WantBuildManager::doLists()
 						addBuild((*it).buildtype);
 					}
 				}
-				logc("dl generiek buildenunit\n");
-				logc((*it).buildtype.getName().append("\n").c_str());
-				addBuild((*it).buildtype);
-				logc("na de addbuild\n");
+				else
+				{
+					logc("dl generiek buildenunit\n");
+					logc((*it).buildtype.getName().append("\n").c_str());
+					addBuild((*it).buildtype);
+					logc("na de addbuild\n");
+				}
 			}
 			logc("na de if\n");
 		}
