@@ -10,5 +10,5 @@ public:
 	int hitPoints;
 	bool seenByEnemy;
 	int seenByEnemyTime;
-	BWAPI::Position* seenByEnemyPosition;
+	BWAPI::Position seenByEnemyPosition;
 };
