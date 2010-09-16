@@ -750,7 +750,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							else
 							{
 								logx((*unitit), "outnumbered!\n");
-								if ((allies.size())<enemies.size())
+								if ((allies.size())<amountCanAttackGround(enemies.not(isWorker)))
 								{
 									logx((*unitit), "moveaway!\n");
 									(*unitit)->move(moveAway(*unitit));
