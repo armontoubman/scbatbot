@@ -16,7 +16,7 @@ WantBuildManager::WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b
 {
 	this->eudm = e;
 	this->bom = b;
-	this->bm = ba;
+	this->bm = ba;S
 	this->hc = h;
 	this->mm = m;
 
@@ -564,7 +564,7 @@ void WantBuildManager::update()
 			{
 				if(canBeMade(b.researchtype) && !BWAPI::Broodwar->self()->hasResearched(b.researchtype))
 				{
-					this->bom->research(b.researchtype, 1);
+					this->eigenResearch(b.researchtype);
 					buildList.removeTop();
 					return;
 				} 
@@ -581,7 +581,7 @@ void WantBuildManager::update()
 			{
 				if(canBeMade(b.upgradetype) && (b.upgradetype.maxRepeats() > BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)))
 				{
-					this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)+1, b.upgradetype, 1);
+					this->eigenUpgrade(b.upgradetype);
 					buildList.removeTop();
 					return;
 				}
@@ -755,7 +755,7 @@ void WantBuildManager::update()
 					if(bothCanBeMade(b.buildtype, v.researchtype) && !BWAPI::Broodwar->self()->hasResearched(v.researchtype))
 					{
 						logc("research second\n");
-						this->bom->research(v.researchtype, 1);
+						this->eigenResearch(v.researchtype);
 						buildList.removeSecond();
 						return;
 					} 
@@ -774,7 +774,7 @@ void WantBuildManager::update()
 					if(bothCanBeMadeExpand(v.researchtype) && !BWAPI::Broodwar->self()->hasResearched(v.researchtype))
 					{
 						logc("research second 2\n");
-						this->bom->research(v.researchtype, 1);
+						this->eigenResearch(v.researchtype);
 						buildList.removeSecond();
 						return;
 					} 
@@ -792,7 +792,7 @@ void WantBuildManager::update()
 					if(bothCanBeMade(b.buildtype, v.upgradetype) && (v.upgradetype.maxRepeats() > BWAPI::Broodwar->self()->getUpgradeLevel(v.upgradetype)))
 					{
 						logc("upgrade second\n");
-						this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(v.upgradetype)+1, v.upgradetype, 1);
+						this->eigenUpgrade(v.upgradetype);
 						buildList.removeSecond();
 						return;
 					}
@@ -810,7 +810,7 @@ void WantBuildManager::update()
 					if(bothCanBeMadeExpand(v.upgradetype) && (v.upgradetype.maxRepeats() > BWAPI::Broodwar->self()->getUpgradeLevel(v.upgradetype)))
 					{
 						logc("upgrade second 2\n");
-						this->bom->upgrade(BWAPI::Broodwar->self()->getUpgradeLevel(v.upgradetype)+1, v.upgradetype, 1);
+						this->eigenUpgrade(v.upgradetype);
 						buildList.removeSecond();
 						return;
 					}
@@ -2332,5 +2332,63 @@ void WantBuildManager::logc(const char* msg)
 	if(true)
 	{
 		log(msg);
+	}
+}
+
+void WantBuildManager::eigenResearch(BWAPI::TechType techtype)
+{
+	BWAPI::UnitType soortunit = techtype.whatResearches();
+	UnitGroup dezesoort = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, soortunit);
+	if(dezesoort.size() == 0)
+	{
+		return;
+	}
+	bool wordtalgedaan = false;
+	for each(BWAPI::Unit* unit in dezesoort)
+	{
+		if(unit->isResearching() && unit->getTech() == techtype)
+		{
+			wordtalgedaan = true;
+		}
+	}
+	if(!wordtalgedaan)
+	{
+		for each(BWAPI::Unit* unit in dezesoort)
+		{
+			if(!unit->isResearching())
+			{
+				unit->research(techtype);
+				return;
+			}
+		}
+	}
+}
+
+void WantBuildManager::eigenUpgrade(BWAPI::UpgradeType upgradetype)
+{
+	BWAPI::UnitType soortunit = upgradetype.whatUpgrades();
+	UnitGroup dezesoort = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, soortunit);
+	if(dezesoort.size() == 0)
+	{
+		return;
+	}
+	bool wordtalgedaan = false;
+	for each(BWAPI::Unit* unit in dezesoort)
+	{
+		if(unit->isUpgrading() && unit->getUpgrade() == upgradetype)
+		{
+			wordtalgedaan = true;
+		}
+	}
+	if(!wordtalgedaan)
+	{
+		for each(BWAPI::Unit* unit in dezesoort)
+		{
+			if(!unit->isUpgrading())
+			{
+				unit->upgrade(upgradetype);
+				return;
+			}
+		}
 	}
 }

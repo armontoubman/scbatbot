@@ -100,4 +100,7 @@ public:
 
 	void logBuildList(BuildList bl);
 	std::string bouwlistString(BuildList bl);
+
+	void eigenResearch(BWAPI::TechType techtype);
+	void eigenUpgrade(BWAPI::UpgradeType upgradetype);
 };
