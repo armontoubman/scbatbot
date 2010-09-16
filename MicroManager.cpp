@@ -363,10 +363,10 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 	{
 		if (unit->isGatheringGas())
 		{
-			 if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(6), unit->getTarget()->getPosition()).size()>3)
-			 {
-					 unit->stop();
-			 }
+			if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(5), unit->getPosition()).size()>3)
+			{
+				unit->stop();
+			}
 		}
 	}
 	else
