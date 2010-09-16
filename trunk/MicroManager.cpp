@@ -688,38 +688,46 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					UnitGroup enemiesair = enemiesInRange((*unitit)->getPosition(), dist(7), 2);
 					if (MicroManager::amountCanAttackGround(enemiesair)>0 && MicroManager::amountCanAttackAir(allies)==0)
 					{
+						logx((*unitit), "moveaway van air enemies, geen support in de buurt\n");
 						(*unitit)->move(moveAway(*unitit));
 					}
 					else
 					{
 						if (currentTask.type == 1)
 						{
+							logx((*unitit), "scout task\n");
 							if (enemiesInRange((*unitit)->getPosition(), dist(4), 0).not(isBuilding).size()>0)
 							{
+								logx((*unitit), "moveaway van enemies\n");
 								(*unitit)->move(moveAway(*unitit));
 							}
 							else
 							{
+								logx((*unitit), "geen enemies\n");
 								if ((*unitit)->getDistance(currentTask.position) < dist(4))
 								{
+									logx((*unitit), "dichtbij task\n");
 									if (!(*unitit)->isMoving())
 									{
+										logx((*unitit), "staat stil, random lopen\n");
 										int x = (*unitit)->getPosition().x();
 										int y = (*unitit)->getPosition().y();
 										int factor = dist(10);
 										int newx = x + (((rand() % 30)-15)*factor);
 										int newy = y + (((rand() % 30)-15)*factor);
-										(*unitit)->move(BWAPI::Position(newx, newy));
+										(*unitit)->move(BWAPI::Position(newx, newy).makeValid());
 									}
 								}							
 								else
 								{
+									logx((*unitit), "move naar task\n");
 									(*unitit)->move(currentTask.position);
 								}
 							}
 						}
 						else
 						{
+							logx((*unitit), "geen scout task\n");
 							BWAPI::Unit* swarm = nearestSwarm((*unitit));
 							if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
 							{
@@ -741,31 +749,40 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
+								logx((*unitit), "outnumbered!\n");
 								if ((allies.size())<enemies.size())
 								{
+									logx((*unitit), "moveaway!\n");
 									(*unitit)->move(moveAway(*unitit));
 								}
 								else
 								{
+									logx((*unitit), "niet outnumbered\n");
 									if (enemiesInRange((*unitit)->getPosition(), dist(3), 1).size()>0)
 									{
+										logx((*unitit), "ground enemy in range 3, nothing AI enzo\n");
 										// nothing AI enzo
 									}
 									else
 									{
+										logx((*unitit), "geen enemy in range 3\n");
 										if (enemies.size()>0)
 										{
+											logx((*unitit), "wel in range 10, attackmove\n");
 											BWAPI::Unit* nearest = nearestUnit((*unitit)->getPosition(), enemies);
 											(*unitit)->attackMove(nearest->getPosition());
 										}
 										else
 										{
+											logx((*unitit), "geen enemies\n");
 											if (tooSplitUp(dist(7), *it))
 											{
+												logx((*unitit), "groep is tooSplitUp, move naar center unit\n");
 												(*unitit)->attackMove(nearestUnit((*it)->getCenter(), (**it))->getPosition());
 											}
 											else
 											{
+												logx((*unitit), "groep is bij elkaar, move naar task\n");
 												(*unitit)->attackMove(currentTask.position);
 											}
 										}
