@@ -185,21 +185,21 @@ UnitGroup* EigenUnitGroupManager::findOtherUG(BWAPI::Unit* unit)
 			ug = *it;
 			if (unit->getType() == BWAPI::UnitTypes::Zerg_Zergling || unit->getType() == BWAPI::UnitTypes::Zerg_Ultralisk || unit->getType() == BWAPI::UnitTypes::Zerg_Defiler)
 			{
-				if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Zergling).size()>0 && ug->size()<6)
+				if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Zergling).size()>0 && ug->size()<12)
 				{
 					logc("findotherUGgevonden1\n");
 					return ug;
 				}
 				else
 				{
-					if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Ultralisk).size()>0 && ug->size()<6)
+					if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Ultralisk).size()>0 && ug->size()<12)
 					{
 						logc("findotherUGgevonden2\n");
 						return ug;
 					}
 					else
 					{
-						if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Defiler).size()>0 && ug->size()<6)
+						if ((*ug)(GetType, BWAPI::UnitTypes::Zerg_Defiler).size()>0 && ug->size()<12)
 						{
 							logc("findotherUGgevonden3\n");
 							return ug;
@@ -209,7 +209,7 @@ UnitGroup* EigenUnitGroupManager::findOtherUG(BWAPI::Unit* unit)
 			}
 			else
 			{
-				if((*ug)(GetType, unit->getType()).size()>0 && ug->size()<6) {
+				if((*ug)(GetType, unit->getType()).size()>0 && ug->size()<12) {
 					logc("findotherUGgevonden4\n");
 					return ug;
 				}
@@ -328,7 +328,7 @@ void EigenUnitGroupManager::update()
 				}
 				else
 				{
-					if ((*lit)->size()>6) // te groot
+					if ((*lit)->size()>12) // te groot
 					{
 						logc("tegrootsplitup\n");
 						splitGroup(*lit);// splitup groep

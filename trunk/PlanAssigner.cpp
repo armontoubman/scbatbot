@@ -150,7 +150,14 @@ Task PlanAssigner::mostAppropriate(UnitGroup* current, int tasktype, std::map<Un
 				{
 					if (otask.type == 5)
 					{
-						appropriateTasks.push_front(otask);
+						if (otask.enemyMilitarySize > 4)
+						{
+							return otask; // lol gewoon als defend met groot leger dit gewoon gelijk returnen, es zien wat happens
+						}
+						else
+						{
+							appropriateTasks.push_front(otask);
+						}
 					}
 					else
 					{
