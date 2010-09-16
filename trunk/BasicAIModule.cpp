@@ -108,7 +108,7 @@ void BasicAIModule::onFrame()
   this->highCommand->update(Broodwar->self()->getUnits(), Broodwar->enemy()->getUnits());
 
   ///////////////////
-  std::set<Unit*> units=Broodwar->self()->getUnits();
+  //std::set<Unit*> units=Broodwar->self()->getUnits();
   /*if (this->showManagerAssignments)
   {
     for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
