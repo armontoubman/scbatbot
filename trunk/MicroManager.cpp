@@ -581,78 +581,87 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			}
 			else
 			{
-				if(eerste->getGroundWeaponCooldown() != 0)
+				if(eerste->getGroundWeaponCooldown() != 0 || eerste->getAirWeaponCooldown() != 0)
 				{
 					logx(eerste, " groundweap cd\n");
-					if(canAttackAir(enemiesInRange(eerste->getPosition(), dist(7), 0)))
+					if(canAttackAir(enemiesInRange(eerste->getPosition(), dist(8), 0)))
 					{
 						logx(eerste, " enemies, moveaway\n");
 						moveAway(**it);
 					}
 					else
 					{
-						if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(9))
+						if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(5))
 						{
 							logx(eerste, " vlakbij task, terug naar base\n");
 							moveToNearestBase(**it);
 						}
 						else
 						{
-							logx(eerste, " gogo naar task\n");
-							(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position);	 // move
+							if (tooSplitUp(dist(3), (*it)))
+							{
+								(*it)->attackMove(nearestUnit((*it)->getCenter(), (**it))->getPosition());
+							}
+							else
+							{
+								logx(eerste, " gogo naar task\n");
+								(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position);	 // move
+							}
 						}
 					}
 				}
 				else
 				{
 					logx(eerste, " groundweap klaar\n");
-					if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(9))
+					logx(eerste, " bij task\n");
+					UnitGroup enemies = enemiesInRange(eerste->getPosition(), dist(7), 0);
+					UnitGroup enemiesMilitary = enemiesInRange(eerste->getPosition(), dist(7), 0).not(isBuilding);
+					if (enemiesMilitary.size()>0)
 					{
-						logx(eerste, " bij task\n");
-						BWAPI::Unit* nearestAirEnemy = nearestEnemyThatCanAttackAir(eerste);
-						BWAPI::Unit* nearestNonBuilding = nearestNonBuildingEnemy(eerste);
-						double distanceAE = 99999;
-						double distanceNB = 99999;
-						if(nearestAirEnemy != NULL)
+						BWAPI::Unit* nearestt = nearestUnit(eerste->getPosition(), enemiesMilitary);
+						if (nearestt->getDistance(eerste->getPosition()) < dist(4))
 						{
-							distanceAE = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestAirEnemy).lastKnownPosition);
-						}
-						if(nearestNonBuilding != NULL)
-						{
-							double distanceNB = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestNonBuilding).lastKnownPosition);
-						}
-						if(distanceNB < dist(9))
-						{
-							if(distanceAE < distanceNB && nearestAirEnemy != NULL)
-							{
-								(*it)->attackUnit(nearestAirEnemy);
-							}
-							else if(nearestNonBuilding != NULL)
-							{
-								(*it)->attackUnit(nearestNonBuilding);
-							}
-							else
-							{
-								BWAPI::Unit* nearesttt = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(9), 0));
-								if(nearesttt != NULL)
-								{
-									(*it)->attackUnit(nearesttt);
-								}
-							}
+							(*it)->attackUnit(nearestt);
 						}
 						else
 						{
-							BWAPI::Unit* nearesttt = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(9), 0));
-							if(nearesttt != NULL)
-							{
-								(*it)->attackUnit(nearesttt);
-							}
+							(*it)->attackMove(nearestt->getPosition());
 						}
 					}
 					else
 					{
-						logx(eerste, " move naar task\n");
-						(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position);
+						if (enemies.size()>0)
+						{
+							BWAPI::Unit* nearestt = nearestUnit(eerste->getPosition(), enemies);
+							if (nearestt->getDistance(eerste->getPosition()) < dist(4))
+							{
+								(*it)->attackUnit(nearestt);
+							}
+							else
+							{
+								(*it)->attackMove(nearestt->getPosition());
+							}
+						}
+						else
+						{
+							if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(5))
+							{
+								logx(eerste, " vlakbij task, terug naar base\n");
+								moveToNearestBase(**it);
+							}
+							else
+							{
+								if (tooSplitUp(dist(3), (*it)))
+								{
+									(*it)->attackMove(nearestUnit((*it)->getCenter(), (**it))->getPosition());
+								}
+								else
+								{
+									logx(eerste, " move naar task\n");
+									(*it)->attackMove(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position);
+								}
+							}
+						}
 					}
 				}
 			}
