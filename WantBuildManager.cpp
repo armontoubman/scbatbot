@@ -331,10 +331,16 @@ void WantBuildManager::update()
 	if(buildList.size() > 0)
 	{
 		BuildItem b = buildList.top();
-
+		if (buildList.count(BWAPI::UnitTypes::Zerg_Overlord)>0 && b.typenr != 4 && !b.buildtype.isBuilding() && b.buildtype != BWAPI::UnitTypes::Zerg_Overlord)
+		{
+			logc("remove voor overlord\n");
+			buildList.removeTop();
+			b = buildList.top();
+			return;
+		}
 		// check of gebouw al aant bouwe is
 		if((b.typenr == 1 && b.buildtype.isBuilding()) || b.typenr == 4)
-	{
+		{
 			UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
 			bezig = bezig + (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).not(isCompleted));
 			if(b.typenr == 4)
@@ -781,7 +787,7 @@ void WantBuildManager::doLists()
 		if( stap == 2)
 		{
 			logc("doLists stap 2\n");
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2))
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2) && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>8)
 			{
 				logc("dl p 1-nexpand\n");
 				buildExpand();

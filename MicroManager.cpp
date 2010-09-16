@@ -361,13 +361,13 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 {
 	if ((unit->isGatheringGas()) || (unit->isConstructing()) || ((unit->isMoving()) && (!unit->isCarryingMinerals())) )
 	{
-		/*if (unit->isGatheringGas())
+		if (unit->isGatheringGas())
 		{
-			 if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(10), unit->getTarget()->getPosition()).size()>3)
+			 if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).inRadius(dist(6), unit->getTarget()->getPosition()).size()>3)
 			 {
 					 unit->stop();
 			 }
-		}*/
+		}
 	}
 	else
 	{
