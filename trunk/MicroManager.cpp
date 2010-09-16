@@ -408,7 +408,13 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 				}
 				else
 				{
-					unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
+					if(unit->getDistance(this->hc->getNearestHatchery(unit->getPosition())->getPosition()) < dist(4))
+					{
+					}
+					else
+					{
+						unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
+					}
 				}
 			}
 			else
@@ -604,23 +610,43 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					{
 						logx(eerste, " bij task");
 						BWAPI::Unit* nearestAirEnemy = nearestEnemyThatCanAttackAir(eerste);
-						double distanceAE = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestAirEnemy).lastKnownPosition);
 						BWAPI::Unit* nearestNonBuilding = nearestNonBuildingEnemy(eerste);
-						double distanceNB = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestNonBuilding).lastKnownPosition);
+						double distanceAE = 99999;
+						double distanceNB = 99999;
+						if(nearestAirEnemy != NULL)
+						{
+							distanceAE = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestAirEnemy).lastKnownPosition);
+						}
+						if(nearestNonBuilding != NULL)
+						{
+							double distanceNB = eerste->getPosition().getDistance(this->eudm->getEnemyUnitData(nearestNonBuilding).lastKnownPosition);
+						}
 						if(distanceNB < dist(9))
 						{
-							if(distanceAE < distanceNB)
+							if(distanceAE < distanceNB && nearestAirEnemy != NULL)
 							{
 								(*it)->attackUnit(nearestAirEnemy);
 							}
-							else
+							else if(nearestNonBuilding != NULL)
 							{
 								(*it)->attackUnit(nearestNonBuilding);
+							}
+							else
+							{
+								BWAPI::Unit* nearesttt = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(9), 0));
+								if(nearesttt != NULL)
+								{
+									(*it)->attackUnit(nearesttt);
+								}
 							}
 						}
 						else
 						{
-							(*it)->attackUnit(nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(9), 0)));
+							BWAPI::Unit* nearesttt = nearestUnit(eerste->getPosition(), enemiesInRange(eerste->getPosition(), dist(9), 0));
+							if(nearesttt != NULL)
+							{
+								(*it)->attackUnit(nearesttt);
+							}
 						}
 					}
 					else
@@ -1005,6 +1031,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							{
 								logx((*unitit), " type=1||4\n");
 								BWAPI::Unit* nearAir = nearestEnemyThatCanAttackAir(*unitit);
+								logx(*unitit), "nearAir ok\n");
 								// de volgende if heeft geen else, hij gaat er niet in, maar is dan klaar met de micro
 								if(nearAir != NULL && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(9), 0)))
 								{
@@ -1045,21 +1072,24 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
+									logx((*unitit), "check stealths\n");
 									UnitGroup stealths = allEnemyUnits(isCloaked);
 									BWAPI::Unit* neareststealth = nearestUnit((*unitit)->getPosition(), stealths);
+									logx((*unitit), "check stealths ok\n");
 									if(neareststealth != NULL)
 									{
 										logx((*unitit), " stealth gezien\n");
-										(*unitit)->rightClick(neareststealth->getPosition());
+										(*unitit)->move(neareststealth->getPosition());
 									}
 									else
 									{
+										logx((*unitit), "check dropships\n");
 										UnitGroup dropships = allEnemyUnits(Dropship) + allEnemyUnits(Shuttle);
 										dropships = dropships.inRadius(dist(10), (*unitit)->getPosition());
 										if(dropships.size() > 0)
 										{
 											logx((*unitit), " dropship gezien\n");
-											(*unitit)->rightClick(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
+											(*unitit)->move(nearestUnit((*unitit)->getPosition(), dropships)->getPosition());
 										}
 										else
 										{
@@ -1554,7 +1584,7 @@ BWAPI::Unit* MicroManager::nearestEnemyThatCanAttackAir(BWAPI::Unit* unit)
 	for(std::map<BWAPI::Unit*, EnemyUnitData>::iterator it=enemies.begin(); it!=enemies.end(); it++)
 	{
 		double currentDistance = unit->getPosition().getDistance(it->second.lastKnownPosition);
-		if(it->second.unitType.airWeapon().targetsAir())
+		if(it->second.unitType.airWeapon().targetsAir() || it->second.unitType.groundWeapon().targetsAir())
 		{
 			if(distance == -1)
 			{
