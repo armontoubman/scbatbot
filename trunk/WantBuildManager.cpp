@@ -973,9 +973,10 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 4)
 		{
+			addWant(BWAPI::UnitTypes::Zerg_Queens_Nest);
 			addWant(BWAPI::UnitTypes::Zerg_Hive);
 			addWant(BWAPI::UnitTypes::Zerg_Defiler_Mound);
-			addWant(BWAPI::UnitTypes::Zerg_Ultralisk);
+			addWant(BWAPI::UnitTypes::Zerg_Ultralisk_Cavern);
 		}
 		// reinforcements -->
 		logc("dl p r start\n");
@@ -1092,7 +1093,7 @@ void WantBuildManager::doLists()
 			else
 			{
 				logc("dl p r 3-2\n");
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) < 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0))
+				if( (buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) < 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0))
 				{
 					logc("dl p r 3-2-1\n");
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
@@ -1174,7 +1175,7 @@ void WantBuildManager::doLists()
 			}
 			else
 			{
-				if (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3)
+				if (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3 && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0))
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
 				}
@@ -1264,12 +1265,12 @@ void WantBuildManager::doLists()
 			if(nrOfEnemy(BWAPI::UnitTypes::Terran_Vulture) > 0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Spire)==0)
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Extractor);
-				addWant(BWAPI::UnitTypes::Zerg_Hydralisk);
+				addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 			}
 			if(nrOfEnemy(BWAPI::UnitTypes::Terran_Starport) > 0)
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Extractor);
-				addWant(BWAPI::UnitTypes::Zerg_Hydralisk);
+				addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 			}
 			if( wantListContains(BWAPI::UnitTypes::Zerg_Hydralisk_Den) && !wantListContains(BWAPI::UnitTypes::Zerg_Spire))
 			{
@@ -1336,9 +1337,10 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 4)
 		{
+			addWant(BWAPI::UnitTypes::Zerg_Queens_Nest);
 			addWant(BWAPI::UnitTypes::Zerg_Hive);
-			addWant(BWAPI::UnitTypes::Zerg_Defiler);
-			addWant(BWAPI::UnitTypes::Zerg_Ultralisk);
+			addWant(BWAPI::UnitTypes::Zerg_Defiler_Mound);
+			addWant(BWAPI::UnitTypes::Zerg_Ultralisk_Cavern);
 		}
 		//reinforcements
 		if( nrOfEnemy(BWAPI::UnitTypes::Terran_Marine) > 8)
@@ -1929,9 +1931,22 @@ void WantBuildManager::doLists()
 			int wantAantal = wantList.count((*it).buildtype);
 			int buildAantal = buildList.count((*it).buildtype);
 			int hebAantal = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType,(*it).buildtype).size();
+			if ((*it).buildtype == BWAPI::UnitTypes::Zerg_Lair)
+			{
+				hebAantal = hebAantal + UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hive).size();
+			}
 			logc("for wantlist type==1\n");
 			if(wantAantal > (buildAantal+hebAantal))
 			{
+				if ((*it).buildtype == BWAPI::UnitTypes::Zerg_Lair || (*it).buildtype == BWAPI::UnitTypes::Zerg_Hive)
+				{
+					if (UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair,Hive,Hatchery)(isMorphing).size()==0)
+					{
+						logc("lair of hive tech\n");
+						logc((*it).buildtype.getName().append("\n").c_str());
+						addBuild((*it).buildtype);
+					}
+				}
 				logc("dl generiek buildenunit\n");
 				logc((*it).buildtype.getName().append("\n").c_str());
 				addBuild((*it).buildtype);

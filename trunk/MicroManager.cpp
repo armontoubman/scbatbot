@@ -399,21 +399,21 @@ void MicroManager::gatherWhere(BWAPI::Unit* unit)
 		if (!unit->isGatheringMinerals())
 		{
 			result = getUnusedMineralsNearHatcheries();
-			if (result.empty() || unit->isCarryingMinerals() || unit->isCarryingGas())
+			if (result.empty())
 			{
-				if (unit->isCarryingMinerals() || unit->isCarryingGas())
+				/*if (unit->isCarryingMinerals() || unit->isCarryingGas())
 				{
 					//unit->returnCargo();
 				}
 				else
+				{*/
+				if(unit->getDistance(this->hc->getNearestHatchery(unit->getPosition())->getPosition()) < dist(4))
 				{
-					if(unit->getDistance(this->hc->getNearestHatchery(unit->getPosition())->getPosition()) < dist(4))
-					{
-					}
-					else
-					{
-						unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
-					}
+				}
+				else
+				{
+					unit->move(this->hc->getNearestHatchery(unit->getPosition())->getPosition());
+					return;
 				}
 			}
 			else
@@ -703,7 +703,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							else
 							{
 								logx((*unitit), "geen enemies\n");
-								if ((*unitit)->getDistance(currentTask.position) < dist(4))
+								if ((*unitit)->getDistance(currentTask.position) < dist(4) && BWAPI::Broodwar->isVisible(currentTask.position))
 								//if(BWTA::getGroundDistance((*unitit)->getTilePosition(), BWAPI::TilePosition(currentTask.position)) < dist(4))
 								{
 									logx((*unitit), "dichtbij task\n");
@@ -1249,7 +1249,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										}
 										else
 										{
-											(*unitit)->move(this->eudm->getEnemyUnitData(*enemies.begin()).lastKnownPosition);
+											(*unitit)->move(moveAway(*unitit));
 										}
 									}
 									else
@@ -1262,7 +1262,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										}
 										else
 										{
-											UnitGroup militaryInRange = allSelfUnits.inRadius(dist(14), (*unitit)->getPosition()).not(isWorker)(canAttack);
+											UnitGroup militaryInRange = allSelfUnits.inRadius(dist(8), (*unitit)->getPosition()).not(isWorker)(canAttack);
 											if(militaryInRange.size() > 0)
 											{
 												logx((*unitit), " military \n");
@@ -1279,7 +1279,6 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								else
 								{
 									logx((*unitit), " harvestcheck\n");
-									UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
 									gatherWhere(*unitit);
 									logx((*unitit), " harvestdone\n");							
 								}
@@ -1310,7 +1309,6 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						if((*unitit)->isIdle()==true || (*unitit)->getOrder() == BWAPI::Orders::None || (*unitit)->getOrder() == BWAPI::Orders::Nothing)
 						{
 							logx((*unitit), " harvestcheckidle\n");
-							UnitGroup mineralDrones = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isGatheringMinerals);
 							gatherWhere(*unitit);
 							logx((*unitit), " harvestdonewasidle\n");	
 						}
