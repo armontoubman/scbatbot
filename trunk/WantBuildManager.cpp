@@ -12,11 +12,9 @@
 #include "HighCommand.h"
 #include "BuildingPlacer.h"
 
-WantBuildManager::WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba, HighCommand* h, MicroManager* m)
+WantBuildManager::WantBuildManager(EnemyUnitDataManager* e, HighCommand* h, MicroManager* m)
 {
 	this->eudm = e;
-	this->bom = b;
-	this->bm = ba;
 	this->hc = h;
 	this->mm = m;
 

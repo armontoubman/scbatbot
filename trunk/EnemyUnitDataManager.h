@@ -8,7 +8,6 @@ class EnemyUnitDataManager
 	friend class HighCommand;
 public:
 	EnemyUnitDataManager();
-	EnemyUnitDataManager(InformationManager* im);
 	void update(std::set<BWAPI::Unit*> units);
 	void onRemoveUnit(BWAPI::Unit* unit);
 	std::map<BWAPI::Unit*,EnemyUnitData> getData();

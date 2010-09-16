@@ -13,7 +13,7 @@ class WantBuildManager
 	friend class HighCommand;
 public:
 	WantBuildManager();
-	WantBuildManager(EnemyUnitDataManager* e, BuildOrderManager* b, BaseManager* ba, HighCommand* h, MicroManager* m);
+	WantBuildManager(EnemyUnitDataManager* e, HighCommand* h, MicroManager* m);
 
 	int stap;
 
@@ -81,8 +81,6 @@ public:
 	BuildList wantList;
 
 	EnemyUnitDataManager* eudm;
-	BuildOrderManager* bom;
-	BaseManager* bm;
 	HighCommand* hc;
 	MicroManager* mm;
 

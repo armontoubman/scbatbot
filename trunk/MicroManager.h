@@ -18,7 +18,7 @@ class MicroManager
 	friend class HighCommand;
 public:
 	MicroManager();
-	MicroManager(BuildOrderManager* b, EnemyUnitDataManager* e, TaskManager* t, HighCommand* h, EigenUnitDataManager* ei, WantBuildManager* w);
+	MicroManager(EnemyUnitDataManager* e, TaskManager* t, HighCommand* h, EigenUnitDataManager* ei, WantBuildManager* w);
 	BWAPI::Position moveAway(BWAPI::Unit* unit, double radius);
 	BWAPI::Position moveAway(BWAPI::Unit* unit);
 	void moveAway(std::set<BWAPI::Unit*> units);
@@ -65,7 +65,6 @@ public:
 	UnitGroup getHatcheriesWithMinerals();
 	UnitGroup getUnusedMineralsNearHatcheries();
 
-	BuildOrderManager* bom;
 	EnemyUnitDataManager* eudm;
 	TaskManager* tm;
 	HighCommand* hc;

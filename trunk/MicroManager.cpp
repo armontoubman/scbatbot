@@ -19,9 +19,8 @@ MicroManager::MicroManager()
 {
 }
 
-MicroManager::MicroManager(BuildOrderManager* b, EnemyUnitDataManager* e, TaskManager* t, HighCommand* h, EigenUnitDataManager* ei, WantBuildManager* w)
+MicroManager::MicroManager(EnemyUnitDataManager* e, TaskManager* t, HighCommand* h, EigenUnitDataManager* ei, WantBuildManager* w)
 {
-	this->bom = b;
 	this->eudm = e;
 	this->tm = t;
 	this->hc = h;
@@ -122,7 +121,7 @@ bool MicroManager::overlordSupplyProvidedSoon()
 {
 	return
 		BWAPI::Broodwar->self()->supplyUsed() < BWAPI::Broodwar->self()->supplyTotal() - BWAPI::UnitTypes::Zerg_Overlord.supplyProvided() ||
-		this->bom->getPlannedCount(BWAPI::UnitTypes::Zerg_Overlord) > 0;
+		(this->wbm->countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)+this->wbm->buildList.count(BWAPI::UnitTypes::Zerg_Overlord)) > 0;
 }
 
 bool MicroManager::enemyInRange(BWAPI::Position p, double radius, int type)
@@ -704,7 +703,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							else
 							{
 								logx((*unitit), "geen enemies\n");
-								if ((*unitit)->getDistance(currentTask.position) < dist(4))
+								//if ((*unitit)->getDistance(currentTask.position) < dist(4))
+								if(BWTA::getGroundDistance((*unitit)->getTilePosition(), BWAPI::TilePosition(currentTask.position)) < dist(4))
 								{
 									logx((*unitit), "dichtbij task\n");
 									if (!(*unitit)->isMoving())
