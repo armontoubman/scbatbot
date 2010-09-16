@@ -58,7 +58,7 @@ void EigenUnitDataManager::update(std::set<BWAPI::Unit*> units, std::set<BWAPI::
 				if((*i)->getDistance(*j) <= (*j)->getType().sightRange()) {
 					currentUnitData.seenByEnemy = true;
 					currentUnitData.seenByEnemyTime = BWAPI::Broodwar->getFrameCount();
-					currentUnitData.seenByEnemyPosition = new BWAPI::Position((*i)->getPosition().x(), (*i)->getPosition().y());
+					currentUnitData.seenByEnemyPosition = BWAPI::Position((*i)->getPosition().x(), (*i)->getPosition().y());
 					eventUnitSeen(*i);
 					break;
 				}
