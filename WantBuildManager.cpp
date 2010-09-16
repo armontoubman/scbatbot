@@ -456,10 +456,11 @@ void WantBuildManager::update()
 								else
 								{
 									UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
-									if(hatcheries.size() == 0)
+									if(hatcheries.size() == 0 || nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)>0)
 									{
 										logc("kan geen lair maken, geen hatcheries\n");
 										buildList.removeTop();
+										return;
 									}
 									else
 									{
@@ -486,10 +487,11 @@ void WantBuildManager::update()
 									else
 									{
 										UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
-										if(lairs.size() == 0)
+										if(lairs.size() == 0 || nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>0)
 										{
 											logc("kan geen hive maken, geen lairs\n");
 											buildList.removeTop();
+											return;
 										}
 										else
 										{
@@ -533,6 +535,7 @@ void WantBuildManager::update()
 										{
 											logc("bouwen mislukt, geen locatie\n");
 											buildList.removeTop();
+											return;
 										}
 									}
 									else
@@ -633,6 +636,70 @@ void WantBuildManager::update()
 							buildList.removeSecond();
 							logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 							return;
+						}
+					}
+				}
+			}
+			if (v.typenr == 1 && (v.buildtype==BWAPI::UnitTypes::Zerg_Lair || v.buildtype == BWAPI::UnitTypes::Zerg_Hive) && (b.buildtype.isBuilding() || b.typenr == 4))
+			{
+				if (v.buildtype==BWAPI::UnitTypes::Zerg_Lair)
+				{
+					if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
+					{
+						logc("probeer hatchery naar lair te morphen... sec\n");
+						this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Lair);
+						logc("gelukt. sec\n");
+						buildList.removeSecond();
+						return;
+					}
+					else
+					{
+						UnitGroup hatcheries = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery);
+						if(hatcheries.size() == 0 || nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)>0)
+						{
+							logc("kan geen lair maken, geen hatcheries sec\n");
+							buildList.removeSecond();
+							return;
+						}
+						else
+						{
+							logc("probeer hatchery naar lair te morphen... sec\n");
+							(*hatcheries.begin())->morph(BWAPI::UnitTypes::Zerg_Lair);
+							logc("gelukt. sec\n");
+							buildList.removeSecond();
+							return;
+						}
+					}
+				}
+				else
+				{
+					if(v.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+					{
+						if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
+						{
+							logc("probeer lair naar hive te morphen... second\n");
+							this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
+							logc("gelukt second.\n");
+							buildList.removeSecond();
+							return;
+						}
+						else
+						{
+							UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
+							if(lairs.size() == 0 || nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>0)
+							{
+								logc("kan geen hive maken, geen lairs second\n");
+								buildList.removeSecond();
+								return;
+							}
+							else
+							{
+								logc("probeer lair naar hive te morphen... second\n");
+								(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
+								logc("gelukt. sec\n");
+								buildList.removeSecond();
+								return;
+							}
 						}
 					}
 				}
@@ -864,7 +931,7 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 3)
 		{
-			if (nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>14 && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<5) && nrOfOwn(BWAPI::UnitTypes::Zerg_Spire)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0)
+			if (buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>16 && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<5) && nrOfOwn(BWAPI::UnitTypes::Zerg_Spire)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0)
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
 			}
@@ -1735,7 +1802,7 @@ void WantBuildManager::doLists()
 	logc("dl v extrac\n");
 	for(std::set<BWAPI::Unit*>::iterator hit=hatcheries.begin(); hit!=hatcheries.end(); hit++)
 	{
-		if(geysers.inRadius(dist(10.00), (*hit)->getPosition()).size() > 0 && extractors.inRadius(dist(10.00), (*hit)->getPosition()).size() == 0 && buildList.count(BWAPI::UnitTypes::Zerg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
+		if(geysers.inRadius(dist(10.00), (*hit)->getPosition()).size() > 0 && extractors.inRadius(dist(10.00), (*hit)->getPosition()).size() == 0 && dronesRequiredAll()<3 && nrOfOwn(BWAPI::UnitTypes::Zerg_Extractor)+buildList.count(BWAPI::UnitTypes::Zerg_Extractor)+wantList.count(BWAPI::UnitTypes::Zerg_Extractor) < hatcheries.size())
 		{
 			logc("dl v addbuild extrac\n");
 			addBuild(BWAPI::UnitTypes::Zerg_Extractor);
@@ -1749,11 +1816,18 @@ void WantBuildManager::doLists()
 		enemiesNearNatural = this->eudm->getEnemyUnitsInRadius(dist(10.00), natural->getPosition()).size();
 	}
 
-	if( (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Protoss || BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Terran)
-		&& (nrOfEnemyBases()*2 >= nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) && !buildList.containsExpand() && enemiesNearNatural == 0 && dronesRequiredAll()<3)
+	if( buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && (BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Protoss || BWAPI::Broodwar->enemy()->getRace() == BWAPI::Races::Terran)
+		&& (nrOfEnemyBases()*2 >= nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) && nrOfEnemyBases()>1 && !buildList.containsExpand() && enemiesNearNatural == 0 && dronesRequiredAll()<3)
 	{
 		logc("dl v expand 1\n");
-		buildExpand();
+		if (nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>15)
+		{
+			addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
+		}
+		else
+		{
+			buildExpand();
+		}
 	}
 
 	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 2 && BWAPI::Broodwar->self()->minerals() >= 500 && enemiesNearNatural == 0 && !buildList.containsExpand() && dronesRequiredAll()<3)
@@ -1762,12 +1836,12 @@ void WantBuildManager::doLists()
 		buildExpand();
 	}
 
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 2 && BWAPI::Broodwar->self()->minerals() >= 500 && enemiesNearNatural > 0 && !buildList.containsExpand() && dronesRequiredAll()<3)
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 2 && BWAPI::Broodwar->self()->minerals() >= 500 && enemiesNearNatural > 0 && !buildList.containsExpand() && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && dronesRequiredAll()<3 )
 	{
 		logc("dl v extrahatch req\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
 	}
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && !buildList.containsExpand() && nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<5 && BWAPI::Broodwar->self()->minerals() >= 500)
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && !buildList.containsExpand() && nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<5 && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && BWAPI::Broodwar->self()->minerals() >= 500)
 	{
 		logc("dl v extrahatch req 2\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
