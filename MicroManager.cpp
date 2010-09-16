@@ -532,7 +532,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		/* SCOURGE */
 		if((**it)(Scourge).size() > 0)
 		{
-			BWAPI::Unit* eerste = *((*it)->begin());
+			BWAPI::Unit* eerste = *((**it)(Scourge).begin());
 			UnitGroup airenemies = enemiesInRange(eerste->getPosition(), dist(7), 2);
 			UnitGroup allenemies = enemiesInRange(eerste->getPosition(), dist(7), 0);
 			if(eerste->isUnderStorm() || canAttackAir(allenemies) && airenemies.size() == 0)
@@ -572,7 +572,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		 /* MUTALISK */
 		else if((**it)(Mutalisk).size() > 0)
 		{
-			BWAPI::Unit* eerste = *((*it)->begin());
+			BWAPI::Unit* eerste = *((**it)(Mutalisk).begin());
 			logx(eerste, " begin micro\n");
 			if(eerste->isUnderStorm()) 
 			{
