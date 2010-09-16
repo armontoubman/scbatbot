@@ -703,8 +703,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							else
 							{
 								logx((*unitit), "geen enemies\n");
-								//if ((*unitit)->getDistance(currentTask.position) < dist(4))
-								if(BWTA::getGroundDistance((*unitit)->getTilePosition(), BWAPI::TilePosition(currentTask.position)) < dist(4))
+								if ((*unitit)->getDistance(currentTask.position) < dist(4))
+								//if(BWTA::getGroundDistance((*unitit)->getTilePosition(), BWAPI::TilePosition(currentTask.position)) < dist(4))
 								{
 									logx((*unitit), "dichtbij task\n");
 									if (!(*unitit)->isMoving())
@@ -1710,7 +1710,7 @@ void MicroManager::logx(BWAPI::Unit* unit, std::string msg)
 
 void MicroManager::logc(const char* msg)
 {
-	if(true)
+	if(false)
 	{
 		log(msg);
 	}
