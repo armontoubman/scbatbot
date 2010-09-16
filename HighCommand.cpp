@@ -17,7 +17,7 @@
 #include <time.h>
 #include <BWTA.h>
 
-HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseManager* ba)
+HighCommand::HighCommand()
 {
 
 	BWAPI::Broodwar->setLocalSpeed(0); // WEGHALEN IN FINAL
@@ -36,11 +36,11 @@ HighCommand::HighCommand(InformationManager* im, BuildOrderManager* bom, BaseMan
 	log("\n");
 
 	this->eigenUnitDataManager = new EigenUnitDataManager(this);
-	this->enemyUnitDataManager = new EnemyUnitDataManager(im);
+	this->enemyUnitDataManager = new EnemyUnitDataManager();
 	this->eigenUnitGroupManager = new EigenUnitGroupManager(this, this->eigenUnitDataManager, this->taskManager, this->planAssigner);
 	this->taskManager = new TaskManager(this->eigenUnitGroupManager, this->enemyUnitDataManager, this, this->planAssigner);
-	this->wantBuildManager = new WantBuildManager(this->enemyUnitDataManager, bom, ba, this, this->microManager);
-	this->microManager = new MicroManager(bom, this->enemyUnitDataManager, this->taskManager, this, this->eigenUnitDataManager, this->wantBuildManager);
+	this->wantBuildManager = new WantBuildManager(this->enemyUnitDataManager, this, this->microManager);
+	this->microManager = new MicroManager(this->enemyUnitDataManager, this->taskManager, this, this->eigenUnitDataManager, this->wantBuildManager);
 	this->planAssigner = new PlanAssigner(this, this->taskManager, this->eigenUnitGroupManager, this->enemyUnitDataManager, this->microManager);
 	this->thisAlgorithmBecomingSkynetCost = 999999999;
 	this->tick = 1;

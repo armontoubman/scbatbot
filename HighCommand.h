@@ -18,7 +18,7 @@ class PlanAssigner;
 class HighCommand
 {
 public:
-	HighCommand(InformationManager* im, BuildOrderManager* bom, BaseManager* ba);
+	HighCommand();
 	~HighCommand();
 	void update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits);
 	void onRemoveUnit(BWAPI::Unit* unit);

@@ -8,11 +8,6 @@
 
 EnemyUnitDataManager::EnemyUnitDataManager(){} // niet gebruiken
 
-EnemyUnitDataManager::EnemyUnitDataManager(InformationManager* im)
-{
-	this->informationManager = im;
-}
-
 void EnemyUnitDataManager::update(std::set<BWAPI::Unit*> units)
 {
 	EnemyUnitData currentUnitData;

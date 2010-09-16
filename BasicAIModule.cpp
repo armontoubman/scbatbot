@@ -12,6 +12,7 @@ void BasicAIModule::onStart()
   BWTA::readMap();
   BWTA::analyze();
   this->analyzed=true;
+  /*
   this->buildManager       = new BuildManager(&this->arbitrator);
   this->techManager        = new TechManager(&this->arbitrator);
   this->upgradeManager     = new UpgradeManager(&this->arbitrator);
@@ -25,10 +26,12 @@ void BasicAIModule::onStart()
   this->borderManager      = new BorderManager();
   this->unitGroupManager   = new UnitGroupManager();
   this->enhancedUI         = new EnhancedUI();
+  */
 
-  this->highCommand = new HighCommand(this->informationManager, this->buildOrderManager, this->baseManager);
-  this->buildOrderManager->setDebugMode(true);
+  this->highCommand = new HighCommand();
+  //this->buildOrderManager->setDebugMode(true);
 
+  /*
   this->supplyManager->setBuildManager(this->buildManager);
   this->supplyManager->setBuildOrderManager(this->buildOrderManager);
   this->techManager->setBuildingPlacer(this->buildManager->getBuildingPlacer());
@@ -39,13 +42,14 @@ void BasicAIModule::onStart()
   this->borderManager->setInformationManager(this->informationManager);
   this->baseManager->setBorderManager(this->borderManager);
   this->defenseManager->setBorderManager(this->borderManager);
+  */
   
   BWAPI::Race race = Broodwar->self()->getRace();
   BWAPI::Race enemyRace = Broodwar->enemy()->getRace();
   BWAPI::UnitType workerType=race.getWorker();
   
   //this->buildOrderManager->enableDependencyResolver();
-  this->workerManager->disableAutoBuild();
+  //this->workerManager->disableAutoBuild();
   
   if (race == Races::Zerg)
   {
@@ -64,7 +68,7 @@ void BasicAIModule::onStart()
 
 BasicAIModule::~BasicAIModule()
 {
-  delete this->buildManager;
+  /*delete this->buildManager;
   delete this->techManager;
   delete this->upgradeManager;
   delete this->scoutManager;
@@ -76,7 +80,7 @@ BasicAIModule::~BasicAIModule()
   delete this->informationManager;
   delete this->borderManager;
   delete this->unitGroupManager;
-  delete this->enhancedUI;
+  delete this->enhancedUI;*/
 
   delete this->highCommand;
 }
@@ -88,7 +92,7 @@ void BasicAIModule::onFrame()
 {
   if (Broodwar->isReplay()) return;
   if (!this->analyzed) return;
-  //this->buildManager->update();
+  /*//this->buildManager->update();
   this->buildOrderManager->update();
   this->baseManager->update();
   //this->workerManager->update();
@@ -99,7 +103,7 @@ void BasicAIModule::onFrame()
   this->enhancedUI->update();
   this->borderManager->update();
   //this->defenseManager->update();
-  this->arbitrator.update();
+  this->arbitrator.update();*/
 
   this->highCommand->update(Broodwar->self()->getUnits(), Broodwar->enemy()->getUnits());
 
@@ -139,7 +143,7 @@ void BasicAIModule::onFrame()
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
-  this->arbitrator.onRemoveObject(unit);
+  /*this->arbitrator.onRemoveObject(unit);
   this->buildManager->onRemoveUnit(unit);
   this->techManager->onRemoveUnit(unit);
   this->upgradeManager->onRemoveUnit(unit);
@@ -147,7 +151,7 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
   this->scoutManager->onRemoveUnit(unit);
   this->defenseManager->onRemoveUnit(unit);
   this->informationManager->onUnitDestroy(unit);
-  this->baseManager->onRemoveUnit(unit);
+  this->baseManager->onRemoveUnit(unit);*/
 
   this->highCommand->onRemoveUnit(unit);
 }
@@ -155,22 +159,22 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 void BasicAIModule::onUnitDiscover(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
-  this->informationManager->onUnitDiscover(unit);
-  this->unitGroupManager->onUnitDiscover(unit);
+  /*this->informationManager->onUnitDiscover(unit);
+  this->unitGroupManager->onUnitDiscover(unit);*/
 
   this->highCommand->onUnitShow(unit);
 }
 void BasicAIModule::onUnitEvade(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
-  this->informationManager->onUnitEvade(unit);
-  this->unitGroupManager->onUnitEvade(unit);
+  /*this->informationManager->onUnitEvade(unit);
+  this->unitGroupManager->onUnitEvade(unit);*/
 }
 
 void BasicAIModule::onUnitMorph(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
-  this->unitGroupManager->onUnitMorph(unit);
+  //this->unitGroupManager->onUnitMorph(unit);
 
   if(unit->getPlayer() == BWAPI::Broodwar->self())
   {
@@ -180,7 +184,7 @@ void BasicAIModule::onUnitMorph(BWAPI::Unit* unit)
 void BasicAIModule::onUnitRenegade(BWAPI::Unit* unit)
 {
   if (Broodwar->isReplay()) return;
-  this->unitGroupManager->onUnitRenegade(unit);
+  //this->unitGroupManager->onUnitRenegade(unit);
 }
 
 void BasicAIModule::onSendText(std::string text)
