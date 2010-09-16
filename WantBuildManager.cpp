@@ -2016,7 +2016,7 @@ bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UpgradeTyp
 {
 	//int lvl = BWAPI::Broodwar->self()->getUpgradeLevel(researchtype);
 	//return (((unittype.mineralPrice()+researchtype.mineralPriceBase()+(lvl*researchtype.mineralPriceFactor())) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+researchtype.gasPriceBase()+(lvl*researchtype.gasPriceFactor())) <= BWAPI::Broodwar->self()->gas()));
-	return (((unittype.mineralPrice()+researchtype.mineralPriceBase())) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+researchtype.gasPriceBase())) <= BWAPI::Broodwar->self()->gas()));
+	return (((unittype.mineralPrice()+researchtype.mineralPriceBase())) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice()+researchtype.gasPriceBase())) <= BWAPI::Broodwar->self()->gas();
 }
 
 bool WantBuildManager::bothCanBeMadeExpand(BWAPI::UnitType unittype)

@@ -6,5 +6,5 @@ EigenUnitData::EigenUnitData()
 	this->hitPoints = 0;
 	this->seenByEnemy = false;
 	this->seenByEnemyTime = 0;
-	this->seenByEnemyPosition = new BWAPI::Position();
+	this->seenByEnemyPosition = BWAPI::Position();
 }
