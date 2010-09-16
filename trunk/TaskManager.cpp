@@ -231,6 +231,8 @@ void TaskManager::update()
 		}
 	}
 
+	// frontline building defenden
+	/*
 	std::map<BWAPI::Unit*, EnemyUnitData> buildingdata = this->eudm->getData();
 	std::set<BWAPI::Position> posset;
 	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in buildingdata)
@@ -244,9 +246,11 @@ void TaskManager::update()
 	{
 		UnitGroup eigenbuildings = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(isBuilding);	
 		BWAPI::Position frontline = frontlineBuilding(posset);
-		//insertTask(Task(5, frontline));
+		insertTask(Task(5, frontline));
 	}
+	*/
 
+	// scout tasks op alle baselocations
 	if(this->eudm->getData().size() < 15)
 	{
 		std::set<BWTA::BaseLocation*> baselocs = BWTA::getBaseLocations();
@@ -280,6 +284,18 @@ void TaskManager::update()
 	// zit nu in mostappropriate
 	//insertTask(Task(5, 3, this->hc->hatchery->getPosition()));
 
+	// if unit lost hp zonder enemy in de buurt, detector task
+	UnitGroup visibleEnemies = UnitGroup::getUnitGroup(BWAPI::Broodwar->enemy()->getUnits());
+	for each(BWAPI::Unit* hpunit in this->hc->eigenUnitDataManager->lostHealthSet)
+	{
+		if(hpunit->getHitPoints() > 1)
+		{
+			if(visibleEnemies.inRadius(9*32, hpunit->getPosition()).size() == 0)
+			{
+				insertTask(Task(4, hpunit->getPosition()));
+			}
+		}
+	}
 }
 
 std::list<Task> TaskManager::findTasksWithType(int t)

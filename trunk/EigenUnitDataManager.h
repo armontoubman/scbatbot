@@ -13,7 +13,7 @@ public:
 	void eventUnitSeen(BWAPI::Unit* unit);
 	bool unitIsSeen(BWAPI::Unit* unit);
 	bool lostHealthThisFrame(BWAPI::Unit* unit);
-private:
+
 	std::string intToString(int i);
 	std::map<BWAPI::Unit*,EigenUnitData> myUnitsMap;
 	bool haveUnitOfType(BWAPI::UnitType type);
