@@ -456,7 +456,7 @@ void WantBuildManager::doLists()
 		if( stap == 2)
 		{
 			logc("doLists stap 2\n");
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2) && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>8)
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2) && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>9)
 			{
 				logc("dl p 1-nexpand\n");
 				buildExpand();
@@ -1445,7 +1445,7 @@ void WantBuildManager::doLists()
 		buildExpand();
 	}
 
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 2 && BWAPI::Broodwar->self()->minerals() >= 350 && enemiesNearNatural > 0 && !buildList.containsExpand() && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && dronesRequiredAll()<4 )
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 2 && BWAPI::Broodwar->self()->minerals() >= 550 && enemiesNearNatural > 0 && !buildList.containsExpand() && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && dronesRequiredAll()<4 )
 	{
 		logc("dl v extrahatch req\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
@@ -2137,7 +2137,26 @@ void WantBuildManager::buildNow(BuildItem b)
 		if(b.typenr == 1 && b.buildtype.isBuilding())
 		{
 			logc("buildNow type isBuilding\n");
-			if(!isBeingHandled(b))
+			if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair || b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+			{
+				if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair)
+				{
+					if(allUnits(Hatchery).size() > 0)
+					{
+						logc("buildNow lair\n");
+						(*allUnits(Hatchery).begin())->morph(b.buildtype);
+					}
+				}
+				if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+				{
+					if(allUnits(Lair).size() > 0)
+					{
+						logc("buildNow hive\n");
+						(*allUnits(Lair).begin())->morph(b.buildtype);
+					}
+				}
+			}
+			else if(!isBeingHandled(b))
 			{
 				logc("not being handled\n");
 				BWAPI::TilePosition lokatie;

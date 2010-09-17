@@ -1686,7 +1686,7 @@ void MicroManager::logx(BWAPI::Unit* unit, std::string msg)
 
 void MicroManager::logc(const char* msg)
 {
-	if(true)
+	if(false)
 	{
 		log(msg);
 	}
