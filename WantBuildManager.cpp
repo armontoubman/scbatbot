@@ -333,7 +333,6 @@ void WantBuildManager::update()
 		{
 			logc("remove voor overlord\n");
 			buildList.removeTop();
-			b = buildList.top();
 			return;
 		}
 		// check of gebouw al aant bouwe is
@@ -360,13 +359,12 @@ void WantBuildManager::update()
 			for each(BWAPI::Unit* lolgebouw in bezig)
 			{
 				logc("bezig met: ");
-				logc(b.buildtype.getName().append("\n").c_str());
-				if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
+				logc(lolgebouw->getType().getName().append("\n").c_str());
+				if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.8)
 				{
 					logc(b.buildtype.getName().append(" ").c_str());
 					logc("started and removed from top\n");
 					buildList.removeTop();
-					b = buildList.top();
 					return;
 				}
 				if(b.typenr == 1 && b.buildtype == lolgebouw->getType() && b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
@@ -374,15 +372,13 @@ void WantBuildManager::update()
 					logc(b.buildtype.getName().append(" ").c_str());
 					logc("started and removed from top\n");
 					buildList.removeTop();
-					b = buildList.top();
 					return;
 				}
-				if(b.typenr == 4 && lolgebouw->getType() == BWAPI::UnitTypes::Zerg_Hatchery && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.9)
+				if(b.typenr == 4 && lolgebouw->getType() == BWAPI::UnitTypes::Zerg_Hatchery && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.7)
 					// maybe herkent ie niet zerg_hatchery als iets dat bouwt...
 				{
 					logc("expand started and removed from top\n");
 					buildList.removeTop();
-					b = buildList.top();
 					return;
 				}
 			}
@@ -831,7 +827,7 @@ void WantBuildManager::update()
 				buildList.removeSecond();
 				return;
 			}
-			if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && b.buildtype.isBuilding())))
+			if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && v.buildtype.isBuilding())))
 			{
 				logc("beide buildings\n");
 				buildList.removeSecond();
@@ -864,6 +860,7 @@ void WantBuildManager::doLists()
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 2); // *7*
 			addBuild(BWAPI::UnitTypes::Zerg_Zergling, 3);
+			addWant(BWAPI::UnitTypes::Zerg_Hatchery);
 			stap = 2;
 		}
 		if( stap == 2)
@@ -1253,6 +1250,7 @@ void WantBuildManager::doLists()
 			addWant(BWAPI::UnitTypes::Zerg_Spawning_Pool);
 			addBuild(BWAPI::UnitTypes::Zerg_Drone, 2);
 			addBuild(BWAPI::UnitTypes::Zerg_Zergling, 3);
+			addWant(BWAPI::UnitTypes::Zerg_Hatchery);
 			stap = 2;
 		}
 		if( stap == 2)
