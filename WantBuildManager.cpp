@@ -98,7 +98,7 @@ void WantBuildManager::addBuildTop(BWAPI::UnitType unittype)
 
 void WantBuildManager::addBuild(BWAPI::TechType techtype)
 {
-	if (this->wantList.count(techtype)<1)
+	if (this->buildList.count(techtype)<1)
 	{
 		this->buildList.addItem(BuildItem(techtype, 1));
 	}
@@ -106,7 +106,7 @@ void WantBuildManager::addBuild(BWAPI::TechType techtype)
 
 void WantBuildManager::addBuild(BWAPI::UpgradeType upgradetype)
 {
-	if (this->wantList.count(upgradetype)<1)
+	if (this->buildList.count(upgradetype)<1)
 	{
 		this->buildList.addItem(BuildItem(upgradetype, 1));
 	}
