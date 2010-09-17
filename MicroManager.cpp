@@ -559,7 +559,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		 /* MUTALISK */
 		else if((**it)(Mutalisk).size() > 0)
 		{
-			BWAPI::Unit* eerste = nearestUnit(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position, (*it)(Mutalisk));
+			BWAPI::Unit* eerste = nearestUnit(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position, (**it)(Mutalisk));
 
 			logx(eerste, " begin micro\n");
 			bool onderstorm = false;
