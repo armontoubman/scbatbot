@@ -1907,7 +1907,7 @@ void WantBuildManager::doLists()
 	if( dronesRequiredAll()+2 > (buildList.count(BWAPI::UnitTypes::Zerg_Drone)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Drone)) && buildList.count(BWAPI::UnitTypes::Zerg_Drone)<6 ) // not sufficient drones
 	{
 		logc("drone build\n");	
-		addBuild(BWAPI::UnitTypes::Zerg_Drone, dronesRequiredAll());
+		addBuild(BWAPI::UnitTypes::Zerg_Drone, dronesRequiredAll()+2);
 	}
 	
 	UnitGroup hatcheries = getHatcheriesWithMinerals()(isCompleted);
