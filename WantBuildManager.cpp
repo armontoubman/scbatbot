@@ -708,6 +708,7 @@ void WantBuildManager::update()
 			logc("buildlist bs pre 4, 1\n");
 			if (v.typenr == 1 && b.typenr == 4)
 			{
+				logc("buildlist bs ja het wordt herkend \n");
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					logc("can't make secondexp\n\t");
@@ -719,8 +720,10 @@ void WantBuildManager::update()
 				}
 				else
 				{
+					logc("buildlist bs ja wordt voldaan\n");
 					if (bothCanBeMadeExpand(v.buildtype))
 					{
+						logc("buildlist bs beide kunnen lets do this\n");
 						if(v.buildtype == BWAPI::UnitTypes::Zerg_Lurker)
 						{
 							logc("can make second2exp\n\t");
@@ -2042,7 +2045,7 @@ bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UpgradeTyp
 
 bool WantBuildManager::bothCanBeMadeExpand(BWAPI::UnitType unittype)
 {
-	return (!unittype.isBuilding() &&((unittype.mineralPrice()+300) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice())<= BWAPI::Broodwar->self()->gas()) && unittype.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittype.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
+	return (!unittype.isBuilding() && ((unittype.mineralPrice()+300) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice())<= BWAPI::Broodwar->self()->gas()) && unittype.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittype.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
 }
 
 bool WantBuildManager::bothCanBeMadeExpand(BWAPI::TechType techtype)
