@@ -557,7 +557,7 @@ void WantBuildManager::update()
 								else
 								{
 									bool albezig = isBeingHandled(b);
-									if(albezig == false && (((b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && b.buildtype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() == 0) || b.buildtype == BWAPI::UnitTypes::Zerg_Hatchery || b.buildtype == BWAPI::UnitTypes::Zerg_Extractor) && b.buildtype.isBuilding())
+									if(albezig == false && (((b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && b.buildtype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() == 0) || b.buildtype == BWAPI::UnitTypes::Zerg_Hatchery || b.buildtype == BWAPI::UnitTypes::Zerg_Extractor) && b.buildtype.isBuilding()))
 									{
 										logc("bouwen maar\n");
 										bool gogo = false;
