@@ -374,7 +374,7 @@ void WantBuildManager::update()
 					buildList.removeTop();
 					return;
 				}
-				if(b.typenr == 4 && lolgebouw->getType() == BWAPI::UnitTypes::Zerg_Hatchery && lolgebouw->getRemainingBuildTime() / lolgebouw->getType().buildTime() >= 0.7)
+				if(b.typenr == 4 && lolgebouw->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
 					// maybe herkent ie niet zerg_hatchery als iets dat bouwt...
 				{
 					logc("expand started and removed from top\n");
@@ -394,7 +394,8 @@ void WantBuildManager::update()
 				logc(b.buildtype.getName().append("\n").c_str());
 				logc("remove\n");
 				buildList.removeTop();
-				logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+				//logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+				logc(std::string((intToString(wantList.buildlist.size())).append("\n")).c_str());
 				return;
 			}
 			else
@@ -429,7 +430,8 @@ void WantBuildManager::update()
 								logc(b.buildtype.getName().append("\n").c_str());
 								(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
 								buildList.removeTop();
-								logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+								//logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+								logc(std::string(intToString(wantList.buildlist.size()).append("\n")).c_str());
 								return;
 							}
 						}
@@ -549,15 +551,19 @@ void WantBuildManager::update()
 		logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 		if(b.typenr == 2)
 		{
+			logc("research op b\n");
 			if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
+				logc("research removed first\n");
 				buildList.removeTop();
 				return;
 			}
 			else
 			{
+				logc("research req satisf\n");
 				if(canBeMade(b.researchtype) && !BWAPI::Broodwar->self()->hasResearched(b.researchtype))
 				{
+					logc("research wordt gedaan\n");
 					this->eigenResearch(b.researchtype);
 					buildList.removeTop();
 					return;
@@ -566,8 +572,10 @@ void WantBuildManager::update()
 		}
 		if(b.typenr == 3)
 		{
+			logc("upgrade op b\n");
 			if(!requirementsSatisfied(b.upgradetype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
+				logc("upgrade removed firstp b\n");
 				buildList.removeTop();
 				return;
 			}
@@ -575,6 +583,7 @@ void WantBuildManager::update()
 			{
 				if(canBeMade(b.upgradetype) && (b.upgradetype.maxRepeats() > BWAPI::Broodwar->self()->getUpgradeLevel(b.upgradetype)))
 				{
+					logc("upgrade wordt gedaan\n");
 					this->eigenUpgrade(b.upgradetype);
 					buildList.removeTop();
 					return;
@@ -1255,7 +1264,7 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 2)
 		{
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2))
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2) && !buildList.containsExpand())
 			{
 				logc("dl p 1-nexpand\n");
 				buildExpand();
@@ -1306,7 +1315,7 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 3)
 		{
-			if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<3)
+			if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<3 && !buildList.containsExpand())
 			{
 				buildExpand();
 			}
