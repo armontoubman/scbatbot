@@ -137,7 +137,7 @@ bool WantBuildManager::buildListContains(BWAPI::UnitType unittype)
 
 int WantBuildManager::nrOfEnemyMilitaryUnits()
 {
-	return this->eudm->getUG().not(isBuilding).not(Overlord).not(Drone).not(SCV).not(Probe).not(Observer).size();
+	return this->eudm->mapMilitarySize(this->eudm->enemyUnitsMap);
 }
 
 int WantBuildManager::nrOfOwnMilitaryUnits()
@@ -1086,7 +1086,7 @@ void WantBuildManager::doLists()
 		if( nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot) > 6)
 		{
 			logc("dl p r 1\n");
-			if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle) > 0) || this->eudm->getUG()(isFlyer).size() >4)
+			if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Shuttle) > 0) || this->eudm->mapAirSize(this->eudm->enemyUnitsMap) >4)
 			{
 				logc("dl p r 1-1\n");
 				if( nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) > 9 || nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)>0)
@@ -1496,7 +1496,7 @@ void WantBuildManager::doLists()
 			{
 				if(BWAPI::Broodwar->self()->hasResearched(BWAPI::TechTypes::Lurker_Aspect))
 				{
-					if( this->eudm->getUG()(isFlyer).size() > 3)
+					if( this->eudm->mapAirSize(this->eudm->enemyUnitsMap) > 3)
 					{
 						if(nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) == 0)
 						{
