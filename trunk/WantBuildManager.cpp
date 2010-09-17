@@ -28,7 +28,7 @@ int WantBuildManager::nrOfEnemy(BWAPI::UnitType unittype)
 
 int WantBuildManager::nrOfOwn(BWAPI::UnitType unittype)
 {
-	return UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unittype).size();
+	return UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unittype)(isCompleted).size();
 }
 
 bool WantBuildManager::wantListIsEmpty()
@@ -707,7 +707,7 @@ void WantBuildManager::update()
 			}
 			logc("buildlist bs pre 4, 1\n");
 			if (v.typenr == 1 && b.typenr == 4)
-				{
+			{
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					logc("can't make second\n\t");
@@ -721,7 +721,7 @@ void WantBuildManager::update()
 				{
 					if (bothCanBeMadeExpand(v.buildtype))
 					{
-						if(b.buildtype == BWAPI::UnitTypes::Zerg_Lurker)
+						if(v.buildtype == BWAPI::UnitTypes::Zerg_Lurker)
 						{
 							logc("can make\n\t");
 							logc(v.buildtype.getName().append("\n").c_str());

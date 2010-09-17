@@ -799,23 +799,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					{
 						if((*unitit)->isIrradiated())
 						{
-							if(allSelfUnits.inRadius(dist(3), (*unitit)->getPosition()).size() > 0)
+							UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(30), 1);
+							if(enemies.size()>0)
 							{
-								BWAPI::Position base = BWAPI::Broodwar->enemy()->getStartLocation();
-								(*unitit)->attackMove(base);
-							}
-							else
-							{
-								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(3), 0);
-								if(enemies.size() > 0)
-								{
-
-								}
-								else
-								{
-									BWAPI::Position base = BWAPI::Broodwar->enemy()->getStartLocation();
-									(*unitit)->attackMove(base);
-								}
+								(*unitit)->attackMove(nearestUnit((*unitit)->getPosition(), enemies)->getPosition());
 							}
 						}
 						else
@@ -840,9 +827,9 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
-									if(currentTask.type != -1 && (*unitit)->getDistance(currentTask.position) < dist(8))
+									if(currentTask.type != -1 && (*unitit)->getDistance(currentTask.position) < dist(6) && BWAPI::Broodwar->isVisible(currentTask.position) )
 									{
-										(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), dist(8), 0).begin());
+										(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), dist(6), 0).begin());
 									}
 									else
 									{
@@ -1355,7 +1342,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								if(allSelfUnits(Hydralisk).inRadius(dist(8), (*unitit)->getPosition()).size() > 0)
+								if(allSelfUnits(Hydralisk).inRadius(dist(8), (*unitit)->getPosition()).size() > 1)
 								{
 									int allies = allSelfUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
 									int enemies = allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
@@ -1463,7 +1450,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										moveToNearestBase(*unitit);
+										if (tooSplitUp(dist(8), (*it)))
+										{
+											(*unitit)->attackMove(nearestUnit((*it)->getCenter(), (**it))->getPosition());
+										}
+										else
+										{
+											moveToNearestBase(*unitit);
+										}
 									}
 								}
 							}
