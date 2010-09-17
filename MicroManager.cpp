@@ -559,7 +559,8 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		 /* MUTALISK */
 		else if((**it)(Mutalisk).size() > 0)
 		{
-			BWAPI::Unit* eerste = *((**it)(Mutalisk).begin());
+			BWAPI::Unit* eerste = nearestUnit(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position, (*it)(Mutalisk));
+
 			logx(eerste, " begin micro\n");
 			bool onderstorm = false;
 			// check of allemaal uit storm zijn, als er 1tje onder storm is, move to nearest base
@@ -1361,16 +1362,16 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 											{
 												logx((*unitit), " er zijn enemies\n");
 												BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(6), (*unitit)->getPosition()));
-												if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) <= dist(6))
+												if(nearesttarget != NULL && nearesttarget->getPosition().getDistance((*unitit)->getPosition()) <= dist(6))
 												{
-													logx((*unitit), " nearest check\n");
+													/*logx((*unitit), " nearest check\n");
 													if(allSelfUnits(Hydralisk).inRadius(dist(9), nearesttarget->getPosition()).size() > 0)
 													{
 														logx((*unitit), " moveaway ofzo\n");
 														(*unitit)->move(moveAway(*unitit));
 													}
 													else
-													{
+													{*/
 														if((*unitit)->getGroundWeaponCooldown() != 0)
 														{
 															logx((*unitit), " moveaway not rdy\n");
@@ -1381,7 +1382,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 															logx((*unitit), " val nogmaals aan\n");
 															(*unitit)->attackUnit(nearesttarget);
 														}
-													}
+													//}
 												}
 												else
 												{
