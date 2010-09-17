@@ -29,7 +29,8 @@ public:
 	bool mapContainsGround(std::map<BWAPI::Unit*, EnemyUnitData> data);
 	int mapSize(std::map<BWAPI::Unit*, EnemyUnitData> data);
 	int mapMilitarySize(std::map<BWAPI::Unit*, EnemyUnitData> data);
-private:
+	int mapAirSize(std::map<BWAPI::Unit*, EnemyUnitData> data);
+
 	std::string intToString(int i);
 	std::map<BWAPI::Unit*,EnemyUnitData> enemyUnitsMap;
 	InformationManager* informationManager;

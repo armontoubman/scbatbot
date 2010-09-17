@@ -24,16 +24,16 @@ HighCommand::HighCommand()
 
 	this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery).begin();
 
-	log("\n\n\n\nNEW GAME\n\n\n\n");
+	//log("\n\n\n\nNEW GAME\n\n\n\n");
 
 	time_t rawtime;
 	struct tm * timeinfo;
 
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
-	log("\n");
-	log(asctime(timeinfo));
-	log("\n");
+	//log("\n");
+	//log(asctime(timeinfo));
+	//log("\n");
 
 	this->eigenUnitDataManager = new EigenUnitDataManager(this);
 	this->enemyUnitDataManager = new EnemyUnitDataManager();
@@ -62,11 +62,11 @@ HighCommand::~HighCommand() {
 
 void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> enemyUnits)
 {
-	log("eudm map: ");
-	log(this->wantBuildManager->intToString(this->enemyUnitDataManager->enemyUnitsMap.size()).append("\n").c_str());
+	//log("eudm map: ");
+	//log(this->wantBuildManager->intToString(this->enemyUnitDataManager->enemyUnitsMap.size()).append("\n").c_str());
 	
-	log("eiudm map: ");
-	log(this->wantBuildManager->intToString(this->eigenUnitDataManager->myUnitsMap.size()).append("\n").c_str());
+	//log("eiudm map: ");
+	//log(this->wantBuildManager->intToString(this->eigenUnitDataManager->myUnitsMap.size()).append("\n").c_str());
 
 	if(!UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).contains(this->hatchery))
 	{
@@ -95,19 +95,19 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 		//log("HC::update taskManager\n");
 		this->taskManager->update();
 		//log("tasklist: ");
-		log(this->wantBuildManager->intToString(this->taskManager->tasklist.size()).append("\n").c_str());
+		//log(this->wantBuildManager->intToString(this->taskManager->tasklist.size()).append("\n").c_str());
 		//log("HC::update planAssigner\n");
 		//log("hcplan: ");
-		log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
+		//log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
 		//this->planAssigner->update();
 		this->hcplan = this->planAssigner->maakPlan();
 		//log("hcplan: ");
-		log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
+		//log(this->wantBuildManager->intToString(this->hcplan.size()).append("\n").c_str());
 	}
 
-	log("HC::update doMicro\n");
+	//log("HC::update doMicro\n");
 	this->microManager->doMicro(this->eigenUnitGroupManager->unitGroups);
-	log("HC::update wantBuildManager\n");
+	//log("HC::update wantBuildManager\n");
 	this->wantBuildManager->update();
 
 	if(this->tick == 5)
@@ -167,12 +167,12 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	/////////////
 	//log("einde hc cirkeltjes\n");
 
-	log("einde hc update\n");
+	//log("einde hc update\n");
 }
 
 void HighCommand::onRemoveUnit(BWAPI::Unit* unit)
 {
-	log("HC onRemoveUnit\n");
+	//log("HC onRemoveUnit\n");
 	if(unit->getPlayer() == BWAPI::Broodwar->self()) {
 		this->eigenUnitDataManager->onRemoveUnit(unit);
 		this->eigenUnitGroupManager->onRemoveUnit(unit);

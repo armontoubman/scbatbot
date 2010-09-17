@@ -41,13 +41,16 @@ void EnemyUnitDataManager::update(std::set<BWAPI::Unit*> units)
 
 void EnemyUnitDataManager::onRemoveUnit(BWAPI::Unit* unit)
 {
-	std::map<BWAPI::Unit*, EnemyUnitData>::iterator it = enemyUnitsMap.find(unit);
-	enemyUnitsMap.erase(it);
+	if(enemyUnitsMap.count(unit) > 0)
+	{
+		std::map<BWAPI::Unit*, EnemyUnitData>::iterator it = enemyUnitsMap.find(unit);
+		enemyUnitsMap.erase(it);
 
-	BWAPI::Broodwar->printf("onRemoveUnit");
-	log("onRemoveUnit: ");
-	log(unit->getType().getName().c_str());
-	log("\n");
+		BWAPI::Broodwar->printf("onRemoveUnit");
+		log("onRemoveUnit: ");
+		log(unit->getType().getName().c_str());
+		log("\n");
+	}
 }
 
 std::string EnemyUnitDataManager::intToString(int i) {
@@ -247,6 +250,19 @@ int EnemyUnitDataManager::mapMilitarySize(std::map<BWAPI::Unit*, EnemyUnitData> 
 	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
 	{
 		if(isMilitary(enemy.second.unitType))
+		{
+			result++;
+		}
+	}
+	return result;
+}
+
+int EnemyUnitDataManager::mapAirSize(std::map<BWAPI::Unit*, EnemyUnitData> data)
+{
+	int result = 0;
+	for each(std::pair<BWAPI::Unit*, EnemyUnitData> enemy in data)
+	{
+		if(enemy.second.unitType.isFlyer())
 		{
 			result++;
 		}
