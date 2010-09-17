@@ -466,14 +466,17 @@ void WantBuildManager::update()
 									alwat=true;
 									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 								}
-								logc("can make\n\t");
-								logc(b.buildtype.getName().append("\n").c_str());
-								(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
-								buildList.removeTop();
-								//logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-								logc(std::string(intToString(wantList.buildlist.size()).append("\n")).c_str());
-								alwat=true;
-								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+								else
+								{
+									logc("can make\n\t");
+									logc(b.buildtype.getName().append("\n").c_str());
+									(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(b.buildtype);
+									buildList.removeTop();
+									//logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+									logc(std::string(intToString(wantList.buildlist.size()).append("\n")).c_str());
+									alwat=true;
+									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+								}
 							}
 						}
 						else
