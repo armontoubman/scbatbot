@@ -58,9 +58,11 @@ public:
 	UnitGroup getHatcheriesWithMinerals();
 	BWTA::BaseLocation* getNaturalExpansion();
 
+	bool requirementsSatisfied(BuildItem b);
 	bool requirementsSatisfied(BWAPI::UnitType unittype);
 	bool requirementsSatisfied(BWAPI::TechType techtype);
 	bool requirementsSatisfied(BWAPI::UpgradeType upgradetype);
+	bool canBeMade(BuildItem b);
 	bool canBeMade(BWAPI::UnitType unittype);
 	bool bothCanBeMade(BWAPI::UnitType unittype,BWAPI::UnitType unittypetwo);
 	bool canBeMade(BWAPI::TechType techtype);
@@ -101,4 +103,9 @@ public:
 
 	void eigenResearch(BWAPI::TechType techtype);
 	void eigenUpgrade(BWAPI::UpgradeType upgradetype);
+
+	int lastBuildOrderIssued;
+
+	void buildNow(BuildItem b);
+	void checkGemaakt();
 };
