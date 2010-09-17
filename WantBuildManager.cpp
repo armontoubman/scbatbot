@@ -557,7 +557,7 @@ void WantBuildManager::update()
 								else
 								{
 									bool albezig = isBeingHandled(b);
-									if(albezig == false && b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && b.buildtype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() > 0 && b.buildtype.isBuilding())
+									if(albezig == false && (((b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && b.buildtype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() == 0) || b.buildtype == BWAPI::UnitTypes::Zerg_Hatchery || b.buildtype == BWAPI::UnitTypes::Zerg_Extractor) && b.buildtype.isBuilding())
 									{
 										logc("bouwen maar\n");
 										bool gogo = false;
@@ -2308,7 +2308,7 @@ BWAPI::TilePosition WantBuildManager::placeFoundExtractor()
 void WantBuildManager::bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType unittype)
 {
 	logc("bouwStruc\n");
-	if (unittype != BWAPI::UnitTypes::Zerg_Hatchery && unittype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unittype).size() == 0 && unittype.isBuilding())
+	if (((unittype != BWAPI::UnitTypes::Zerg_Hatchery && unittype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unittype).size() == 0) || unittype == BWAPI::UnitTypes::Zerg_Hatchery || unittype == BWAPI::UnitTypes::Zerg_Extractor) && unittype.isBuilding())
 	{
 		BWAPI::Unit* drone = pickBuildDrone(tilepos);
 		if(drone != NULL)
@@ -2660,7 +2660,7 @@ void WantBuildManager::buildNow(BuildItem b)
 	}
 	else
 	{
-		if(b.typenr == 1 && b.buildtype.isBuilding() && b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && b.buildtype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() == 0)
+		if(b.typenr == 1 && b.buildtype.isBuilding() && (((b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && b.buildtype != BWAPI::UnitTypes::Zerg_Extractor && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() == 0) || b.buildtype == BWAPI::UnitTypes::Zerg_Hatchery || b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)))
 		{
 			logc("buildNow type isBuilding\n");
 			if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair || b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
