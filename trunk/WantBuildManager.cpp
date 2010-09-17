@@ -330,7 +330,7 @@ void WantBuildManager::update()
 	if(this->buildList.size() > 0)
 	{
 		checkGemaakt();
-		if(BWAPI::Broodwar->getFrameCount() - this->lastBuildOrderIssued > 300)
+		if(BWAPI::Broodwar->getFrameCount() - this->lastBuildOrderIssued > 600)
 		{
 			logc("timeout, remove\n");
 			this->buildList.removeTop();
@@ -356,60 +356,68 @@ void WantBuildManager::update()
 				}
 				else
 				{
-					logc("geen resource overschot\n");
-					if(this->buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() >= BWAPI::Broodwar->self()->supplyTotal())
+					if(this->buildList.top().buildtype == BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() < (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)))
 					{
-						logc("top != overlord, wel supply tekort\n");
-						if(this->buildList.top().buildtype.isBuilding() && BWAPI::Broodwar->self()->minerals() > 300)
-						{
-							logc("isBuilding en 300 minerals\n");
-							buildNow(this->buildList.top());
-							this->buildList.removeTop();
-							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
-						}
-						else
-						{
-							logc("not (isBuilding en 300 minerals), remove\n");
-							this->buildList.removeTop();
-							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
-						}
+						this->buildList.removeTop();
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					}
 					else
 					{
-						logc("top satisfied\n");
-						if(this->buildList.top().buildtype.isBuilding() 
-							&& UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(!isCompleted).size() > 0 
-							&& this->buildList.size() > 1)
+						logc("geen resource overschot\n");
+						if(this->buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() >= BWAPI::Broodwar->self()->supplyTotal())
 						{
-							logc("top is building maar er is al iets bezig en size > 1\n");
-							if(!requirementsSatisfied(this->buildList.getSecond()))
+							logc("top != overlord, wel supply tekort\n");
+							if(this->buildList.top().buildtype.isBuilding() && BWAPI::Broodwar->self()->minerals() > 300)
 							{
-								logc("second niet satisfied, remove\n");
-								this->buildList.removeSecond();
+								logc("isBuilding en 300 minerals\n");
+								buildNow(this->buildList.top());
+								this->buildList.removeTop();
 								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 							else
 							{
-								logc("second satisfied\n");
-								if(canBeMade(this->buildList.top()) 
-									&& canBeMade(this->buildList.getSecond()) 
-									&& !this->buildList.getSecond().buildtype.isBuilding())
-								{
-									logc("beide canBeMade, second !isBuilding\n");
-									buildNow(this->buildList.getSecond());
-									this->buildList.removeSecond();
-									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
-								}
+								logc("not (isBuilding en 300 minerals), remove\n");
+								this->buildList.removeTop();
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 						}
 						else
 						{
-							logc("not(top is building en albezig en size > 1)\n");
-							if(canBeMade(this->buildList.top()))
+							logc("top satisfied\n");
+							if(this->buildList.top().buildtype.isBuilding() 
+								&& UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(!isCompleted).size() > 0 
+								&& this->buildList.size() > 1)
 							{
-								logc("top canBeMade, gogo\n");
-								buildNow(this->buildList.top());
-								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+								logc("top is building maar er is al iets bezig en size > 1\n");
+								if(!requirementsSatisfied(this->buildList.getSecond()))
+								{
+									logc("second niet satisfied, remove\n");
+									this->buildList.removeSecond();
+									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+								}
+								else
+								{
+									logc("second satisfied\n");
+									if(canBeMade(this->buildList.top()) 
+										&& canBeMade(this->buildList.getSecond()) 
+										&& !this->buildList.getSecond().buildtype.isBuilding())
+									{
+										logc("beide canBeMade, second !isBuilding\n");
+										buildNow(this->buildList.getSecond());
+										this->buildList.removeSecond();
+										this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+									}
+								}
+							}
+							else
+							{
+								logc("not(top is building en albezig en size > 1)\n");
+								if(canBeMade(this->buildList.top()))
+								{
+									logc("top canBeMade, gogo\n");
+									buildNow(this->buildList.top());
+									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+								}
 							}
 						}
 					}
@@ -1438,7 +1446,7 @@ void WantBuildManager::doLists()
 		buildExpand();
 	}
 
-	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 2 && BWAPI::Broodwar->self()->minerals() >= 500 && enemiesNearNatural > 0 && !buildList.containsExpand() && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && dronesRequiredAll()<3 )
+	if( nrOfOwn(BWAPI::UnitTypes::Zerg_Larva) == 0 && buildList.countUnits() > 2 && BWAPI::Broodwar->self()->minerals() >= 350 && enemiesNearNatural > 0 && !buildList.containsExpand() && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && dronesRequiredAll()<4 )
 	{
 		logc("dl v extrahatch req\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
@@ -1465,7 +1473,7 @@ void WantBuildManager::doLists()
 		}
 	}*/
 
-	if((((BWAPI::Broodwar->self()->minerals()>400 || BWAPI::Broodwar->self()->gas()>400) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) == 2)) || (nrOfOwnMilitaryUnits() <7) || ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) > 2) || (nrOfOwnMilitaryUnits() < nrOfEnemyMilitaryUnits())))
+	if((((BWAPI::Broodwar->self()->minerals()>300 || BWAPI::Broodwar->self()->gas()>300) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) == 2)) || (nrOfOwnMilitaryUnits() <7) || ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)) > 2) || (nrOfOwnMilitaryUnits() < nrOfEnemyMilitaryUnits())))
 	{
 		logc("dl v maakunits 8\n");
 		if ( nrOfOwn(BWAPI::UnitTypes::Zerg_Defiler_Mound) > 0)
@@ -1485,26 +1493,26 @@ void WantBuildManager::doLists()
 		}
 		if ( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk) < 10) && (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3) )
 		{
-			addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
+			addBuild(BWAPI::UnitTypes::Zerg_Hydralisk,3);
 		}
 		else 
 		{
 			logc("dl v b 8b-2\n");
 			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+(buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))) < 11) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<3)
 			{
-				addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
+				addBuild(BWAPI::UnitTypes::Zerg_Mutalisk,3);
 			}
 			else
 			{
 				if ( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 6) && (buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk)<3) )
 				{
-					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk);
+					addBuild(BWAPI::UnitTypes::Zerg_Hydralisk,3);
 				}
 				else
 				{
 					if (buildList.count(BWAPI::UnitTypes::Zerg_Zergling)<1)
 					{
-						addBuild(BWAPI::UnitTypes::Zerg_Zergling);
+						addBuild(BWAPI::UnitTypes::Zerg_Zergling,3);
 					}
 				}
 			}
@@ -1565,7 +1573,7 @@ void WantBuildManager::doLists()
 		if((*it).typenr == 3)
 		{
 			logc("for wantlist type==3\n");
-			if(buildList.count((*it).upgradetype) == 0 && BWAPI::Broodwar->self()->getUpgradeLevel((*it).upgradetype  < (*it).upgradetype.maxRepeats()))
+			if(buildList.count((*it).upgradetype) == 0 && BWAPI::Broodwar->self()->getUpgradeLevel((*it).upgradetype) < (*it).upgradetype.maxRepeats())
 			{
 				logc("dl generiek upgrade\n");
 				addBuild((*it).upgradetype);
