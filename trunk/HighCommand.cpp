@@ -68,12 +68,19 @@ void HighCommand::update(std::set<BWAPI::Unit*> myUnits, std::set<BWAPI::Unit*> 
 	log("eiudm map: ");
 	log(this->wantBuildManager->intToString(this->eigenUnitDataManager->myUnitsMap.size()).append("\n").c_str());
 
-	if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).size() == 0)
+	if(!UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).contains(this->hatchery))
 	{
-		BWAPI::Broodwar->leaveGame();
-	}
-	else {
-		if(this->hatchery->getHitPoints() < 100) this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
+		// huidige hatchery is dood
+		if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).size() > 0)
+		{
+			// als er een andere hatchery is, promote nieuwe
+			this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery, Lair, Hive).begin();
+		}
+		else
+		{
+			// geen hatcheries? promote een random unit tot hatchery voor positiechecks etc
+			this->hatchery = *UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).begin();
+		}
 	}
 	
 	//log("HC::update eigenUnitDataManager\n");
