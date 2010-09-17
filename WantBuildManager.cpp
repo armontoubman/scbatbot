@@ -338,42 +338,41 @@ void WantBuildManager::update()
 		}
 		else
 		{
-			logc("geen timeout\n");
-			if(BWAPI::Broodwar->self()->minerals() > 500 && BWAPI::Broodwar->self()->gas() > 500)
+			if(!requirementsSatisfied(this->buildList.top()))
 			{
-				logc("500 minerals 500 gas, forceer bouw\n");
-				buildNow(this->buildList.top());
+				logc("niet satisfied, remove\n");
 				this->buildList.removeTop();
 				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
 			else
 			{
-				logc("geen resource overschot\n");
-				if(this->buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() >= BWAPI::Broodwar->self()->supplyTotal())
+				logc("geen timeout\n");
+				if(BWAPI::Broodwar->self()->minerals() > 300 && BWAPI::Broodwar->self()->gas() > 300)
 				{
-					logc("top != overlord, wel supply tekort\n");
-					if(this->buildList.top().buildtype.isBuilding() && BWAPI::Broodwar->self()->minerals() > 300)
-					{
-						logc("isBuilding en 300 minerals\n");
-						buildNow(this->buildList.top());
-						this->buildList.removeTop();
-						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
-					}
-					else
-					{
-						logc("not (isBuilding en 300 minerals), remove\n");
-						this->buildList.removeTop();
-						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
-					}
+					logc("300 minerals 300 gas, forceer bouw\n");
+					buildNow(this->buildList.top());
+					this->buildList.removeTop();
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
-					logc("not (not overlord en supply tekort)\n");
-					if(!requirementsSatisfied(this->buildList.top()))
+					logc("geen resource overschot\n");
+					if(this->buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() >= BWAPI::Broodwar->self()->supplyTotal())
 					{
-						logc("niet satisfied, remove\n");
-						this->buildList.removeTop();
-						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+						logc("top != overlord, wel supply tekort\n");
+						if(this->buildList.top().buildtype.isBuilding() && BWAPI::Broodwar->self()->minerals() > 300)
+						{
+							logc("isBuilding en 300 minerals\n");
+							buildNow(this->buildList.top());
+							this->buildList.removeTop();
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+						}
+						else
+						{
+							logc("not (isBuilding en 300 minerals), remove\n");
+							this->buildList.removeTop();
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+						}
 					}
 					else
 					{
@@ -557,7 +556,7 @@ void WantBuildManager::doLists()
 			{
 				addWant(BWAPI::TechTypes::Lurker_Aspect);
 			}
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>3) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 15) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 30) && dronesRequiredAll() < 3)
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>3) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 20) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 30)) && dronesRequiredAll() < 3)
 			{
 				stap = 4;
 			}
@@ -922,7 +921,7 @@ void WantBuildManager::doLists()
 					addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 				}
 			}
-			if((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && wantListIsCompleted() ) 
+			if((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>2) && wantListIsCompleted() && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 20) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 30)) ) 
 			{
 				stap = 4;
 			}
@@ -1393,10 +1392,10 @@ void WantBuildManager::doLists()
 		logc("dl v buildtopoverlord3\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Overlord);
 	}
-	if( dronesRequiredAll() > (buildList.count(BWAPI::UnitTypes::Zerg_Drone)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Drone)) && buildList.count(BWAPI::UnitTypes::Zerg_Drone)<6 ) // not sufficient drones
+	if( dronesRequiredAll()+2 > (buildList.count(BWAPI::UnitTypes::Zerg_Drone)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Drone)) && buildList.count(BWAPI::UnitTypes::Zerg_Drone)<6 ) // not sufficient drones
 	{
 		logc("drone build\n");	
-		addBuild(BWAPI::UnitTypes::Zerg_Drone);
+		addBuild(BWAPI::UnitTypes::Zerg_Drone, dronesRequiredAll());
 	}
 	
 	UnitGroup hatcheries = getHatcheriesWithMinerals()(isCompleted);
