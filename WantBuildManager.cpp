@@ -332,61 +332,85 @@ void WantBuildManager::update()
 		checkGemaakt();
 		if(BWAPI::Broodwar->getFrameCount() - this->lastBuildOrderIssued > 300)
 		{
+			logc("timeout, remove\n");
 			this->buildList.removeTop();
+			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 		}
 		else
 		{
+			logc("geen timeout\n");
 			if(BWAPI::Broodwar->self()->minerals() > 500 && BWAPI::Broodwar->self()->gas() > 500)
 			{
+				logc("500 minerals 500 gas, forceer bouw\n");
 				buildNow(this->buildList.top());
 				this->buildList.removeTop();
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
 			else
 			{
+				logc("geen resource overschot\n");
 				if(this->buildList.top().buildtype != BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() >= BWAPI::Broodwar->self()->supplyTotal())
 				{
+					logc("top != overlord, wel supply tekort\n");
 					if(this->buildList.top().buildtype.isBuilding() && BWAPI::Broodwar->self()->minerals() > 300)
 					{
+						logc("isBuilding en 300 minerals\n");
 						buildNow(this->buildList.top());
 						this->buildList.removeTop();
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					}
 					else
 					{
+						logc("not (isBuilding en 300 minerals), remove\n");
 						this->buildList.removeTop();
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					}
 				}
 				else
 				{
+					logc("not (not overlord en supply tekort)\n");
 					if(!requirementsSatisfied(this->buildList.top()))
 					{
+						logc("niet satisfied, remove\n");
 						this->buildList.removeTop();
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					}
 					else
 					{
+						logc("top satisfied\n");
 						if(this->buildList.top().buildtype.isBuilding() 
 							&& UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(!isCompleted).size() > 0 
 							&& this->buildList.size() > 1)
 						{
+							logc("top is building maar er is al iets bezig en size > 1\n");
 							if(!requirementsSatisfied(this->buildList.getSecond()))
 							{
+								logc("second niet satisfied, remove\n");
 								this->buildList.removeSecond();
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 							else
 							{
+								logc("second satisfied\n");
 								if(canBeMade(this->buildList.top()) 
 									&& canBeMade(this->buildList.getSecond()) 
 									&& !this->buildList.getSecond().buildtype.isBuilding())
 								{
+									logc("beide canBeMade, second !isBuilding\n");
 									buildNow(this->buildList.getSecond());
 									this->buildList.removeSecond();
+									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 								}
 							}
 						}
 						else
 						{
+							logc("not(top is building en albezig en size > 1)\n");
 							if(canBeMade(this->buildList.top()))
 							{
+								logc("top canBeMade, gogo\n");
 								buildNow(this->buildList.top());
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 						}
 					}
@@ -2085,6 +2109,7 @@ void WantBuildManager::buildNow(BuildItem b)
 			{
 				BWAPI::Unit* nearestHydra = this->mm->nearestUnit(this->hc->hatchery->getPosition(), allUnits(Hydralisk));
 				nearestHydra->morph(b.buildtype);
+				logc("buildNow lurker\n");
 			}
 		}
 		else
@@ -2092,6 +2117,7 @@ void WantBuildManager::buildNow(BuildItem b)
 			if(allUnits(Larva).size() > 0)
 			{
 				(*allUnits(Larva).begin())->morph(b.buildtype);
+				logc("buildNow unit\n");
 			}
 		}
 	}
@@ -2099,8 +2125,10 @@ void WantBuildManager::buildNow(BuildItem b)
 	{
 		if(b.typenr == 1 && b.buildtype.isBuilding())
 		{
+			logc("buildNow type isBuilding\n");
 			if(!isBeingHandled(b))
 			{
+				logc("not being handled\n");
 				BWAPI::TilePosition lokatie;
 				if(b.buildtype == BWAPI::UnitTypes::Zerg_Extractor)
 				{
@@ -2110,6 +2138,7 @@ void WantBuildManager::buildNow(BuildItem b)
 				{
 					lokatie = placeFound(b.buildtype);
 				}
+				logc("buildNow building\n");
 				bouwStruc(lokatie, b.buildtype);
 			}
 		}
@@ -2117,16 +2146,19 @@ void WantBuildManager::buildNow(BuildItem b)
 		{
 			if(b.typenr == 4)
 			{
+				logc("buildNow expand\n");
 				doExpand();
 			}
 			else
 			{
 				if(b.typenr == 2)
 				{
+					logc("buildNow research\n");
 					eigenResearch(b.researchtype);
 				}
 				if(b.typenr == 3)
 				{
+					logc("buildNow upgrade\n");
 					eigenUpgrade(b.upgradetype);
 				}
 			}
