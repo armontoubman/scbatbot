@@ -357,7 +357,7 @@ bool PlanAssigner::canReach(UnitGroup* ug, BWAPI::Position pos)
 
 void PlanAssigner::logc(const char* msg)
 {
-	if(true)
+	if(false)
 	{
 		log(msg);
 	}
