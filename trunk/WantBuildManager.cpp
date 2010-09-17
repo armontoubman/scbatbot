@@ -2024,7 +2024,19 @@ bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UnitType u
 {
 	// enkel 1st is building, 2e is unit
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
-	return (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittypetwo.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
+	bool result = (unittype.isBuilding() && !unittypetwo.isBuilding() && allUnits(Larva).size() > 0 && (unittype.mineralPrice()+unittypetwo.mineralPrice()) <= BWAPI::Broodwar->self()->minerals() && (unittype.gasPrice()+unittypetwo.gasPrice()) <= BWAPI::Broodwar->self()->gas() && unittypetwo.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittypetwo.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
+	if(result)
+	{
+		logc("bothCanBeMade = true\n");
+	}
+	else
+	{
+		logc("bothCanBeMade = false\n ");
+	}
+	logc("totaal minerals: ");
+	logc(intToString(unittype.mineralPrice()+unittypetwo.mineralPrice()).c_str());
+	logc("\n");
+	return result;
 }
 
 bool WantBuildManager::canBeMade(BWAPI::TechType techtype)
@@ -2053,7 +2065,19 @@ bool WantBuildManager::bothCanBeMade(BWAPI::UnitType unittype, BWAPI::UpgradeTyp
 
 bool WantBuildManager::bothCanBeMadeExpandUnit(BWAPI::UnitType unittype)
 {
-	return (((unittype.mineralPrice()+300) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice())<= BWAPI::Broodwar->self()->gas()) && unittype.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittype.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
+	bool result = (((unittype.mineralPrice()+300) <= BWAPI::Broodwar->self()->minerals()) && ((unittype.gasPrice())<= BWAPI::Broodwar->self()->gas()) && unittype.supplyRequired() <= ((BWAPI::Broodwar->self()->supplyTotal()+unittype.supplyProvided()) - BWAPI::Broodwar->self()->supplyUsed()));
+	if(result)
+	{
+		logc("bothCanBeMadeExpandUnit = true\n");
+	}
+	else
+	{
+		logc("bothCanBeMadeExpandUnit = false\n ");
+	}
+	logc("totaal minerals: ");
+	logc(intToString(unittype.mineralPrice()+300).c_str());
+	logc("\n");
+	return result;
 }
 
 bool WantBuildManager::bothCanBeMadeExpand(BWAPI::TechType techtype)
