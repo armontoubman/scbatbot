@@ -30,13 +30,13 @@ void TaskManager::insertTask(Task t)
 	// tasklist had altijd maar grootte 1
 	// tasklist was eerst een set
 	// unique = fout
-	log("insertTask()\n");
-	log("tasklist voor: ");
-	log(this->hc->wantBuildManager->intToString(this->tasklist.size()).append("\n").c_str());
+	//log("insertTask()\n");
+	//log("tasklist voor: ");
+	//log(this->hc->wantBuildManager->intToString(this->tasklist.size()).append("\n").c_str());
 
 	this->tasklist.push_front(t);
-	log(" tasklist na: ");
-	log(this->hc->wantBuildManager->intToString(this->tasklist.size()).append("\n").c_str());
+	//log(" tasklist na: ");
+	//log(this->hc->wantBuildManager->intToString(this->tasklist.size()).append("\n").c_str());
 	/*std::list<Task>::iterator insertposition;
 	bool plek = false;
 	for(std::list<Task>::iterator i=this->tasklist.begin();i!=this->tasklist.end();i++)
