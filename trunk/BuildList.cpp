@@ -18,16 +18,19 @@ void BuildList::addItem(BuildItem b)
 
 void BuildList::removeItem(BuildItem b)
 {
+	if(this->buildlist.size() == 0) return;
 	this->buildlist.erase(find(this->buildlist.begin(), this->buildlist.end(), b));
 }
 
 void BuildList::removeTop()
 {
+	if(this->buildlist.size() == 0) return;
 	this->buildlist.erase(this->buildlist.begin());
 }
 
 void BuildList::removeSecond()
 {
+	if(this->buildlist.size() == 0) return;
 	BuildItem b = this->top();
 	this->removeTop();
 	this->removeTop();
@@ -36,6 +39,7 @@ void BuildList::removeSecond()
 
 void BuildList::removeAll(BuildItem b)
 {
+	if(this->buildlist.size() == 0) return;
 	std::list<BuildItem>::iterator curr = this->buildlist.begin();
 	while(curr != this->buildlist.end())
 	{

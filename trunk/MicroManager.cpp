@@ -817,14 +817,25 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
-										(*unitit)->move(nearestSwarm(*unitit)->getPosition());
+										BWAPI::Unit* swarm = nearestSwarm(*unitit);
+										if(swarm != NULL)
+										{
+											(*unitit)->move(swarm->getPosition());
+										}
 									}
 								}
 								else
 								{
 									if(currentTask.type != -1 && (*unitit)->getDistance(currentTask.position) < dist(6) && BWAPI::Broodwar->isVisible(currentTask.position) )
 									{
-										(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), dist(6), 0).begin());
+										if(enemiesInRange((*unitit)->getPosition(), dist(6), 0).size() > 0)
+										{
+											(*unitit)->attackUnit(*enemiesInRange((*unitit)->getPosition(), dist(6), 0).begin());
+										}
+										else
+										{
+											(*unitit)->attackMove(currentTask.position);
+										}
 									}
 									else
 									{
@@ -911,18 +922,33 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										else
 										{
 											logc("lurker structureattack\n");
-											UnitGroup structures = allSelfUnits(isBuilding);
-											BWAPI::Unit* neareststructure = nearestUnit((*unitit)->getPosition(), structures);
-											if((*it)->getCenter().getDistance(neareststructure->getPosition()) < dist(10))
+											UnitGroup structures = allEnemyUnits(isBuilding);
+											if(structures.size() > 0)
 											{
-												(*unitit)->attackUnit(*enemies.begin());
+												BWAPI::Unit* neareststructure = nearestUnit((*unitit)->getPosition(), structures);
+												if((*it)->getCenter().getDistance(neareststructure->getPosition()) < dist(10))
+												{
+													(*unitit)->attackUnit(neareststructure);
+												}
 											}
 										}
 									}
 									else
 									{
 										logc("lurker detected\n");
-										(*unitit)->stop(); // mogelijk moet dit anders als de micro zo vaak hier langs komt dat hij gewoon niet eens aanvalt
+										//(*unitit)->stop(); // mogelijk moet dit anders als de micro zo vaak hier langs komt dat hij gewoon niet eens aanvalt
+										// hold lurker
+										std::set<BWAPI::Unit*> holdset;
+										holdset.insert(*unitit);
+										UnitGroup olords = allSelfUnits(Overlord)(isIdle);
+										logc("lurker preholdpos\n");
+										if(olords.size() > 0)
+										{
+											logc("lurker holdposdone\n");
+											holdset.insert(*olords.begin());
+											UnitGroup holdgroup = UnitGroup::getUnitGroup(holdset);
+											holdgroup.holdPosition();
+										}
 									}
 								}
 								else
@@ -1367,7 +1393,15 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 													else
 													{
 														logx((*unitit), " attack 3\n");
-														(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
+														BWAPI::Unit* attack3nearest = nearestUnit((*unitit)->getPosition(), allEnemyUnits);
+														if(attack3nearest != NULL)
+														{
+															(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
+														}
+														else
+														{
+															(*unitit)->move(currentTask.position);
+														}
 													}
 												}
 											}
