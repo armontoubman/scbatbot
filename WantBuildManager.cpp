@@ -326,17 +326,43 @@ void WantBuildManager::update()
 	logBuildList(this->buildList);
 	logc("stap: ");
 	logc(intToString(this->stap).append("\n").c_str());
+	bool alwat = false;
 	// Actual building of items
 	if(buildList.size() > 0)
 	{
 		BuildItem b = buildList.top();
-		if (buildList.count(BWAPI::UnitTypes::Zerg_Overlord)>0 && b.typenr != 4 && !b.buildtype.isBuilding() && b.buildtype != BWAPI::UnitTypes::Zerg_Overlord)
+		if(BWAPI::Broodwar->getFrameCount() - this->lastBuildOrderIssued > 300)
+		{
+			logc("timeout, remove\n");
+			buildList.removeTop();
+			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+			alwat=true;
+		}
+		if(!requirementsSatisfied(b))
+		{
+			logc("niet satisfied, remove\n");
+			this->buildList.removeTop();
+			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+			alwat=true;
+		}
+		if (alwat==false && buildList.count(BWAPI::UnitTypes::Zerg_Overlord)>0 && b.typenr != 4 && !b.buildtype.isBuilding() && b.buildtype != BWAPI::UnitTypes::Zerg_Overlord)
 		{
 			logc("remove voor overlord\n");
 			buildList.removeTop();
-			return;
+			alwat=true;
+			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 		}
-		// check of gebouw al aant bouwe is
+
+
+		if(alwat==false && BWAPI::Broodwar->self()->minerals() > 500 || BWAPI::Broodwar->self()->gas() > 500)
+		{
+			logc("300 minerals 300 gas, forceer bouw\n");
+			buildNow(this->buildList.top());
+			this->buildList.removeTop();
+			alwat=true;
+			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+		}
+		/*// check of gebouw al aant bouwe is
 		if((b.typenr == 1 && b.buildtype.isBuilding()) || b.typenr == 4)
 		{
 			UnitGroup bezig = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(isBeingConstructed);
@@ -383,11 +409,20 @@ void WantBuildManager::update()
 					return;
 				}
 			}
-		}
+		}*/
 		//einde remove build als aant bouwe is
 
+		if(alwat==false)
+		{
+			alwat = checkGemaakt();
+			if(alwat==true)
+			{
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+			}
+		}
+
 		logc(std::string(intToString(b.typenr)).append("=b.typenr\n").c_str());
-		if(b.typenr == 1)
+		if(b.typenr == 1 && alwat==false)
 		{
 			if(!requirementsSatisfied(b.buildtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
@@ -397,7 +432,8 @@ void WantBuildManager::update()
 				buildList.removeTop();
 				//logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 				logc(std::string((intToString(wantList.buildlist.size())).append("\n")).c_str());
-				return;
+				alwat=true;
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
 			else
 			{
@@ -406,7 +442,8 @@ void WantBuildManager::update()
 					logc(b.buildtype.getName().append(" ").c_str());
 					logc("drones voorrang\n");
 					buildList.removeTop();
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
@@ -418,14 +455,16 @@ void WantBuildManager::update()
 							{
 								(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hydralisk).begin())->morph(b.buildtype);
 								buildList.removeTop();
-								return;
+								alwat=true;
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 							else
 							{
 								if (b.buildtype == BWAPI::UnitTypes::Zerg_Overlord && ((BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) < (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) || BWAPI::Broodwar->self()->supplyUsed() > 38 && BWAPI::Broodwar->self()->supplyUsed()+16 < (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16))))
 								{
 									buildList.removeTop();
-									return;
+									alwat=true;
+									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 								}
 								logc("can make\n\t");
 								logc(b.buildtype.getName().append("\n").c_str());
@@ -433,7 +472,8 @@ void WantBuildManager::update()
 								buildList.removeTop();
 								//logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
 								logc(std::string(intToString(wantList.buildlist.size()).append("\n")).c_str());
-								return;
+								alwat=true;
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 						}
 						else
@@ -448,7 +488,8 @@ void WantBuildManager::update()
 									this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Lair);
 									logc("gelukt.\n");
 									buildList.removeTop();
-									return;
+									alwat=true;
+									this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 								}
 								else
 								{
@@ -457,7 +498,8 @@ void WantBuildManager::update()
 									{
 										logc("kan geen lair maken, geen hatcheries\n");
 										buildList.removeTop();
-										return;
+										alwat=true;
+										this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 									}
 									else
 									{
@@ -465,7 +507,8 @@ void WantBuildManager::update()
 										(*hatcheries.begin())->morph(BWAPI::UnitTypes::Zerg_Lair);
 										logc("gelukt.\n");
 										buildList.removeTop();
-										return;
+										alwat=true;
+										this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 									}
 								}
 							}
@@ -479,7 +522,8 @@ void WantBuildManager::update()
 										this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
 										logc("gelukt.\n");
 										buildList.removeTop();
-										return;
+										alwat=true;
+										this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 									}
 									else
 									{
@@ -488,7 +532,8 @@ void WantBuildManager::update()
 										{
 											logc("kan geen hive maken, geen lairs\n");
 											buildList.removeTop();
-											return;
+											alwat=true;
+											this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 										}
 										else
 										{
@@ -496,7 +541,8 @@ void WantBuildManager::update()
 											(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
 											logc("gelukt.\n");
 											buildList.removeTop();
-											return;
+											alwat=true;
+											this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 										}
 									}
 								}
@@ -532,7 +578,8 @@ void WantBuildManager::update()
 										{
 											logc("bouwen mislukt, geen locatie\n");
 											buildList.removeTop();
-											return;
+											alwat=true;
+											this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 										}
 									}
 									else
@@ -541,7 +588,6 @@ void WantBuildManager::update()
 										logc("wordt al gemaakt\n");
 									}
 									logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-									return;
 								}
 							}
 						}
@@ -550,14 +596,15 @@ void WantBuildManager::update()
 			}
 		}
 		logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-		if(b.typenr == 2)
+		if(b.typenr == 2 && alwat==false)
 		{
 			logc("research op b\n");
 			if(!requirementsSatisfied(b.researchtype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
 				logc("research removed first\n");
 				buildList.removeTop();
-				return;
+				alwat=true;
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
 			else
 			{
@@ -567,18 +614,20 @@ void WantBuildManager::update()
 					logc("research wordt gedaan\n");
 					this->eigenResearch(b.researchtype);
 					buildList.removeTop();
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				} 
 			}
 		}
-		if(b.typenr == 3)
+		if(b.typenr == 3 && alwat==false)
 		{
 			logc("upgrade op b\n");
 			if(!requirementsSatisfied(b.upgradetype) || (BWAPI::Broodwar->self()->gas() < b.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 			{
 				logc("upgrade removed firstp b\n");
 				buildList.removeTop();
-				return;
+				alwat=true;
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
 			else
 			{
@@ -587,26 +636,28 @@ void WantBuildManager::update()
 					logc("upgrade wordt gedaan\n");
 					this->eigenUpgrade(b.upgradetype);
 					buildList.removeTop();
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 			}
 		}
 		logc("buildlist bf 4\n");
-		if(b.typenr == 4)
+		if(b.typenr == 4 && alwat==false)
 		{
 			if(requirementsSatisfied(BWAPI::UnitTypes::Zerg_Hatchery) && canBeMade(BWAPI::UnitTypes::Zerg_Hatchery))
 			{
 				doExpand();
 				//buildList.removeTop();
-				return;
+				alwat=true;
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
 		}
 		// als eerste een gebouw is en 2e een unit = oke, 1=unit+2=gebouw, wordt wat lastiger moet je weer het 'buildstuff' doen, mogelijk aparte methode gewoon voor maken. Als je beide build hebt, dan wordt het maybe nog erger, moge we nog meer checks doen... zoals pak geen drone die al buildorder heeft. Maja zo vaak bouw je geen 2 dinge tegelijk als zerg.
-		if (buildList.size()>1)
+		if (buildList.size()>1 && alwat==false)
 		{
 			logc("buildlist bs start\n");
 			BuildItem v = buildList.getSecond();
-			if (v.typenr == 1 && b.typenr == 1 && !v.buildtype.isBuilding() && b.buildtype.isBuilding())
+			if (v.typenr == 1 && b.typenr == 1 && !v.buildtype.isBuilding() && b.buildtype.isBuilding() && alwat==false)
 			{
 				logc("buildlist bs buildingplusunit\n");
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
@@ -616,7 +667,8 @@ void WantBuildManager::update()
 					logc("remove second\n");
 					buildList.removeSecond();
 					logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
@@ -629,27 +681,33 @@ void WantBuildManager::update()
 							logc(v.buildtype.getName().append("\n").c_str());
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hydralisk).begin())->morph(v.buildtype);
 							buildList.removeSecond();
-							return;
+							alwat=true;
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 						}
 						else
 						{
 							if (v.buildtype == BWAPI::UnitTypes::Zerg_Overlord && ((BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) < (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) || BWAPI::Broodwar->self()->supplyUsed() > 38 && BWAPI::Broodwar->self()->supplyUsed()+16 < (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16))))
 							{
 								buildList.removeSecond();
-								return;
+								alwat=true;
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
-							logc("can make second\n\t");
-							logc(v.buildtype.getName().append("\n").c_str());
-							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
-							buildList.removeSecond();
-							logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-							return;
+							else
+							{
+								logc("can make second\n\t");
+								logc(v.buildtype.getName().append("\n").c_str());
+								(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
+								buildList.removeSecond();
+								logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
+								alwat=true;
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+							}
 						}
 					}
 				}
 			}
 			logc("buildlist bs pre 1, lair\n");
-			if (v.typenr == 1 && (v.buildtype==BWAPI::UnitTypes::Zerg_Lair || v.buildtype == BWAPI::UnitTypes::Zerg_Hive) && (b.buildtype.isBuilding() || b.typenr == 4))
+			if (alwat==false && v.typenr == 1 && (v.buildtype==BWAPI::UnitTypes::Zerg_Lair || v.buildtype == BWAPI::UnitTypes::Zerg_Hive) && (b.buildtype.isBuilding() || b.typenr == 4))
 			{
 				logc("buildlist upgrlairyo\n");
 				if (v.buildtype==BWAPI::UnitTypes::Zerg_Lair)
@@ -660,7 +718,8 @@ void WantBuildManager::update()
 						this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Lair);
 						logc("gelukt. sec\n");
 						buildList.removeSecond();
-						return;
+						alwat=true;
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					}
 					else
 					{
@@ -669,7 +728,8 @@ void WantBuildManager::update()
 						{
 							logc("kan geen lair maken, geen hatcheries sec\n");
 							buildList.removeSecond();
-							return;
+							alwat=true;
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 						}
 						else
 						{
@@ -677,7 +737,8 @@ void WantBuildManager::update()
 							(*hatcheries.begin())->morph(BWAPI::UnitTypes::Zerg_Lair);
 							logc("gelukt. sec\n");
 							buildList.removeSecond();
-							return;
+							alwat=true;
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 						}
 					}
 				}
@@ -691,7 +752,8 @@ void WantBuildManager::update()
 							this->hc->hatchery->morph(BWAPI::UnitTypes::Zerg_Hive);
 							logc("gelukt second.\n");
 							buildList.removeSecond();
-							return;
+							alwat=true;
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 						}
 						else
 						{
@@ -700,7 +762,8 @@ void WantBuildManager::update()
 							{
 								logc("kan geen hive maken, geen lairs second\n");
 								buildList.removeSecond();
-								return;
+								alwat=true;
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 							else
 							{
@@ -708,14 +771,15 @@ void WantBuildManager::update()
 								(*lairs.begin())->morph(BWAPI::UnitTypes::Zerg_Hive);
 								logc("gelukt. sec\n");
 								buildList.removeSecond();
-								return;
+								alwat=true;
+								this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 							}
 						}
 					}
 				}
 			}
 			logc("buildlist bs pre 4, 1\n");
-			if (v.typenr == 1 && b.typenr == 4 && !v.buildtype.isBuilding())
+			if (alwat==false && v.typenr == 1 && b.typenr == 4 && !v.buildtype.isBuilding())
 			{
 				logc("buildlist bs ja het wordt herkend \n");
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
@@ -725,7 +789,8 @@ void WantBuildManager::update()
 					logc("remove second\n");
 					buildList.removeSecond();
 					logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
@@ -739,7 +804,8 @@ void WantBuildManager::update()
 							logc(v.buildtype.getName().append("\n").c_str());
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hydralisk).begin())->morph(v.buildtype);
 							buildList.removeSecond();
-							return;
+							alwat=true;
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 						}
 						else
 						{
@@ -748,18 +814,20 @@ void WantBuildManager::update()
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
 							buildList.removeSecond();
 							logc(std::string(intToString(buildList.buildlist.size()).append(" ").append(intToString(wantList.buildlist.size())).append("\n")).c_str());
-							return;
+							alwat=true;
+							this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 						}
 					}
 				}
 			}
-			if (v.typenr == 2 && b.typenr == 1)
+			if (alwat==false && v.typenr == 2 && b.typenr == 1)
 			{
 				logc("buildlist bs buildingplusresearch\n");
 				if(!requirementsSatisfied(v.researchtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					buildList.removeSecond();
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
@@ -768,19 +836,21 @@ void WantBuildManager::update()
 						logc("research second\n");
 						this->eigenResearch(v.researchtype);
 						buildList.removeSecond();
-						return;
+						alwat=true;
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					} 
 				}
 			}
 			logc("buildlist bs pre 4, 2\n");
-			if (v.typenr == 2 && b.typenr == 4)
+			if (alwat==false && v.typenr == 2 && b.typenr == 4)
 			{
 				logc("buildlist bs expandplusresearch\n");
 				if(!requirementsSatisfied(v.researchtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					buildList.removeSecond();
 					logc("buildlist bs reseearchremove\n");
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
@@ -789,17 +859,19 @@ void WantBuildManager::update()
 						logc("research second 2\n");
 						this->eigenResearch(v.researchtype);
 						buildList.removeSecond();
-						return;
+						alwat=true;
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					} 
 				}
 			}
-			if(v.typenr == 3 && b.typenr == 1)
+			if(alwat==false && v.typenr == 3 && b.typenr == 1)
 			{
 				logc("buildlist bs buildingplusupgrade\n");
 				if(!requirementsSatisfied(v.upgradetype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					buildList.removeSecond();
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
@@ -808,17 +880,19 @@ void WantBuildManager::update()
 						logc("upgrade second\n");
 						this->eigenUpgrade(v.upgradetype);
 						buildList.removeSecond();
-						return;
+						alwat=true;
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					}
 				}
 			}
-			if(v.typenr == 3 && b.typenr == 4)
+			if(alwat==false && v.typenr == 3 && b.typenr == 4)
 			{
 				logc("buildlist bs expandplusupgrade\n");
 				if(!requirementsSatisfied(v.upgradetype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
 					buildList.removeSecond();
-					return;
+					alwat=true;
+					this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 				}
 				else
 				{
@@ -827,21 +901,24 @@ void WantBuildManager::update()
 						logc("upgrade second 2\n");
 						this->eigenUpgrade(v.upgradetype);
 						buildList.removeSecond();
-						return;
+						alwat=true;
+						this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 					}
 				}
 			}
-			if (v.typenr == 4 && (buildList.count(BWAPI::UnitTypes::Zerg_Spawning_Pool) || buildList.count(BWAPI::UnitTypes::Zerg_Spire) || buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den)))
+			if (alwat==false && v.typenr == 4 && (buildList.count(BWAPI::UnitTypes::Zerg_Spawning_Pool) || buildList.count(BWAPI::UnitTypes::Zerg_Spire) || buildList.count(BWAPI::UnitTypes::Zerg_Hydralisk_Den)))
 			{
 				logc("geen expand als er nog tech inbuildlist staat\n");
 				buildList.removeSecond();
-				return;
+				alwat=true;
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
-			if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && v.buildtype.isBuilding())))
+			if (((b.typenr == 1 && b.buildtype.isBuilding()) || (b.typenr == 4)) && ((v.typenr == 4) || (v.typenr == 1 && v.buildtype.isBuilding())) && alwat==false)
 			{
 				logc("beide buildings\n");
 				buildList.removeSecond();
-				return;
+				alwat=true;
+				this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			}
 		}
 	}
@@ -876,7 +953,7 @@ void WantBuildManager::doLists()
 		if( stap == 2)
 		{
 			logc("doLists stap 2\n");
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2) && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>9)
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<2) && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>8)
 			{
 				logc("dl p 1-nexpand\n");
 				buildExpand();
@@ -2504,7 +2581,7 @@ void WantBuildManager::eigenUpgrade(BWAPI::UpgradeType upgradetype)
 	}
 }
 
-void WantBuildManager::checkGemaakt()
+bool WantBuildManager::checkGemaakt()
 {
 	std::list<BuildItem> teVerwijderen;
 	for each(BuildItem b in this->buildList.buildlist)
@@ -2526,6 +2603,11 @@ void WantBuildManager::checkGemaakt()
 	{
 		this->buildList.buildlist.remove(z);
 	}
+	if (teVerwijderen.size()>0)
+	{
+		return true;
+	}
+	return false;
 }
 
 void WantBuildManager::buildNow(BuildItem b)

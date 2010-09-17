@@ -107,5 +107,5 @@ public:
 	int lastBuildOrderIssued;
 
 	void buildNow(BuildItem b);
-	void checkGemaakt();
+	bool checkGemaakt();
 };
