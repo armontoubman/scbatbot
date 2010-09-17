@@ -345,16 +345,21 @@ void WantBuildManager::update()
 			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 			alwat=true;
 		}
-		if (alwat==false && buildList.count(BWAPI::UnitTypes::Zerg_Overlord)>0 && b.typenr != 4 && !b.buildtype.isBuilding() && b.buildtype != BWAPI::UnitTypes::Zerg_Overlord)
+		if (alwat==false && buildList.count(BWAPI::UnitTypes::Zerg_Overlord)>0 && b.typenr != 4 && !b.buildtype.isBuilding() && b.buildtype != BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() >= (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)))
 		{
 			logc("remove voor overlord\n");
 			buildList.removeTop();
 			alwat=true;
 			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
 		}
-
-
-		if(alwat==false && BWAPI::Broodwar->self()->minerals() > 500 || BWAPI::Broodwar->self()->gas() > 500)
+		if (alwat==false && buildList.count(BWAPI::UnitTypes::Zerg_Overlord)>0 && b.buildtype == BWAPI::UnitTypes::Zerg_Overlord && BWAPI::Broodwar->self()->supplyUsed() < (BWAPI::Broodwar->self()->supplyTotal()-4+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)))
+		{
+			logc("overkill overlord\n");
+			buildList.removeTop();
+			alwat=true;
+			this->lastBuildOrderIssued = BWAPI::Broodwar->getFrameCount();
+		}
+		if(alwat==false && (BWAPI::Broodwar->self()->minerals() > 500 || BWAPI::Broodwar->self()->gas() > 500))
 		{
 			logc("300 minerals 300 gas, forceer bouw\n");
 			buildNow(this->buildList.top());
@@ -483,7 +488,7 @@ void WantBuildManager::update()
 						{
 							logc("can make\n\t");
 							logc(b.buildtype.getName().append("\n").c_str());
-							if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair)
+							if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair,Hive).size()==0)
 							{
 								if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
 								{
@@ -517,7 +522,7 @@ void WantBuildManager::update()
 							}
 							else
 							{
-								if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+								if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hive).size()==0)
 								{
 									if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
 									{
@@ -530,8 +535,8 @@ void WantBuildManager::update()
 									}
 									else
 									{
-										UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair);
-										if(lairs.size() == 0 || nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>0)
+										UnitGroup lairs = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair,Hive);
+										if(lairs.size() == 0)
 										{
 											logc("kan geen hive maken, geen lairs\n");
 											buildList.removeTop();
@@ -552,7 +557,7 @@ void WantBuildManager::update()
 								else
 								{
 									bool albezig = isBeingHandled(b);
-									if(albezig == false)
+									if(albezig == false && b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() > 0 && b.buildtype.isBuilding())
 									{
 										logc("bouwen maar\n");
 										bool gogo = false;
@@ -713,7 +718,7 @@ void WantBuildManager::update()
 			if (alwat==false && v.typenr == 1 && (v.buildtype==BWAPI::UnitTypes::Zerg_Lair || v.buildtype == BWAPI::UnitTypes::Zerg_Hive) && (b.buildtype.isBuilding() || b.typenr == 4))
 			{
 				logc("buildlist upgrlairyo\n");
-				if (v.buildtype==BWAPI::UnitTypes::Zerg_Lair)
+				if (v.buildtype==BWAPI::UnitTypes::Zerg_Lair && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair,Hive).size()==0 )
 				{
 					if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Hatchery)
 					{
@@ -747,7 +752,7 @@ void WantBuildManager::update()
 				}
 				else
 				{
-					if(v.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+					if(v.buildtype == BWAPI::UnitTypes::Zerg_Hive && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hive).size()==0)
 					{
 						if(this->hc->hatchery->getType() == BWAPI::UnitTypes::Zerg_Lair)
 						{
@@ -2290,12 +2295,15 @@ BWAPI::TilePosition WantBuildManager::placeFoundExtractor()
 void WantBuildManager::bouwStruc(BWAPI::TilePosition tilepos, BWAPI::UnitType unittype)
 {
 	logc("bouwStruc\n");
-	BWAPI::Unit* drone = pickBuildDrone(tilepos);
-	if(drone != NULL)
+	if (unittype != BWAPI::UnitTypes::Zerg_Hatchery && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, unittype).size() == 0 && unittype.isBuilding())
 	{
-		logc("drone != NULL\n");
-		drone->build(tilepos, unittype);
-		//this->bouwdrones.insert(drone);
+		BWAPI::Unit* drone = pickBuildDrone(tilepos);
+		if(drone != NULL)
+		{
+			logc("drone != NULL\n");
+			drone->build(tilepos, unittype);
+			//this->bouwdrones.insert(drone);
+		}
 	}
 }
 
@@ -2639,12 +2647,12 @@ void WantBuildManager::buildNow(BuildItem b)
 	}
 	else
 	{
-		if(b.typenr == 1 && b.buildtype.isBuilding())
+		if(b.typenr == 1 && b.buildtype.isBuilding() && b.buildtype != BWAPI::UnitTypes::Zerg_Hatchery && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).size() == 0)
 		{
 			logc("buildNow type isBuilding\n");
 			if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair || b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
 			{
-				if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair)
+				if(b.buildtype == BWAPI::UnitTypes::Zerg_Lair && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Lair,Hive).size() == 0 )
 				{
 					if(allUnits(Hatchery).size() > 0)
 					{
@@ -2652,7 +2660,7 @@ void WantBuildManager::buildNow(BuildItem b)
 						(*allUnits(Hatchery).begin())->morph(b.buildtype);
 					}
 				}
-				if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+				if(b.buildtype == BWAPI::UnitTypes::Zerg_Hive && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hive).size() == 0)
 				{
 					if(allUnits(Lair).size() > 0)
 					{
