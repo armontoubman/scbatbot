@@ -689,7 +689,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 				/* NEW ZERGLING */
 				if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Zergling)
 				{
-					UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(20), (*unitit)->getPosition());
+					UnitGroup allies = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).inRadius(dist(12), (*unitit)->getPosition());
 					UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(10), 1);
 					UnitGroup enemiesair = enemiesInRange((*unitit)->getPosition(), dist(7), 2);
 					if (MicroManager::amountCanAttackGround(enemiesair)>0 && MicroManager::amountCanAttackAir(allies)==0)
@@ -853,18 +853,22 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					{
 						if(!(*unitit)->isBurrowed())
 						{
+							logc("lurker unburrowed\n");
 							if((*unitit)->isUnderStorm())
 							{
+								logc("lurker storm\n");
 								moveToNearestBase(*unitit);
 							}
 							else
 							{
-								if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6) && enemiesInRange((*unitit)->getPosition(), dist(13), 0).size() == 0)
+								if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6) && enemiesInRange((*unitit)->getPosition(), dist(8), 0).size() == 0)
 								{
+									logc("lurker movetask\n");
 									(*unitit)->move(currentTask.position);
 								}
 								else
 								{
+									logc("burrow\n");
 									(*unitit)->burrow();
 								}
 							}
@@ -873,21 +877,25 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						{
 							if((*unitit)->isUnderStorm())
 							{
+								logc("lurker stormunburrow\n");
 								(*unitit)->unburrow();
 							}
 							else
 							{
 								UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(6), 0);
-								if(enemiesInRange((*unitit)->getPosition(), dist(13), 0).size() > 0)
+								if(enemiesInRange((*unitit)->getPosition(), dist(8), 0).size() > 0)
 								{
+									logc("lurker predetectie\n");
 									if(!this->eiudm->unitIsSeen(*unitit))
 									{
+										logc("lurker notdetec\n");
 										if(enemies.size() > 3)
 										{
 											if(enemies(Marine).size() > 0 || enemies(isWorker).size() > 0 || enemies(Zealot).size() > 0 || enemies(Medic).size() > 0 || enemies(Zergling).size() > 0)
 											{
 												if(nearestUnit((*unitit)->getPosition(), enemies)->getPosition().getDistance((*unitit)->getPosition()) < dist(3))
 												{
+													logc("lurker attackinseen\n");
 													(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), enemies)); // mogelijke changen
 												}
 												else
@@ -896,8 +904,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 													std::set<BWAPI::Unit*> holdset;
 													holdset.insert(*unitit);
 													UnitGroup olords = allSelfUnits(Overlord)(isIdle);
+													logc("lurker preholdpos\n");
 													if(olords.size() > 0)
 													{
+														logc("lurker holdposdone\n");
 														holdset.insert(*olords.begin());
 														UnitGroup holdgroup = UnitGroup::getUnitGroup(holdset);
 														holdgroup.holdPosition();
@@ -906,11 +916,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 											}
 											else
 											{
+												logc("lurker attackgewoon\n");
 												(*unitit)->attackUnit(*enemies.begin());
 											}
 										}
 										else
 										{
+											logc("lurker structureattack\n");
 											UnitGroup structures = allSelfUnits(isBuilding);
 											BWAPI::Unit* neareststructure = nearestUnit((*unitit)->getPosition(), structures);
 											if((*it)->getCenter().getDistance(neareststructure->getPosition()) < dist(10))
@@ -921,6 +933,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									}
 									else
 									{
+										logc("lurker detected\n");
 										(*unitit)->stop(); // mogelijk moet dit anders als de micro zo vaak hier langs komt dat hij gewoon niet eens aanvalt
 									}
 								}
@@ -928,6 +941,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								{
 									if((*unitit)->getPosition().getDistance(currentTask.position) > dist(6))
 									{
+										logc("lurker unburrowmoven\n");
 										(*unitit)->unburrow();
 									}
 									else
@@ -936,16 +950,19 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										std::set<BWAPI::Unit*> holdset;
 										holdset.insert(*unitit);
 										UnitGroup olords = allSelfUnits(Overlord)(isIdle);
+										logc("lurker andereprehold\n");
 										if(olords.size() > 0)
 										{
 											holdset.insert(*olords.begin());
 											UnitGroup holdgroup = UnitGroup::getUnitGroup(holdset);
 											holdgroup.holdPosition();
+											logc("lurker anderehold\n");
 										}
 									}
 								}
 							}
 						}
+						logc("lurker einde\n");
 					}
 					/* EINDE LURKER */
 
@@ -1233,7 +1250,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									UnitGroup allyAirInRange = allSelfUnits(isFlyer).inRadius(dist(7), (*unitit)->getPosition());
 									UnitGroup dronesInRange = allSelfUnits(Drone).inRadius(dist(7), (*unitit)->getPosition());
 									UnitGroup enemies = enemiesInRange((*unitit)->getPosition(), dist(7), 0);
-									if(!canAttackGround(allyAirInRange) && enemies.size()*4 <= dronesInRange.size())
+									if(!canAttackGround(allyAirInRange) && enemies.size()*2 <= dronesInRange.size())
 									{
 										logx((*unitit), " drone rage\n");
 										BWAPI::Unit* target = getVisibleUnit(enemies);

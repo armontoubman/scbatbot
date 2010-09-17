@@ -617,7 +617,7 @@ void WantBuildManager::update()
 					{
 						if(b.buildtype == BWAPI::UnitTypes::Zerg_Lurker)
 						{
-							logc("can make\n\t");
+							logc("can make second\n\t");
 							logc(v.buildtype.getName().append("\n").c_str());
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hydralisk).begin())->morph(v.buildtype);
 							buildList.removeSecond();
@@ -625,12 +625,12 @@ void WantBuildManager::update()
 						}
 						else
 						{
-							if (v.buildtype == BWAPI::UnitTypes::Zerg_Overlord && (BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) < (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)))
+							if (v.buildtype == BWAPI::UnitTypes::Zerg_Overlord && ((BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) < (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) || BWAPI::Broodwar->self()->supplyUsed() > 38 && BWAPI::Broodwar->self()->supplyUsed()+16 < (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16))))
 							{
-								buildList.removeTop();
+								buildList.removeSecond();
 								return;
 							}
-							logc("can make\n\t");
+							logc("can make second\n\t");
 							logc(v.buildtype.getName().append("\n").c_str());
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
 							buildList.removeSecond();
@@ -710,7 +710,7 @@ void WantBuildManager::update()
 			{
 				if(!requirementsSatisfied(v.buildtype) || (BWAPI::Broodwar->self()->gas() < v.gasPrice() && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Drone)(isGatheringGas).size() == 0))
 				{
-					logc("can't make second\n\t");
+					logc("can't make secondexp\n\t");
 					logc(v.buildtype.getName().append("\n").c_str());
 					logc("remove second\n");
 					buildList.removeSecond();
@@ -723,7 +723,7 @@ void WantBuildManager::update()
 					{
 						if(v.buildtype == BWAPI::UnitTypes::Zerg_Lurker)
 						{
-							logc("can make\n\t");
+							logc("can make second2exp\n\t");
 							logc(v.buildtype.getName().append("\n").c_str());
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hydralisk).begin())->morph(v.buildtype);
 							buildList.removeSecond();
@@ -731,7 +731,7 @@ void WantBuildManager::update()
 						}
 						else
 						{
-							logc("can make\n\t");
+							logc("can make second3exp\n\t");
 							logc(v.buildtype.getName().append("\n").c_str());
 							(*UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Larva).begin())->morph(v.buildtype);
 							buildList.removeSecond();
