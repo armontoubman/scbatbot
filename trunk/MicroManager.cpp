@@ -1518,7 +1518,6 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						logc("hydra eind\n ");
 					}
-					logc("hydra eind2\n");
 					/* EINDE HYDRALISK */
 				}
 			}
