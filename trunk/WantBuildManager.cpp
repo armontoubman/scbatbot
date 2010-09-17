@@ -330,7 +330,7 @@ void WantBuildManager::update()
 	if(this->buildList.size() > 0)
 	{
 		checkGemaakt();
-		if(BWAPI::Broodwar->getFrameCount() - this->lastBuildOrderIssued > 600)
+		if(BWAPI::Broodwar->getFrameCount() - this->lastBuildOrderIssued > 300)
 		{
 			logc("timeout, remove\n");
 			this->buildList.removeTop();
@@ -385,7 +385,7 @@ void WantBuildManager::update()
 						{
 							logc("top satisfied\n");
 							if(this->buildList.top().buildtype.isBuilding() 
-								&& UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(!isCompleted).size() > 0 
+								&& UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits()).not(isCompleted).size() > 0 
 								&& this->buildList.size() > 1)
 							{
 								logc("top is building maar er is al iets bezig en size > 1\n");
@@ -1262,9 +1262,8 @@ void WantBuildManager::doLists()
 
 	// upgrades
 
-	int zerglingtotaal = this->buildList.count(BWAPI::UnitTypes::Zerg_Zergling);
-	zerglingtotaal += UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Zergling).size();
-	zerglingtotaal += countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Zergling);
+	int zerglingtotaal = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Zergling).size();
+	zerglingtotaal += countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Zergling)*2;
 	logc("dl g zlingtotal\n");
 	if (zerglingtotaal > 10)
 	{
@@ -2092,12 +2091,17 @@ void WantBuildManager::checkGemaakt()
 	{
 		if(b.buildtype.isBuilding())
 		{
-			if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype)(!isCompleted).size() > 0)
+			if(UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, b.buildtype).not(isCompleted).size() > 0)
 			{
 				teVerwijderen.push_back(b);
 			}
 		}
+		if(b.typenr == 4 && UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(Hatchery).not(isCompleted).size() > 0)
+		{
+			teVerwijderen.push_back(b);
+		}
 	}
+
 	for each(BuildItem z in teVerwijderen)
 	{
 		this->buildList.buildlist.remove(z);
