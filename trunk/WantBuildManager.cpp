@@ -1299,14 +1299,13 @@ void WantBuildManager::doLists()
 				}
 				else
 				{
-					addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
 					if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)<3) && !buildList.containsExpand() && buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0)
 					{
 						buildExpand();
 					}
 				}
 			}
-			if( wantListIsCompleted())
+			if( wantListIsCompleted() && nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den)+nrOfOwn(BWAPI::UnitTypes::Zerg_Spire)>0)
 			{
 				addWant(BWAPI::UnitTypes::Zerg_Extractor);
 				addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
@@ -1315,6 +1314,7 @@ void WantBuildManager::doLists()
 		}
 		if( stap == 3)
 		{
+			addWant(BWAPI::UnitTypes::Zerg_Lair);
 			if ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<3 && !buildList.containsExpand())
 			{
 				buildExpand();
