@@ -565,7 +565,7 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 			// check of allemaal uit storm zijn, als er 1tje onder storm is, move to nearest base
 			for(std::set<BWAPI::Unit*>::iterator unitit=(*it)->begin(); unitit!=(*it)->end(); unitit++)
 			{
-				if ((*unitit)->isUnderStorm())
+				if ((*unitit)->isUnderStorm() || (((*unitit) != eerste) && canAttackAir(enemiesInRange((*unitit)->getPosition(), dist(6), 0)) && eerste->getDistance((*unitit)->getPosition()) > dist(4)) )
 					onderstorm = true;
 			}
 			if(onderstorm) 
