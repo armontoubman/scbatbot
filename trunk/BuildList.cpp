@@ -146,6 +146,7 @@ bool BuildList::containsExpand()
 
 BuildItem BuildList::top()
 {
+	if(buildlist.size==0) return BuildItem();
 	return *buildlist.begin();
 }
 
