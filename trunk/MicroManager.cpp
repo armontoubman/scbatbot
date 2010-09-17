@@ -507,7 +507,7 @@ bool MicroManager::tooSplitUp(double radius, UnitGroup* ug)
 	int amount = 0;
 	for(std::set<BWAPI::Unit*>::iterator it=ug->begin(); it!=ug->end(); it++)
 	{
-		if ((*it)->getDistance(ugcenter) > radius)
+		if ((*it)->getDistance(ugcenter) > radius && (*it)->getType() != BWAPI::UnitTypes::Zerg_Overlord)
 		{
 			amount++;
 		}
@@ -573,14 +573,21 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 		{
 			BWAPI::Unit* eerste = *((**it)(Mutalisk).begin());
 			logx(eerste, " begin micro\n");
-			if(eerste->isUnderStorm()) 
+			bool onderstorm = false;
+			// check of allemaal uit storm zijn, als er 1tje onder storm is, move to nearest base
+			for(std::set<BWAPI::Unit*>::iterator unitit=(*it)->begin(); unitit!=(*it)->end(); unitit++)
+			{
+				if ((*unitit)->isUnderStorm())
+					onderstorm = true;
+			}
+			if(onderstorm) 
 			{
 				logx(eerste, " is under storm\n");
 				moveToNearestBase(**it);
 			}
 			else
 			{
-				if(eerste->getGroundWeaponCooldown() != 0 || eerste->getAirWeaponCooldown() != 0)
+				if(eerste->getGroundWeaponCooldown() >= 15 || eerste->getAirWeaponCooldown() >= 15) // er staat op internet 30 is cooldown, en idee is dat ze niet pas terugkomen als cooldown ready is, maar gewoon simpel heen en weer enzo.
 				{
 					logx(eerste, " groundweap cd\n");
 					if(canAttackAir(enemiesInRange(eerste->getPosition(), dist(8), 0)))
@@ -643,14 +650,14 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 						}
 						else
 						{
-							if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) < dist(5))
+							if(eerste->getDistance(this->hc->planAssigner->vindTask(this->hc->hcplan, (*it)).position) <= dist(1))
 							{
 								logx(eerste, " vlakbij task, terug naar base\n");
 								moveToNearestBase(**it);
 							}
 							else
 							{
-								if (tooSplitUp(dist(3), (*it)))
+								if (tooSplitUp(dist(6), (*it)))
 								{
 									(*it)->attackMove(nearestUnit((*it)->getCenter(), (**it))->getPosition());
 								}
@@ -1305,8 +1312,10 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 					/* HYDRALISK */
 					else if((*unitit)->getType() == BWAPI::UnitTypes::Zerg_Hydralisk)
 					{
+						logc("hydra start\n");
 						if((*unitit)->isUnderStorm())
 						{
+							logc("hydra storm\n");
 							(*unitit)->move(moveAway(*unitit, dist(10)));
 						}
 						else
@@ -1315,11 +1324,13 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							UnitGroup allMelee = allEnemies(Drone) + allEnemies(Zealot) + allEnemies(Zergling) + allEnemies(SCV) + allEnemies(Probe) + allEnemies(Ultralisk);
 							allMelee = allMelee.inRadius(dist(6), (*unitit)->getPosition());
 							BWAPI::Unit* swarm = nearestSwarm(*unitit);
+							logc("hydra prenullswarm\n");
 							if(swarm != NULL && swarm->getPosition().getDistance((*unitit)->getPosition()) < dist(10) && allMelee.size() == 0)
 							{
 								BWAPI::Unit* swarm = nearestSwarm(*unitit);
 								if(!isUnderDarkSwarm(*unitit) && swarm != NULL)
 								{
+									logc("hydra darkswarm nearby\n");
 									(*unitit)->attackMove(swarm->getPosition());
 								}
 								else
@@ -1342,18 +1353,23 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 							}
 							else
 							{
-								if(allSelfUnits(Hydralisk).inRadius(dist(8), (*unitit)->getPosition()).size() > 1)
+								logc("hydra Pre samen eerst\n");
+								if(allSelfUnits(Hydralisk).inRadius(dist(6), (*unitit)->getPosition()).size() > 1)
 								{
+									logc("hydra zijnsamen\n");
 									int allies = allSelfUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
 									int enemies = allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()).size();
+									logc("hydra samenpreif\n");
 									if(enemies * 1.5 > allies)
 									{
 										if((*unitit)->getGroundWeaponCooldown() != 0)
 										{
+											logc("hydra groundweapon niet ready\n");
 											(*unitit)->move(moveAway(*unitit));
 										}
 										else
 										{
+											logc("hydra val aan\n");
 											(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition())));
 										}
 									}
@@ -1361,23 +1377,29 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 									{
 										if((*unitit)->getPosition().getDistance(currentTask.position) > dist(8))
 										{
+											logc("hydra distancecheck\n");
 											if(enemiesInRange((*unitit)->getPosition(), dist(9), 0).size() > 0)
 											{
+												logc("hydra er zijn enemies\n");
 												BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()));
 												if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
 												{
+													logc("hydra nearest check\n");
 													if(allSelfUnits(Hydralisk).inRadius(dist(9), nearesttarget->getPosition()).size() > 0)
 													{
+														logc("hydra moveaway ofzo\n");
 														(*unitit)->move(moveAway(*unitit));
 													}
 													else
 													{
 														if((*unitit)->getGroundWeaponCooldown() != 0)
 														{
+															logc("hydra moveaway not rdy\n");
 															(*unitit)->move(currentTask.position);
 														}
 														else
 														{
+															logc("hydra val nogmaals aan\n");
 															(*unitit)->attackUnit(nearesttarget);
 														}
 													}
@@ -1386,16 +1408,19 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 												{
 													if((*unitit)->getGroundWeaponCooldown() != 0)
 													{
+														logc("hydra move to task not ready\n");
 														(*unitit)->move(currentTask.position);
 													}
 													else
 													{
+														logc("hydra attack 3\n");
 														(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
 													}
 												}
 											}
 											else
 											{
+												logc("hydra attackmove task1\n");
 												(*unitit)->attackMove(currentTask.position);
 											}
 										}
@@ -1403,21 +1428,26 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 										{
 											if(enemiesInRange((*unitit)->getPosition(), dist(9), 0).size() > 0)
 											{
+												logc("hydra anderedistance\n");
 												BWAPI::Unit* nearesttarget = nearestUnit((*unitit)->getPosition(), allEnemyUnits.inRadius(dist(15), (*unitit)->getPosition()));
 												if(nearesttarget->getPosition().getDistance((*unitit)->getPosition()) < dist(9))
 												{
+													logc("hydra distbehaald\n");
 													if(allSelfUnits(Hydralisk).inRadius(dist(9), nearesttarget->getPosition()).size() > 0)
 													{
+														logc("hydra moveaway3\n");
 														(*unitit)->move(moveAway(*unitit));
 													}
 													else
 													{
 														if((*unitit)->getGroundWeaponCooldown() != 0)
 														{
+															logc("hydra notrdy2\n");
 															(*unitit)->move(moveAway(*unitit));
 														}
 														else
 														{
+															logc("hydra attack 3\n");
 															(*unitit)->attackUnit(nearesttarget);
 														}
 													}
@@ -1426,16 +1456,19 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 												{
 													if((*unitit)->getGroundWeaponCooldown() != 0)
 													{
+														logc("hydra notrdy3\n");
 														(*unitit)->move(moveAway(*unitit));
 													}
 													else
 													{
+														logc("hydra attack 4\n");
 														(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), allEnemyUnits));
 													}
 												}
 											}
 											else
 											{
+												logc("hydra moveway4\n");
 												(*unitit)->move(moveAway(*unitit));
 											}
 										}
@@ -1443,26 +1476,32 @@ void MicroManager::doMicro(std::set<UnitGroup*> listUG)
 								}
 								else
 								{
+									logc("hydra met weinig\n");
 									UnitGroup nearEnemies = enemiesInRange((*unitit)->getPosition(), dist(9), 0);
 									if(nearEnemies.size() > 0 && canAttackGround(nearEnemies))
 									{
+										logc("hydra weinig en enemy\n");
 										(*unitit)->attackUnit(nearestUnit((*unitit)->getPosition(), nearEnemies));
 									}
 									else
 									{
 										if (tooSplitUp(dist(8), (*it)))
 										{
+											logc("split up\n");
 											(*unitit)->attackMove(nearestUnit((*it)->getCenter(), (**it))->getPosition());
 										}
 										else
 										{
-											moveToNearestBase(*unitit);
+											logc("hydra gogotask\n");
+											(*unitit)->attackMove(currentTask.position);
 										}
 									}
 								}
 							}
 						}
+						logc("hydra eind\n ");
 					}
+					logc("hydra eind2\n");
 					/* EINDE HYDRALISK */
 				}
 			}

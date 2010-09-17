@@ -424,7 +424,7 @@ void WantBuildManager::update()
 							}
 							else
 							{
-								if (b.buildtype == BWAPI::UnitTypes::Zerg_Overlord && (BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) < (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)))
+								if (b.buildtype == BWAPI::UnitTypes::Zerg_Overlord && ((BWAPI::Broodwar->self()->supplyUsed() + buildList.supplyRequiredForTopThree()) < (BWAPI::Broodwar->self()->supplyTotal()+(countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) || BWAPI::Broodwar->self()->supplyUsed() > 38 && BWAPI::Broodwar->self()->supplyUsed()+16 < (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16))))
 								{
 									buildList.removeTop();
 									return;
@@ -1006,7 +1006,7 @@ void WantBuildManager::doLists()
 					}
 					else
 					{
-						if( ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))< 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) )
+						if( ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))< 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<3 )
 						{
 							logc("dl p r 1-2-2-m\n");
 							addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
@@ -1093,7 +1093,7 @@ void WantBuildManager::doLists()
 			else
 			{
 				logc("dl p r 3-2\n");
-				if( (buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) < 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0))
+				if( (buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) < 11) && (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<3)
 				{
 					logc("dl p r 3-2-1\n");
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
@@ -1210,7 +1210,7 @@ void WantBuildManager::doLists()
 			}
 			else 
 			{
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)) < 11) )
+				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)) < 11) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<3 )
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
 				}
@@ -1495,7 +1495,7 @@ void WantBuildManager::doLists()
 			}
 			else 
 			{
-				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)) < 11) )
+				if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)) < 11) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<3 )
 				{
 					addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
 				}
@@ -1795,7 +1795,12 @@ void WantBuildManager::doLists()
 		logc("dl v buildtopoverlord2\n");
 		addBuild(BWAPI::UnitTypes::Zerg_Overlord); // (dus wordt als eerste gedaan)
 	}
-	
+
+	if (BWAPI::Broodwar->self()->supplyUsed() > 38 && BWAPI::Broodwar->self()->supplyUsed()+16 < (BWAPI::Broodwar->self()->supplyTotal()+(buildList.count(BWAPI::UnitTypes::Zerg_Overlord)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Overlord)*16)) && buildList.count(BWAPI::UnitTypes::Zerg_Overlord)<2 && (BWAPI::Broodwar->self()->supplyTotal() < 400) )
+	{
+		logc("dl v buildtopoverlord3\n");
+		addBuild(BWAPI::UnitTypes::Zerg_Overlord);
+	}
 	if( dronesRequiredAll() > (buildList.count(BWAPI::UnitTypes::Zerg_Drone)+countEggsMorphingInto(BWAPI::UnitTypes::Zerg_Drone)) && buildList.count(BWAPI::UnitTypes::Zerg_Drone)<6 ) // not sufficient drones
 	{
 		logc("drone build\n");	
@@ -1894,7 +1899,7 @@ void WantBuildManager::doLists()
 		else 
 		{
 			logc("dl v b 8b-2\n");
-			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+(buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))) < 11) )
+			if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Spire) > 0 ) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk)+(buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk))) < 11) && buildList.count(BWAPI::UnitTypes::Zerg_Mutalisk)<3)
 			{
 				addBuild(BWAPI::UnitTypes::Zerg_Mutalisk);
 			}
