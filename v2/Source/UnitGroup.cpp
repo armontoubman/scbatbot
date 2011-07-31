@@ -1,4 +1,34 @@
-// http://code.google.com/p/bwsal/
+/*
+
+UnitGroup class from BWSAL
+http://code.google.com/p/bwsal/
+
+The MIT License (MIT)
+
+Copyright (c) 2010 The writers of BWSAL
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"), to 
+deal in the Software without restriction, including without limitation the 
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+sell copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in 
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+DEALINGS IN THE SOFTWARE.
+
+*/
+
+//added
+#include "BWTA.h"
 
 #include "UnitGroup.h"
 
@@ -1935,13 +1965,51 @@ bool UnitGroup::useTech(TechType tech, Unit* target) const
   return retval;
 }
 
-// Armon 11-9-2010
+// below are additions for MassExpand
 bool UnitGroup::move(Position target) const
 {
-  bool retval=true;
-  for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
-  {
-    retval = retval && (*i)->move(target);
-  }
-  return retval;
+	bool retval=true;
+	for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
+	{
+		retval = retval && (*i)->move(target);
+	}
+	return retval;
+}
+
+bool UnitGroup::containsUnitOfType(BWAPI::UnitType unittype) const
+{
+	for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
+	{
+		if((*i)->getType() == unittype)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UnitGroup::canReach(BWAPI::Position target) const
+{
+	BWAPI::Unit* first = *(this->begin());
+	if(!this->containsOnlyAirUnits() && BWTA::isConnected(BWAPI::TilePosition(first->getPosition()), BWAPI::TilePosition(target)))
+	{
+		return true;
+	}
+	if(this->containsOnlyAirUnits())
+	{
+		return true;
+	}
+	return false;
+}
+
+bool UnitGroup::containsOnlyAirUnits() const
+{
+	for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
+	{
+		if(!(*i)->getType().isFlyer())
+		{
+			return false;
+		}
+	}
+	return true;
 }

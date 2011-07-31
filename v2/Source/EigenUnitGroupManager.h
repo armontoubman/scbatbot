@@ -19,6 +19,7 @@ public:
 	void onUnitRenegade(Unit* u);
 	std::set<UnitGroup*> getUnitGroupSet();
 	std::string chat();
+	bool groupIsDroneUG(UnitGroup* ug);
 private:
 	HighCommand* hc;
 	std::set<UnitGroup*> unitgroupset;

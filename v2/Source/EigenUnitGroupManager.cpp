@@ -292,3 +292,12 @@ std::string EigenUnitGroupManager::chat()
 	s = boost::str( boost::format( "EIUGM: %d groups") %this->unitgroupset.size() );
 	return s;
 }
+
+bool EigenUnitGroupManager::groupIsDroneUG(UnitGroup* ug)
+{
+	if(ug == this->droneUG)
+	{
+		return true;
+	}
+	return false;
+}

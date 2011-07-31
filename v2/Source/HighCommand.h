@@ -46,7 +46,7 @@ public:
 	MicroManager* mm;
 	EigenUnitGroupManager* eiugm;
 	TaskManager* tm;
-	TaskAssigner* tp;
+	TaskAssigner* ta;
 	WantBuildManager* wbm;
 	ResourceManager* rm;
 

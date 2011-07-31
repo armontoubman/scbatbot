@@ -27,7 +27,7 @@ HighCommand::HighCommand()
 	this->mm = new MicroManager(this);
 	this->eiugm = new EigenUnitGroupManager(this);
 	this->tm = new TaskManager(this);
-	this->tp = new TaskAssigner(this);
+	this->ta = new TaskAssigner(this);
 	this->wbm = new WantBuildManager(this);
 	this->rm = new ResourceManager(this);
 
@@ -39,7 +39,7 @@ HighCommand::~HighCommand() {
 	delete this->mm;
 	delete this->eiugm;
 	delete this->tm;
-	delete this->tp;
+	delete this->ta;
 	delete this->wbm;
 	delete this->rm;
 }
@@ -65,6 +65,7 @@ void HighCommand::update()
 	this->eudm->update();
 
 	this->tm->update();
+	this->ta->update();
 
 	this->drawFPS();
 	this->drawTasks();
@@ -167,6 +168,29 @@ void HighCommand::drawTasks()
 			Broodwar->drawCircleMap(x,y,32,Colors::White,false);
 			Broodwar->drawTextMap(x,y,t.getTypeName().c_str());
 		}
+	}
+
+	std::map<UnitGroup*, Task> plan = this->ta->getPlan();
+	for each(std::pair<UnitGroup*, Task> assignment in plan)
+	{
+		for(std::set<BWAPI::Unit*>::const_iterator i=assignment.first->begin();i!=assignment.first->end();i++)
+		{
+			int x1 = (*i)->getPosition().x();
+			int y1 = (*i)->getPosition().y();
+			int x2 = assignment.second.getPosition().x();
+			int y2 = assignment.second.getPosition().y();
+			BWAPI::Broodwar->drawLineMap(x1, y1, x2, y2, Colors::White);
+		}
+	}
+
+	std::map<BWAPI::Unit*, Task> dronePlan = this->ta->getDronePlan();
+	for each(std::pair<BWAPI::Unit*, Task> assignment in dronePlan)
+	{
+		int x1 = assignment.first->getPosition().x();
+		int y1 = assignment.first->getPosition().y();
+		int x2 = assignment.second.getPosition().x();
+		int y2 = assignment.second.getPosition().y();
+		BWAPI::Broodwar->drawLineMap(x1, y1, x2, y2, Colors::White);
 	}
 }
 

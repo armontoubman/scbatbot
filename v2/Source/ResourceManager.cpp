@@ -116,9 +116,14 @@ void ResourceManager::createTask(TaskType tasktype, Unit* resource)
 std::list<Task> ResourceManager::getTasklist(TaskType tasktype)
 {
 	if(tasktype == GatherMineralsTask)
+	{
 		return this->gathermineralstasklist;
+	}
 	if(tasktype == GatherGasTask)
-		return this->gathergastasklist;		
+	{
+		return this->gathergastasklist;
+	}
+	return this->gathermineralstasklist;
 }
 
 void ResourceManager::removeMineral(Unit* u)

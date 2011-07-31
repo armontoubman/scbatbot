@@ -147,9 +147,14 @@ void EnemyUnitDataManager::createTask(TaskType tasktype, Position position, Unit
 std::list<Task> EnemyUnitDataManager::getTasklist(TaskType tasktype)
 {
 	if(tasktype == ScoutTask)
+	{
 		return this->scouttasklist;
+	}
 	if(tasktype == CombatTask)
+	{
 		return this->combattasklist;
+	}
+	return this->scouttasklist;
 }
 
 void EnemyUnitDataManager::clearTasklists()

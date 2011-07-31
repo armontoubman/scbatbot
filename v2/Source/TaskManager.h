@@ -13,7 +13,7 @@ public:
 	void update();
 	std::list<Task> getTasklist(TaskType tasktype);
 	std::map<TaskType, std::list<Task>> getTasklists();
-
+	bool existsTaskWithType(TaskType tasktype);
 	std::string chat();
 private:
 	HighCommand* hc;

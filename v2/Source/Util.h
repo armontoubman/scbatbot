@@ -14,3 +14,5 @@ BWAPI::Unit* getNearestUnit(BWAPI::Position pos, UnitGroup ug);
 BWAPI::Position getCenterPosition(std::set<BWAPI::Position> posset);
 bool isMilitary(BWAPI::UnitType unittype);
 std::map<BWAPI::UnitType, int> countUnitTypesInUnitGroup(std::set<BWAPI::Unit*> myUnits);
+std::set<BWAPI::Unit*> getEnemyUnitsInRadius(BWAPI::Position pos, int radius);
+std::set<BWAPI::Unit*> getEigenUnitsInRadius(BWAPI::Position pos, int radius);

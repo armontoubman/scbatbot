@@ -74,3 +74,8 @@ std::map<TaskType, std::list<Task>> TaskManager::getTasklists()
 {
 	return this->tasklistmap;
 }
+
+bool TaskManager::existsTaskWithType(TaskType tasktype)
+{
+	return this->tasklistmap[tasktype].size() > 0;
+}

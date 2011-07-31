@@ -116,3 +116,31 @@ std::map<BWAPI::UnitType, int> countUnitTypesInUnitGroup(std::set<BWAPI::Unit*> 
 	}
 	return unitTypeCounts;
 }
+
+std::set<BWAPI::Unit*> getEnemyUnitsInRadius(BWAPI::Position pos, int radius)
+{
+	std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsInRadius(pos, radius);
+	std::set<BWAPI::Unit*> result;
+	for each(BWAPI::Unit* u in units)
+	{
+		if(u->getPlayer() == BWAPI::Broodwar->enemy())
+		{
+			result.insert(u);
+		}
+	}
+	return result;
+}
+
+std::set<BWAPI::Unit*> getEigenUnitsInRadius(BWAPI::Position pos, int radius)
+{
+	std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsInRadius(pos, radius);
+	std::set<BWAPI::Unit*> result;
+	for each(BWAPI::Unit* u in units)
+	{
+		if(u->getPlayer() == BWAPI::Broodwar->self())
+		{
+			result.insert(u);
+		}
+	}
+	return result;
+}
