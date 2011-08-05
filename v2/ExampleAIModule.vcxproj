@@ -80,7 +80,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories); $(BOOST)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;EXAMPLEAIMODULE_EXPORTS;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
@@ -105,17 +105,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\BuildingPlacer.cpp" />
-    <ClCompile Include="Source\BuildItem.cpp" />
-    <ClCompile Include="Source\BuildList.cpp" />
+    <ClCompile Include="Source\ProductList.cpp" />
+    <ClCompile Include="Source\Product.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
+    <ClCompile Include="Source\DroneMicro.cpp" />
     <ClCompile Include="Source\EigenUnitData.cpp" />
     <ClCompile Include="Source\EigenUnitDataManager.cpp" />
     <ClCompile Include="Source\EigenUnitGroupManager.cpp" />
     <ClCompile Include="Source\EnemyUnitData.cpp" />
     <ClCompile Include="Source\EnemyUnitDataManager.cpp" />
     <ClCompile Include="Source\ExampleAIModule.cpp" />
+    <ClCompile Include="Source\GlobalMicro.cpp" />
     <ClCompile Include="Source\HighCommand.cpp" />
     <ClCompile Include="Source\MicroManager.cpp" />
+    <ClCompile Include="Source\OverlordMicro.cpp" />
+    <ClCompile Include="Source\ProductionManager.cpp" />
     <ClCompile Include="Source\ResourceManager.cpp" />
     <ClCompile Include="Source\TaskAssigner.cpp" />
     <ClCompile Include="Source\Task.cpp" />
@@ -126,16 +130,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildingPlacer.h" />
-    <ClInclude Include="Source\BuildItem.h" />
-    <ClInclude Include="Source\BuildList.h" />
+    <ClInclude Include="Source\ProductList.h" />
+    <ClInclude Include="Source\Product.h" />
+    <ClInclude Include="Source\DroneMicro.h" />
     <ClInclude Include="Source\EigenUnitData.h" />
     <ClInclude Include="Source\EigenUnitDataManager.h" />
     <ClInclude Include="Source\EigenUnitGroupManager.h" />
     <ClInclude Include="Source\EnemyUnitData.h" />
     <ClInclude Include="Source\EnemyUnitDataManager.h" />
     <ClInclude Include="Source\ExampleAIModule.h" />
+    <ClInclude Include="Source\GlobalMicro.h" />
     <ClInclude Include="Source\HighCommand.h" />
     <ClInclude Include="Source\MicroManager.h" />
+    <ClInclude Include="Source\OverlordMicro.h" />
+    <ClInclude Include="Source\ProductionManager.h" />
+    <ClInclude Include="Source\ProductList.h" />
     <ClInclude Include="Source\ResourceManager.h" />
     <ClInclude Include="Source\TaskAssigner.h" />
     <ClInclude Include="Source\RectangleArray.h" />

@@ -40,7 +40,7 @@ std::string floatToString(float f)
 	return buffer.str();
 }
 
-double dist(int d)
+int dist(int d)
 {
 	return d*32;
 }
@@ -117,7 +117,7 @@ std::map<BWAPI::UnitType, int> countUnitTypesInUnitGroup(std::set<BWAPI::Unit*> 
 	return unitTypeCounts;
 }
 
-std::set<BWAPI::Unit*> getEnemyUnitsInRadius(BWAPI::Position pos, int radius)
+UnitGroup getEnemyUnitsInRadius(BWAPI::Position pos, int radius)
 {
 	std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsInRadius(pos, radius);
 	std::set<BWAPI::Unit*> result;
@@ -128,10 +128,10 @@ std::set<BWAPI::Unit*> getEnemyUnitsInRadius(BWAPI::Position pos, int radius)
 			result.insert(u);
 		}
 	}
-	return result;
+	return UnitGroup::getUnitGroup(result);
 }
 
-std::set<BWAPI::Unit*> getEigenUnitsInRadius(BWAPI::Position pos, int radius)
+UnitGroup getEigenUnitsInRadius(BWAPI::Position pos, int radius)
 {
 	std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsInRadius(pos, radius);
 	std::set<BWAPI::Unit*> result;
@@ -142,5 +142,15 @@ std::set<BWAPI::Unit*> getEigenUnitsInRadius(BWAPI::Position pos, int radius)
 			result.insert(u);
 		}
 	}
-	return result;
+	return UnitGroup::getUnitGroup(result);
+}
+
+UnitGroup allEigenUnits()
+{
+	return UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
+}
+
+UnitGroup allEnemyUnits()
+{
+	return UnitGroup::getUnitGroup(BWAPI::Broodwar->enemy()->getUnits());
 }

@@ -20,6 +20,9 @@ public:
 	std::set<UnitGroup*> getUnitGroupSet();
 	std::string chat();
 	bool groupIsDroneUG(UnitGroup* ug);
+	UnitGroup* getGroupOfUnit(BWAPI::Unit* u);
+	UnitGroup* getDroneUG();
+
 private:
 	HighCommand* hc;
 	std::set<UnitGroup*> unitgroupset;

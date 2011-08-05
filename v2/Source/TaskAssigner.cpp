@@ -275,3 +275,29 @@ int TaskAssigner::countDronesOnTask(Task task)
 	}
 	return result;
 }
+
+Task TaskAssigner::getTaskOfUnit(BWAPI::Unit* unit)
+{
+	UnitGroup* ug = this->hc->eiugm->getGroupOfUnit(unit);
+	if(this->hc->eiugm->groupIsDroneUG(ug))
+	{
+		for each(std::pair<BWAPI::Unit*, Task> assignment in this->getDronePlan())
+		{
+			if(assignment.first == unit)
+			{
+				return assignment.second;
+			}
+		}
+	}
+	else
+	{
+		for each(std::pair<UnitGroup*, Task> assignment in this->getPlan())
+		{
+			if(assignment.first == ug)
+			{
+				return assignment.second;
+			}
+		}
+	}
+	return Task(NoTask, unit->getPosition());
+}

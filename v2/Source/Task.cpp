@@ -55,7 +55,7 @@ Unit* Task::getTarget()
 		std::string tname = this->getTypeName();
 		log(boost::str(boost::format("Task::getTarget() returns NULL with Task(type %s, x:%d y%d)\n") % tname % this->position.x() % this->position.y() ).c_str());
 	}
-	return this->getTarget();
+	return this->target;
 }
 
 std::string Task::getTypeName()

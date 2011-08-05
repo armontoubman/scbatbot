@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Header Files\micro">
+      <UniqueIdentifier>{ede92fbc-89d9-4828-a37e-ce022744931d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\micro">
+      <UniqueIdentifier>{257775b0-9099-4e4a-a5b1-a17623adfbf3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Dll.cpp">
@@ -60,16 +66,31 @@
     <ClCompile Include="Source\BuildingPlacer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BuildItem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BuildList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\TaskAssigner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DroneMicro.cpp">
+      <Filter>Source Files\micro</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\GlobalMicro.cpp">
+      <Filter>Source Files\micro</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\OverlordMicro.cpp">
+      <Filter>Source Files\micro</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProductionManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Product.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProductList.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ProductList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -113,12 +134,6 @@
     <ClInclude Include="Source\WantBuildManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BuildList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BuildItem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\BuildingPlacer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -129,6 +144,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\TaskAssigner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DroneMicro.h">
+      <Filter>Header Files\micro</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GlobalMicro.h">
+      <Filter>Header Files\micro</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\OverlordMicro.h">
+      <Filter>Header Files\micro</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProductionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Product.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ProductList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

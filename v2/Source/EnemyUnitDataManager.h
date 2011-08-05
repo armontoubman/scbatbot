@@ -29,6 +29,8 @@ public:
 	void createTask(TaskType tasktype, Position position, Unit* u);
 	std::list<Task> getTasklist(TaskType tasktype);
 
+	BWAPI::Unit* nearestEnemyThatCanAttackAir(BWAPI::Unit* unit);
+
 	std::string chat();
 private:
 	HighCommand* hc;

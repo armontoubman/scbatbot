@@ -265,9 +265,9 @@ void EigenUnitGroupManager::splitGroup(UnitGroup* ugptr)
 
 bool EigenUnitGroupManager::unitIsInAGroup(Unit* u)
 {
-	for each(UnitGroup* ugptr in this->unitgroupset)
+	for each(UnitGroup* ug in this->unitgroupset)
 	{
-		if(ugptr->contains(u))
+		if(ug->contains(u))
 		{
 			return true;
 		}
@@ -300,4 +300,21 @@ bool EigenUnitGroupManager::groupIsDroneUG(UnitGroup* ug)
 		return true;
 	}
 	return false;
+}
+
+UnitGroup* EigenUnitGroupManager::getGroupOfUnit(BWAPI::Unit* u)
+{
+	for each(UnitGroup* ug in this->unitgroupset)
+	{
+		if(ug->contains(u))
+		{
+			return ug;
+		}
+	}
+	return NULL;
+}
+
+UnitGroup* EigenUnitGroupManager::getDroneUG()
+{
+	return this->droneUG;
 }

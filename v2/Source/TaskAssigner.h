@@ -11,6 +11,7 @@ public:
 	void update();
 	std::map<UnitGroup*, Task> getPlan();
 	std::map<BWAPI::Unit*, Task> getDronePlan();
+	Task getTaskOfUnit(BWAPI::Unit* unit);
 
 private:
 	HighCommand* hc;

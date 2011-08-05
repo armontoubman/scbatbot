@@ -108,9 +108,13 @@ int ResourceManager::countOurs(ResourceMap resources)
 void ResourceManager::createTask(TaskType tasktype, Unit* resource)
 {
 	if(tasktype == GatherMineralsTask)
-		this->gathermineralstasklist.push_back(Task(tasktype, resource->getPosition()));
+	{
+		this->gathermineralstasklist.push_back(Task(tasktype, resource->getPosition(), resource));
+	}
 	if(tasktype == GatherGasTask)
-		this->gathergastasklist.push_back(Task(tasktype, resource->getPosition()));		
+	{
+		this->gathergastasklist.push_back(Task(tasktype, resource->getPosition(), resource));
+	}
 }
 
 std::list<Task> ResourceManager::getTasklist(TaskType tasktype)

@@ -139,9 +139,13 @@ void EnemyUnitDataManager::cleanup()
 void EnemyUnitDataManager::createTask(TaskType tasktype, Position position, Unit* u)
 {
 	if(tasktype == ScoutTask)
+	{
 		this->scouttasklist.push_back(Task(tasktype, position, u));
+	}
 	if(tasktype == CombatTask)
+	{
 		this->combattasklist.push_back(Task(tasktype, position, u));
+	}
 }
 
 std::list<Task> EnemyUnitDataManager::getTasklist(TaskType tasktype)
@@ -161,4 +165,30 @@ void EnemyUnitDataManager::clearTasklists()
 {
 	this->scouttasklist.clear();
 	this->combattasklist.clear();
+}
+
+BWAPI::Unit* EnemyUnitDataManager::nearestEnemyThatCanAttackAir(BWAPI::Unit* unit)
+{
+	BWAPI::Unit* enemy = NULL;
+	double distance = -1;
+	
+	for(boost::unordered_map<BWAPI::Unit*, EnemyUnitData>::iterator it=this->unitmap.begin(); it!=this->unitmap.end(); it++)
+	{
+		double currentDistance = unit->getPosition().getDistance(it->second.lastKnownPosition);
+		if(it->second.unitType.airWeapon().targetsAir() || it->second.unitType.groundWeapon().targetsAir())
+		{
+			if(distance == -1)
+			{
+				enemy = it->first;
+				distance = currentDistance;
+			}
+			else if(currentDistance < distance)
+			{
+				enemy = it->first;
+				distance = currentDistance;
+			}
+		}
+	}
+
+	return enemy;
 }

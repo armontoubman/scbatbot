@@ -67,6 +67,8 @@ void HighCommand::update()
 	this->tm->update();
 	this->ta->update();
 
+	this->mm->update();
+
 	this->drawFPS();
 	this->drawTasks();
 	this->drawUnits();
