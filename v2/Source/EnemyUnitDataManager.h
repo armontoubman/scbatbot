@@ -31,6 +31,8 @@ public:
 
 	BWAPI::Unit* nearestEnemyThatCanAttackAir(BWAPI::Unit* unit);
 
+	int count(BWAPI::UnitType unittype);
+
 	std::string chat();
 private:
 	HighCommand* hc;

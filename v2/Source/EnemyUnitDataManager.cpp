@@ -192,3 +192,16 @@ BWAPI::Unit* EnemyUnitDataManager::nearestEnemyThatCanAttackAir(BWAPI::Unit* uni
 
 	return enemy;
 }
+
+int EnemyUnitDataManager::count(BWAPI::UnitType unittype)
+{
+	int result = 0;
+	for(boost::unordered_map<BWAPI::Unit*, EnemyUnitData>::iterator it=this->unitmap.begin(); it!=this->unitmap.end(); it++)
+	{
+		if(it->second.unitType == unittype)
+		{
+			result = result+1;
+		}
+	}
+	return result;
+}

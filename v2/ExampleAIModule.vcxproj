@@ -130,7 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildingPlacer.h" />
-    <ClInclude Include="Source\ProductList.h" />
     <ClInclude Include="Source\Product.h" />
     <ClInclude Include="Source\DroneMicro.h" />
     <ClInclude Include="Source\EigenUnitData.h" />
