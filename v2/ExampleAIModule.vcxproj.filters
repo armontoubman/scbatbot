@@ -60,9 +60,6 @@
     <ClCompile Include="Source\EigenUnitDataManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\WantBuildManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\BuildingPlacer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,10 +84,13 @@
     <ClCompile Include="Source\Product.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ProductList.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ProductList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ConstructionManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ContractManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,9 +131,6 @@
     <ClInclude Include="Source\EigenUnitDataManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\WantBuildManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\BuildingPlacer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -162,6 +159,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\ProductList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ConstructionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ContractManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

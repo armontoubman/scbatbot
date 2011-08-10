@@ -105,6 +105,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\BuildingPlacer.cpp" />
+    <ClCompile Include="Source\ContractManager.cpp" />
     <ClCompile Include="Source\ProductList.cpp" />
     <ClCompile Include="Source\Product.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
@@ -126,10 +127,11 @@
     <ClCompile Include="Source\TaskManager.cpp" />
     <ClCompile Include="Source\UnitGroup.cpp" />
     <ClCompile Include="Source\Util.cpp" />
-    <ClCompile Include="Source\WantBuildManager.cpp" />
+    <ClCompile Include="Source\ConstructionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildingPlacer.h" />
+    <ClInclude Include="Source\ContractManager.h" />
     <ClInclude Include="Source\Product.h" />
     <ClInclude Include="Source\DroneMicro.h" />
     <ClInclude Include="Source\EigenUnitData.h" />
@@ -151,7 +153,7 @@
     <ClInclude Include="Source\TaskManager.h" />
     <ClInclude Include="Source\UnitGroup.h" />
     <ClInclude Include="Source\Util.h" />
-    <ClInclude Include="Source\WantBuildManager.h" />
+    <ClInclude Include="Source\ConstructionManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

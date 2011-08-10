@@ -7,8 +7,10 @@
 #include "EigenUnitGroupManager.h"
 #include "TaskManager.h"
 #include "TaskAssigner.h"
-#include "WantBuildManager.h"
 #include "ResourceManager.h"
+#include "ProductionManager.h"
+#include "ConstructionManager.h"
+#include "ContractManager.h"
 
 #include <BWAPI.h>
 #include "Util.h"
@@ -28,8 +30,10 @@ HighCommand::HighCommand()
 	this->eiugm = new EigenUnitGroupManager(this);
 	this->tm = new TaskManager(this);
 	this->ta = new TaskAssigner(this);
-	this->wbm = new WantBuildManager(this);
 	this->rm = new ResourceManager(this);
+	this->pm = new ProductionManager(this);
+	this->csm = new ConstructionManager(this);
+	this->ctm = new ContractManager(this);
 
 }
 
@@ -40,8 +44,10 @@ HighCommand::~HighCommand() {
 	delete this->eiugm;
 	delete this->tm;
 	delete this->ta;
-	delete this->wbm;
 	delete this->rm;
+	delete this->pm;
+	delete this->csm;
+	delete this->ctm;
 }
 
 void HighCommand::startLog()
@@ -63,6 +69,9 @@ void HighCommand::update()
 	this->eiugm->update();
 	this->rm->update();
 	this->eudm->update();
+
+	this->pm->update();
+	this->csm->update();
 
 	this->tm->update();
 	this->ta->update();

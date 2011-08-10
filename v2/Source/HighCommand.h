@@ -13,10 +13,15 @@ class EigenUnitGroupManager;
 class TaskManager;
 #include "TaskAssigner.h"
 class TaskAssigner;
-#include "WantBuildManager.h"
-class WantBuildManager;
 #include "ResourceManager.h"
 class ResourceManager;
+
+#include "ProductionManager.h"
+class ProductionManager;
+#include "ConstructionManager.h"
+class ConstructionManager;
+#include "ContractManager.h"
+class ContractManager;
 
 #include <time.h>
 
@@ -47,8 +52,10 @@ public:
 	EigenUnitGroupManager* eiugm;
 	TaskManager* tm;
 	TaskAssigner* ta;
-	WantBuildManager* wbm;
 	ResourceManager* rm;
+	ProductionManager* pm;
+	ConstructionManager* csm;
+	ContractManager* ctm;
 
 private:
 	void startLog();
