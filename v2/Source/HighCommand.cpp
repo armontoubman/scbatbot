@@ -24,6 +24,8 @@ HighCommand::HighCommand()
 	//Broodwar->setLocalSpeed(0); // WEGHALEN IN FINAL
 	//this->startLog();
 
+	this->home = BWAPI::Broodwar->self()->getStartLocation();
+
 	this->eiudm = new EigenUnitDataManager(this);
 	this->eudm = new EnemyUnitDataManager(this);
 	this->mm = new MicroManager(this);
@@ -72,6 +74,7 @@ void HighCommand::update()
 
 	this->pm->update();
 	this->csm->update();
+	this->ctm->update();
 
 	this->tm->update();
 	this->ta->update();
@@ -81,6 +84,7 @@ void HighCommand::update()
 	this->drawFPS();
 	this->drawTasks();
 	this->drawUnits();
+	this->drawRightPanel();
 }
 
 void HighCommand::tic()
@@ -147,6 +151,9 @@ void HighCommand::onUnitDestroy(Unit* u)
 	this->eudm->onUnitDestroy(u);
 	this->rm->onUnitDestroy(u);
 	this->eiugm->onUnitDestroy(u);
+	this->ctm->onUnitDestroy(u);
+
+	Broodwar->printf("onUnitDestroy %s", u->getType().getName().c_str());
 }
 
 void HighCommand::onUnitMorph(Unit* u)
@@ -154,6 +161,9 @@ void HighCommand::onUnitMorph(Unit* u)
 	this->eudm->onUnitMorph(u);
 	this->eiugm->onUnitMorph(u);
 	this->rm->onUnitMorph(u);
+	this->ctm->onUnitMorph(u);
+
+	Broodwar->printf("onUnitMorph %s", u->getType().getName().c_str());
 }
 
 void HighCommand::onUnitRenegade(Unit* u)
@@ -213,4 +223,32 @@ void HighCommand::drawUnits()
 		int y = u->getPosition().y();
 		Broodwar->drawTextMap(x,y,intToString(u->getID()).c_str());
 	}
+}
+
+void HighCommand::drawRightPanel()
+{
+	int x = 450;
+	int y = 16;
+	int yoffset = 25;
+
+	int line = 1;
+
+	Broodwar->drawTextScreen(x,yoffset+y*line, "", true);
+	line++;
+	Broodwar->drawTextScreen(x,yoffset+y*line,"BuildList");
+	line++;
+	for each(Product p in this->pm->getBuildList()->productList)
+	{
+		Broodwar->drawTextScreen(x,yoffset+y*line,"%s",p.buildtype.getName().c_str());
+		line++;
+	}
+	line++;
+	Broodwar->drawTextScreen(x,yoffset+y*line,"Contracts");
+	line++;
+	for each(Contract c in this->ctm->getContractList())
+	{
+		// NULLPOINTER op c.drone->getID()
+		Broodwar->drawTextScreen(x,yoffset+y*line,"%d %s",c.drone, c.unittype.getName().c_str());
+		line++;
+    }
 }

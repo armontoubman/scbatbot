@@ -57,6 +57,8 @@ public:
 	ConstructionManager* csm;
 	ContractManager* ctm;
 
+	BWAPI::TilePosition home;
+
 private:
 	void startLog();
 
@@ -69,4 +71,6 @@ private:
 	void drawFPS();
 	void drawTasks();
 	void drawUnits();
+
+	void drawRightPanel();
 };

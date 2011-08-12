@@ -46,7 +46,18 @@ void TaskAssigner::makePlan()
 
 			for(std::set<BWAPI::Unit*>::const_iterator i=ug->begin();i!=ug->end();i++)
 			{
-
+				if(this->hc->ctm->isContracted(*i))
+				{
+					continue;
+				}
+				for each(Task task in tasklists[GatherGasTask])
+				{
+					if(this->countDronesOnTask(task) < 3)
+					{
+						this->assignDrone((*i), task);
+						break;
+					}
+				}
 				for each(Task task in tasklists[GatherMineralsTask])
 				{
 					if(this->countDronesOnTask(task) < 3)

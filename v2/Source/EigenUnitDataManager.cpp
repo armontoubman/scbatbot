@@ -5,6 +5,7 @@
 
 #include "UnitGroup.h"
 #include <boost/format.hpp>
+#include "ContractManager.h"
 
 EigenUnitDataManager::EigenUnitDataManager(HighCommand* h)
 {
