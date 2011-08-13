@@ -13,6 +13,7 @@ TaskAssigner::TaskAssigner(HighCommand* h)
 void TaskAssigner::update()
 {
 	this->plan.clear();
+	this->dronePlan.clear();
 	this->makePlan();
 }
 
@@ -311,4 +312,20 @@ Task TaskAssigner::getTaskOfUnit(BWAPI::Unit* unit)
 		}
 	}
 	return Task(NoTask, unit->getPosition());
+}
+
+void TaskAssigner::onUnitDestroy(Unit* u)
+{
+	if(u->getType() == BWAPI::UnitTypes::Zerg_Drone && u->getPlayer() == BWAPI::Broodwar->self())
+	{
+		this->dronePlan.erase(u);
+	}
+}
+
+void TaskAssigner::onUnitMorph(Unit* u)
+{
+	if(u->getType().isBuilding() && u->getPlayer() == BWAPI::Broodwar->self())
+	{
+		this->dronePlan.erase(u);
+	}
 }

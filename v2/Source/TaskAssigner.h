@@ -13,6 +13,9 @@ public:
 	std::map<BWAPI::Unit*, Task> getDronePlan();
 	Task getTaskOfUnit(BWAPI::Unit* unit);
 
+	void onUnitDestroy(Unit* u);
+	void onUnitMorph(Unit* u);
+
 private:
 	HighCommand* hc;
 

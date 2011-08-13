@@ -115,7 +115,11 @@ void EigenUnitGroupManager::cleanup()
 	while ( it != unitgroupset.end() ) {
 		if ( (*it)->empty() && (*it) != this->droneUG ) {
 			it = unitgroupset.erase( it );
-		} else ++it;    
+		}
+		else
+		{
+			++it;
+		}
 	}
 }
 
@@ -166,7 +170,7 @@ void EigenUnitGroupManager::balanceGroups()
 
 void EigenUnitGroupManager::assignUnit(Unit* u)
 {
-	Broodwar->printf("EIUGM: assigning %s %d", u->getType().getName().c_str(), u->getID());
+	//Broodwar->printf("EIUGM: assigning %s %d", u->getType().getName().c_str(), u->getID());
 	if(u->getType() == UnitTypes::Zerg_Drone)
 	{
 		this->droneUG->insert(u);
@@ -191,7 +195,7 @@ void EigenUnitGroupManager::assignUnit(Unit* u)
 			this->unitgroupset.insert(newfitgroup);
 		}
 	}
-	Broodwar->printf(this->chat().c_str());
+	//Broodwar->printf(this->chat().c_str());
 }
 
 std::set<UnitGroup*> EigenUnitGroupManager::getUnitGroupSet()

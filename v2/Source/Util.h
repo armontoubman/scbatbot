@@ -10,6 +10,8 @@ std::string floatToString(float f);
 int dist(int d);
 
 BWAPI::Unit* getNearestUnit(BWAPI::Position pos, UnitGroup ug);
+BWAPI::Position getNearestPosition(BWAPI::Position pos, std::set<BWAPI::Position> posset);
+BWAPI::TilePosition getNearestTilePosition(BWAPI::TilePosition pos, std::set<BWAPI::TilePosition> posset);
 BWAPI::Position getCenterPosition(std::set<BWAPI::Position> posset);
 bool isMilitary(BWAPI::UnitType unittype);
 std::map<BWAPI::UnitType, int> countUnitTypesInUnitGroup(std::set<BWAPI::Unit*> myUnits);

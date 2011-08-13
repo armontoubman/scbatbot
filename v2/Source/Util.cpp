@@ -71,6 +71,58 @@ BWAPI::Unit* getNearestUnit(BWAPI::Position pos, UnitGroup ug)
 	return besteUnit;
 }
 
+BWAPI::Position getNearestPosition(BWAPI::Position pos, std::set<BWAPI::Position> posset)
+	{
+	double besteAfstand = -1.00;
+	BWAPI::Position bestePos = BWAPI::Positions::None;
+	double d = -1.00;
+	for(std::set<BWAPI::Position>::iterator it = posset.begin(); it != posset.end(); it++)
+	{
+		d = it->getDistance(pos);
+		if(besteAfstand == -1)
+		{
+			besteAfstand = d;
+			bestePos = (*it);
+		}
+		else
+		{
+			if(d < besteAfstand)
+			{
+				besteAfstand = d;
+				bestePos = (*it);
+			}
+		}
+	}
+
+	return bestePos;
+}
+
+BWAPI::TilePosition getNearestTilePosition(BWAPI::TilePosition pos, std::set<BWAPI::TilePosition> posset)
+	{
+	double besteAfstand = -1.00;
+	BWAPI::TilePosition bestePos = BWAPI::TilePositions::None;
+	double d = -1.00;
+	for(std::set<BWAPI::TilePosition>::iterator it = posset.begin(); it != posset.end(); it++)
+	{
+		d = it->getDistance(pos);
+		if(besteAfstand == -1)
+		{
+			besteAfstand = d;
+			bestePos = (*it);
+		}
+		else
+		{
+			if(d < besteAfstand)
+			{
+				besteAfstand = d;
+				bestePos = (*it);
+			}
+		}
+	}
+
+	return bestePos;
+}
+
 BWAPI::Position getCenterPosition(std::set<BWAPI::Position> posset)
 {
 	int result_x;

@@ -21,7 +21,7 @@
 HighCommand::HighCommand()
 {
 
-	//Broodwar->setLocalSpeed(0); // WEGHALEN IN FINAL
+	Broodwar->setLocalSpeed(0); // WEGHALEN IN FINAL
 	//this->startLog();
 
 	this->home = BWAPI::Broodwar->self()->getStartLocation();
@@ -151,6 +151,7 @@ void HighCommand::onUnitDestroy(Unit* u)
 	this->eudm->onUnitDestroy(u);
 	this->rm->onUnitDestroy(u);
 	this->eiugm->onUnitDestroy(u);
+	this->ta->onUnitDestroy(u);
 	this->ctm->onUnitDestroy(u);
 
 	Broodwar->printf("onUnitDestroy %s", u->getType().getName().c_str());
@@ -161,6 +162,7 @@ void HighCommand::onUnitMorph(Unit* u)
 	this->eudm->onUnitMorph(u);
 	this->eiugm->onUnitMorph(u);
 	this->rm->onUnitMorph(u);
+	this->ta->onUnitMorph(u);
 	this->ctm->onUnitMorph(u);
 
 	Broodwar->printf("onUnitMorph %s", u->getType().getName().c_str());
@@ -221,13 +223,13 @@ void HighCommand::drawUnits()
 	{
 		int x = u->getPosition().x();
 		int y = u->getPosition().y();
-		Broodwar->drawTextMap(x,y,intToString(u->getID()).c_str());
+		Broodwar->drawTextMap(x,y,u->getOrder().getName().c_str());
 	}
 }
 
 void HighCommand::drawRightPanel()
 {
-	int x = 450;
+	int x = 500;
 	int y = 16;
 	int yoffset = 25;
 
@@ -247,7 +249,6 @@ void HighCommand::drawRightPanel()
 	line++;
 	for each(Contract c in this->ctm->getContractList())
 	{
-		// NULLPOINTER op c.drone->getID()
 		Broodwar->drawTextScreen(x,yoffset+y*line,"%d %s",c.drone, c.unittype.getName().c_str());
 		line++;
     }
