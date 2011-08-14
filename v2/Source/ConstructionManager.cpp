@@ -70,7 +70,7 @@ bool ConstructionManager::requirementsSatisfied(BWAPI::UnitType unittype)
 	bool reqsMet = true;
 	for each(std::pair<BWAPI::UnitType, int> req in reqs)
 	{
-		if(allUnits(GetType, req.first).size() == 0)
+		if(allUnits(GetType, req.first)(isCompleted).size() == 0)
 		{
 			reqsMet = false;
 		}
@@ -89,7 +89,7 @@ bool ConstructionManager::requirementsSatisfied(BWAPI::TechType techtype)
 {
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	bool reqsMet = true;
-	reqsMet = allUnits(GetType, techtype.whatResearches()).size() > 0;
+	reqsMet = allUnits(GetType, techtype.whatResearches())(isCompleted).size() > 0;
 	return reqsMet;
 }
 
@@ -97,7 +97,7 @@ bool ConstructionManager::requirementsSatisfied(BWAPI::UpgradeType upgradetype)
 {
 	UnitGroup allUnits = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits());
 	bool reqsMet = true;
-	reqsMet = allUnits(GetType, upgradetype.whatUpgrades()).size() > 0;
+	reqsMet = allUnits(GetType, upgradetype.whatUpgrades())(isCompleted).size() > 0;
 	return reqsMet;
 }
 
@@ -136,11 +136,69 @@ bool ConstructionManager::processBuild(Product p)
 
 bool ConstructionManager::processTech(Product p)
 {
+	if(!this->canAfford(p) || !this->requirementsSatisfied(p))
+	{
+		return false;
+	}
+	BWAPI::UnitType typeofresearcher = p.techtype.whatResearches();
+	UnitGroup researchers = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, typeofresearcher)(isCompleted);
+	if(researchers.size() == 0)
+	{
+		return false;
+	}
+	bool beingdone = false;
+	for each(BWAPI::Unit* unit in researchers)
+	{
+		if(unit->isResearching() && unit->getTech() == p.techtype)
+		{
+			beingdone = true;
+		}
+	}
+	if(!beingdone)
+	{
+		for each(BWAPI::Unit* unit in researchers)
+		{
+			if(!unit->isResearching())
+			{
+				unit->research(p.techtype);
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
 bool ConstructionManager::processUpgrade(Product p)
 {
+	if(!this->canAfford(p) || !this->requirementsSatisfied(p))
+	{
+		return false;
+	}
+	BWAPI::UnitType typeofresearcher = p.upgradetype.whatUpgrades();
+	UnitGroup researchers = UnitGroup::getUnitGroup(BWAPI::Broodwar->self()->getUnits())(GetType, typeofresearcher)(isCompleted);
+	if(researchers.size() == 0)
+	{
+		return false;
+	}
+	bool beingdone = false;
+	for each(BWAPI::Unit* unit in researchers)
+	{
+		if(unit->isUpgrading() && unit->getUpgrade() == p.upgradetype)
+		{
+			beingdone = true;
+		}
+	}
+	if(!beingdone)
+	{
+		for each(BWAPI::Unit* unit in researchers)
+		{
+			if(!unit->isUpgrading())
+			{
+				unit->upgrade(p.upgradetype);
+				return true;
+			}
+		}
+	}
 	return false;
 }
 
@@ -160,8 +218,39 @@ bool ConstructionManager::processBuilding(Product p)
 	{
 		return false;
 	}
-	this->hc->ctm->newContract(p.buildtype);
-	return true;
+	if(p.buildtype == BWAPI::UnitTypes::Zerg_Lair || p.buildtype == BWAPI::UnitTypes::Zerg_Hive)
+	{
+		if(p.buildtype == BWAPI::UnitTypes::Zerg_Lair)
+		{
+			UnitGroup hatcheries = allEigenUnits()(Hatchery)(isCompleted);
+			if(hatcheries.size() > 0)
+			{
+				BWAPI::Unit* hatchery = *hatcheries.begin();
+				hatchery->morph(BWAPI::UnitTypes::Zerg_Lair);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			UnitGroup lairs = allEigenUnits()(Lair)(isCompleted);
+			if(lairs.size() > 0)
+			{
+				BWAPI::Unit* lair = *lairs.begin();
+				lair->morph(BWAPI::UnitTypes::Zerg_Hive);
+				return true;
+			}
+			return false;
+		}
+	}
+	else
+	{
+		this->hc->ctm->newContract(p.buildtype);
+		return true;
+	}
 }
 
 bool ConstructionManager::processUnit(Product p)

@@ -103,7 +103,7 @@ void EnemyUnitDataManager::onUnitDestroy(Unit* u)
 {
 	if(u->getPlayer() == Broodwar->enemy())
 	{
-		this->updateUnit(u);
+		this->unitmap.erase(u);
 	}
 }
 
@@ -125,15 +125,6 @@ void EnemyUnitDataManager::onUnitRenegade(Unit* u)
 
 void EnemyUnitDataManager::cleanup()
 {
-	if(this->destroyedset.size() > 0)
-	{
-		Broodwar->printf("EUGM: cleaning %d dead enemies", this->destroyedset.size());
-		for each(Unit* dead in this->destroyedset)
-		{
-			this->unitmap.erase(this->unitmap.find(dead));
-		}
-		this->destroyedset.clear();
-	}
 }
 
 void EnemyUnitDataManager::createTask(TaskType tasktype, Position position, Unit* u)

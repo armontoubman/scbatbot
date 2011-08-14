@@ -100,6 +100,34 @@ void ProductionManager::updateListsAgainstProtoss()
 			this->step = 3;
 		}
 	}
+	if(this->step == 3)
+	{
+		if (buildList.count(BWAPI::UnitTypes::Zerg_Hatchery)==0 && nrOfOwn(BWAPI::UnitTypes::Zerg_Drone)>16 && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))<5) && nrOfOwn(BWAPI::UnitTypes::Zerg_Spire)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk_Den) > 0)
+		{
+			addBuild(BWAPI::UnitTypes::Zerg_Hatchery);
+		}
+		if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive))>2)
+		{
+			addWant(BWAPI::UnitTypes::Zerg_Hydralisk_Den);
+			//addWant(BWAPI::TechTypes::Lurker_Aspect); // fixe
+			//addWant(BWAPI::UpgradeTypes::Pneumatized_Carapace); // fixe
+		}
+		if( (nrOfEnemy(BWAPI::UnitTypes::Protoss_Zealot)+nrOfEnemy(BWAPI::UnitTypes::Protoss_Dragoon)) > 13)
+		{
+			addWant(BWAPI::TechTypes::Lurker_Aspect);
+		}
+		if( (nrOfOwn(BWAPI::UnitTypes::Zerg_Hatchery)+nrOfOwn(BWAPI::UnitTypes::Zerg_Lair)+nrOfOwn(BWAPI::UnitTypes::Zerg_Hive)>3) && ((nrOfOwn(BWAPI::UnitTypes::Zerg_Hydralisk)+nrOfOwn(BWAPI::UnitTypes::Zerg_Mutalisk) > 20) || (nrOfOwn(BWAPI::UnitTypes::Zerg_Zergling) > 30)) && nrOfExtraDronesRequired() < 3)
+		{
+			this->step = 4;
+		}
+	}
+	if(this->step == 4)
+	{
+		addWant(BWAPI::UnitTypes::Zerg_Queens_Nest);
+		addWant(BWAPI::UnitTypes::Zerg_Hive);
+		addWant(BWAPI::UnitTypes::Zerg_Defiler_Mound);
+		addWant(BWAPI::UnitTypes::Zerg_Ultralisk_Cavern);
+	}
 }
 
 void ProductionManager::updateListsAgainstTerran()

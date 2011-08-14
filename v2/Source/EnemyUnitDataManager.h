@@ -41,7 +41,6 @@ private:
 	void clearTasklists();
 
 	EnemyUnitMap unitmap;
-	std::set<Unit*> destroyedset;
 	std::list<Task> scouttasklist;
 	std::list<Task> combattasklist;
 };

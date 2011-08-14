@@ -9,7 +9,7 @@ class ZerglingMicro
 public:
 	ZerglingMicro();
 	ZerglingMicro(HighCommand* h);
-	void micro(BWAPI::Unit* unit);
+	void micro(Unit* unit);
 private:
 	HighCommand* hc;
 };
