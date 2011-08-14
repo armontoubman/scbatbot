@@ -131,6 +131,7 @@
     <ClCompile Include="Source\UnitGroup.cpp" />
     <ClCompile Include="Source\Util.cpp" />
     <ClCompile Include="Source\ConstructionManager.cpp" />
+    <ClCompile Include="Source\ZerglingMicro.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\BuildingPlacer.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Source\UnitGroup.h" />
     <ClInclude Include="Source\Util.h" />
     <ClInclude Include="Source\ConstructionManager.h" />
+    <ClInclude Include="Source\ZerglingMicro.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

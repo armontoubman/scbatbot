@@ -1,62 +1,62 @@
 #pragma once
-#include "BuildItem.h"
+#include "Product.h"
 #include <BWAPI.h>
 
-BuildItem::BuildItem()
+Product::Product()
 {
 	this->priority = 1;
 	this->base = 0;
-	this->type = NoType;
+	this->type = NoProduct;
 	this->buildtype = BWAPI::UnitTypes::None;
-	this->researchtype = BWAPI::TechTypes::None;
+	this->techtype = BWAPI::TechTypes::None;
 	this->upgradetype = BWAPI::UpgradeTypes::None;
 }
 
-BuildItem::BuildItem(BWAPI::UnitType t, int p)
+Product::Product(BWAPI::UnitType t, int p)
 {
 	this->buildtype = t;
-	this->type = BuildType;
+	this->type = BuildProduct;
 	this->priority = p;
 	this->base = 0;
-	this->researchtype = BWAPI::TechTypes::None;
+	this->techtype = BWAPI::TechTypes::None;
 	this->upgradetype = BWAPI::UpgradeTypes::None;
 }
 
-BuildItem::BuildItem(BWAPI::TechType t, int p)
+Product::Product(BWAPI::TechType t, int p)
 {
-	this->researchtype = t;
-	this->type = ResearchType;
+	this->techtype = t;
+	this->type = TechProduct;
 	this->priority = p;
 	this->base = 0;
 	this->buildtype = BWAPI::UnitTypes::None;
 	this->upgradetype = BWAPI::UpgradeTypes::None;
 }
 
-BuildItem::BuildItem(BWAPI::UpgradeType t, int p)
+Product::Product(BWAPI::UpgradeType t, int p)
 {
 	this->upgradetype = t;
-	this->type = UpgradeType;
+	this->type = UpgradeProduct;
 	this->priority = p;
 	this->base = 0;
 	this->buildtype = BWAPI::UnitTypes::None;
-	this->researchtype = BWAPI::TechTypes::None;
+	this->techtype = BWAPI::TechTypes::None;
 }
 
-int BuildItem::mineralPrice()
+int Product::mineralPrice()
 {
 	int price;
 	switch(this->type) {
-	case BuildType:
+	case BuildProduct:
 		{
 			price = this->buildtype.mineralPrice();
 			break;
 		}
-	case ResearchType:
+	case TechProduct:
 		{
-			price = this->researchtype.mineralPrice();
+			price = this->techtype.mineralPrice();
 			break;
 		}
-	case UpgradeType:
+	case UpgradeProduct:
 		{
 			price = this->upgradetype.mineralPrice(1); // factor?
 			break;
@@ -69,21 +69,21 @@ int BuildItem::mineralPrice()
 	return price;
 }
 
-int BuildItem::gasPrice()
+int Product::gasPrice()
 {
 	int price;
 	switch(this->type) {
-	case BuildType:
+	case BuildProduct:
 		{
 			price = this->buildtype.gasPrice();
 			break;
 		}
-	case ResearchType:
+	case TechProduct:
 		{
-			price = this->researchtype.gasPrice();
+			price = this->techtype.gasPrice();
 			break;
 		}
-	case UpgradeType:
+	case UpgradeProduct:
 		{
 			price = this->upgradetype.gasPrice(1); // factor?
 			break;
@@ -96,10 +96,10 @@ int BuildItem::gasPrice()
 	return price;
 }
 
-bool BuildItem::operator==(const BuildItem& other) const
+bool Product::operator==(const Product& other) const
 {
 	if(type != other.type) return false;
-	if(type == BuildType)
+	if(type == BuildProduct)
 	{
 		if(buildtype == other.buildtype)
 		{
@@ -108,16 +108,16 @@ bool BuildItem::operator==(const BuildItem& other) const
 			return false;
 		}
 	}
-	if(type == ResearchType)
+	if(type == TechProduct)
 	{
-		if(researchtype == other.researchtype)
+		if(techtype == other.techtype)
 		{
 			return true;
 		} else {
 			return false;
 		}
 	}
-	if(type == UpgradeType)
+	if(type == UpgradeProduct)
 	{
 		if(upgradetype == other.upgradetype)
 		{
@@ -126,9 +126,9 @@ bool BuildItem::operator==(const BuildItem& other) const
 			return false;
 		}
 	}
-	if(type == ExpandType)
+	if(type == ExpandProduct)
 	{
-		if(other.type == ExpandType)
+		if(other.type == ExpandProduct)
 		{
 			return true;
 		} else {
@@ -138,8 +138,8 @@ bool BuildItem::operator==(const BuildItem& other) const
 	return false;
 }
 
-BuildItem BuildItem::expand()
+Product Product::expand()
 {
-	this->type = ExpandType;
+	this->type = ExpandProduct;
 	return *this;
 }

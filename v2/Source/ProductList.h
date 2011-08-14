@@ -1,13 +1,13 @@
 #pragma once
-#include "BuildItem.h"
+#include "Product.h"
 #include <BWAPI.h>
 #include <list>
-class BuildList {
+class ProductList {
 public:
-	BuildList();
-	void addItem(BuildItem b);
-	void removeItem(BuildItem b);
-	void removeAll(BuildItem b);
+	ProductList();
+	void addProduct(Product b);
+	void removeProduct(Product b);
+	void removeAll(Product b);
 	void removeTop();
 	void removeSecond();
 	void clear();
@@ -22,15 +22,15 @@ public:
 	bool containsUnits();
 	bool containsExpand();
 
-	BuildItem top();
-	BuildItem getSecond();
-	void addItemTop(BuildItem b);
+	Product top();
+	Product getSecond();
+	void addProductTop(Product b);
 
 	int supplyRequiredForTopThree();
 	int countUnits();
 	int countExpand();
 
-	std::list<BuildItem> buildlist;
+	std::list<Product> productList;
 	void init();
 
 	std::map<BWAPI::UnitType, int> unittypeCounter;
@@ -38,6 +38,6 @@ public:
 	std::map<BWAPI::UpgradeType, int> upgradetypeCounter;
 	int expandCounter;
 
-	void incrementCounter(BuildItem b);
-	void decrementCounter(BuildItem b);
+	void incrementCounter(Product b);
+	void decrementCounter(Product b);
 };

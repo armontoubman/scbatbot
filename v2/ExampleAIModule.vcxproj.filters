@@ -93,6 +93,9 @@
     <ClCompile Include="Source\ContractManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ZerglingMicro.cpp">
+      <Filter>Source Files\micro</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ExampleAIModule.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="Source\ContractManager.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ZerglingMicro.h">
+      <Filter>Header Files\micro</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
