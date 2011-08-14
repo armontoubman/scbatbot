@@ -207,6 +207,11 @@ UnitGroup allEnemyUnits()
 	return UnitGroup::getUnitGroup(BWAPI::Broodwar->enemy()->getUnits());
 }
 
+UnitGroup allUnits()
+{
+	return UnitGroup::getUnitGroup(BWAPI::Broodwar->getAllUnits());
+}
+
 UnitGroup filterMilitary(UnitGroup ug)
 {
 	UnitGroup result;

@@ -19,4 +19,5 @@ UnitGroup getEnemyUnitsInRadius(BWAPI::Position pos, int radius);
 UnitGroup getEigenUnitsInRadius(BWAPI::Position pos, int radius);
 UnitGroup allEigenUnits();
 UnitGroup allEnemyUnits();
+UnitGroup allUnits();
 UnitGroup filterMilitary(UnitGroup ug);

@@ -4,8 +4,10 @@
 #include <BWAPI.h>
 #include "UnitGroup.h"
 #include "HighCommand.h"
+
 #include "DroneMicro.h"
 #include "OverlordMicro.h"
+#include "ZerglingMicro.h"
 
 MicroManager::MicroManager(HighCommand* h)
 {
@@ -13,6 +15,7 @@ MicroManager::MicroManager(HighCommand* h)
 
 	this->droneMicro = new DroneMicro(h);
 	this->overlordMicro = new OverlordMicro(h);
+	this->zerglingMicro = new ZerglingMicro(h);
 }
 
 void MicroManager::update()
@@ -43,6 +46,11 @@ void MicroManager::selectMicro(BWAPI::Unit* unit)
 	if(unit->getType() == BWAPI::UnitTypes::Zerg_Overlord)
 	{
 		this->overlordMicro->micro(unit);
+		return;
+	}
+	if(unit->getType() == BWAPI::UnitTypes::Zerg_Zergling)
+	{
+		this->zerglingMicro->micro(unit);
 		return;
 	}
 }

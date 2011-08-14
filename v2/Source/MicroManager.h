@@ -5,6 +5,7 @@ class HighCommand;
 
 class DroneMicro;
 class OverlordMicro;
+class ZerglingMicro;
 
 using namespace BWAPI;
 
@@ -22,6 +23,7 @@ private:
 
 	DroneMicro* droneMicro;
 	OverlordMicro* overlordMicro;
+	ZerglingMicro* zerglingMicro;
 
 	void selectMicro(BWAPI::Unit* unit);
 };

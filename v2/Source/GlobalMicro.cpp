@@ -79,3 +79,53 @@ BWAPI::Position splitUp(BWAPI::Unit* unit)
 	// mogelijk een verdere afstand als de onderlinge afstand klein is. Maar wellicht vuurt dit vaak genoeg.
 	return BWAPI::Position(newx, newy).makeValid();
 }
+
+int amountCanAttackAir(std::set<BWAPI::Unit*> units)
+{
+	int result = 0;
+	for each(BWAPI::Unit* unit in units)
+	{
+		if(canAttackAir(unit))
+		{
+			result++;
+		}
+	}
+	return result;
+}
+
+int amountCanAttackGround(std::set<BWAPI::Unit*> units)
+{
+	int result = 0;
+	for each(BWAPI::Unit* unit in units)
+	{
+		if(canAttackGround(unit))
+		{
+			result++;
+		}
+	}
+	return result;
+}
+
+bool isUnderDarkSwarm(BWAPI::Unit* unit)
+{
+	UnitGroup darkSwarms = allUnits()(Dark_Swarm);
+	return darkSwarms.inRadius(dist(5), unit->getPosition()).size() > 0;
+}
+
+bool tooSplitUp(double radius, UnitGroup ug)
+{
+	BWAPI::Position ugcenter = ug.getCenter();
+	int amount = 0;
+	for each(BWAPI::Unit* unit in ug)
+	{
+		if(unit->getDistance(ugcenter) > radius && unit->getType() != BWAPI::UnitTypes::Zerg_Overlord)
+		{
+			amount++;
+		}
+	}
+	if (ug.size()/2 < amount)
+	{
+		return true;
+	}
+	return false;
+}
