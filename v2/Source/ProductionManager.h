@@ -22,8 +22,11 @@ private:
 	/* update lists */
 	void updateLists();
 	void updateListsAgainstProtoss();
+	void updateListsAgainstProtossReinforcements();
 	void updateListsAgainstTerran();
+	void updateListsAgainstTerranReinforcements();
 	void updateListsAgainstZerg();
+	void updateListsAgainstZergReinforcements();
 	void updateListsUpgrades();
 	void updateListsGeneral();
 	void updateListsGenericRule();
