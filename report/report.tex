@@ -1,7 +1,7 @@
 % !TEX TS-program = pdflatex
 % !TEX encoding = UTF-8 Unicode
 
-\documentclass[11pt,a4paper]{book} % use larger type; default would be 10pt
+\documentclass[11pt,a4paper,oneside]{book} % use larger type; default would be 10pt
 
 \usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
 
@@ -32,7 +32,7 @@
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
 \pagestyle{fancy} % options: empty , plain , fancy
 \renewcommand{\headrulewidth}{0pt} % customise the layout...
-\lhead{}\chead{}\rhead{}
+\lhead{}\chead{}\rhead{\slshape \leftmark}
 \lfoot{}\cfoot{\thepage}\rfoot{}
 
 %%% SECTION TITLE APPEARANCE
@@ -50,23 +50,31 @@
 
 \renewcommand\bibname{Resources} % Bibliography hernoemen
 
+\usepackage{xspace} % automatisch juiste spaties achter macros
+
+\newcommand{\massexpand}{\textsc{mass expand}\xspace} % macro voor Mass Expand
+
 %%% END Article customizations
 
 %%% The "real" document content comes below...
 
-\title{Design and Development of Mass Expand, \\ a Bot for StarCraft: Brood War}
-\author{Ben Haanstra, Armon Toubman}
+\title{\huge Design and Development of \textsc{Mass Expand},\\ a Bot for StarCraft: Brood War}
+\author{Ben Haanstra and Armon Toubman}
 %\date{} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
 
 \begin{document}
 \maketitle
 
+\frontmatter
+
 \tableofcontents
 
 \listoffigures
 
 \listoftables
+
+\mainmatter
 
 % Introduction
 \include{introduction}
@@ -76,6 +84,7 @@
 % Programming tools (bwapi/bwsal/bwta)
 
 % Architecture (schema van geheel, beschrijving van alle onderdelen)
+\include{architecture}
 
 % Strategy
 %    Micro
@@ -84,6 +93,11 @@
 % Evaluation (testresultaten)
 
 % Conclusion
+
+\backmatter
+
+% Tijdlijn
+\include{timeline}
 
 % Resources (links naar source/docs/bwapi etc.)
 \include{resources}
