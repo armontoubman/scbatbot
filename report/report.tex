@@ -58,7 +58,7 @@
 
 %%% The "real" document content comes below...
 
-\title{\huge Design and Development of \textsc{Mass Expand},\\ a Bot for StarCraft: Brood War}
+\title{\huge Design and Development of \textsc{Mass Expand},\\ a Bot for StarCraft\textsuperscript{\small \textregistered}: Brood War\textsuperscript{\small \textregistered}}
 \author{Ben Haanstra and Armon Toubman}
 %\date{} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
@@ -66,13 +66,18 @@
 \begin{document}
 \maketitle
 
+% lege pagina
+\noindent{}StarCraft and Brood War are \textcopyright{}1998 Blizzard Entertainment, Inc. All rights reserved. StarCraft, Brood War and Blizzard Entertainment are trademarks or registered trademarks of Blizzard Entertainment, Inc. in the U.S. and/or other countries.
+\pagestyle{empty}
+\clearpage
+
 \frontmatter
 
 \tableofcontents
 
 \listoffigures
 
-\listoftables
+%\listoftables
 
 \mainmatter
 
@@ -81,14 +86,16 @@
 
 % Project goals (project voor vak, meedoen aan toernooi)
 
-% Programming tools (bwapi/bwsal/bwta)
-
-% Architecture (schema van geheel, beschrijving van alle onderdelen)
-\include{architecture}
+% Brood War libraries (bwapi/bwsal/bwta)
+\include{libraries}
 
 % Strategy
 %    Micro
 %    Bouwen
+\include{strategy}
+
+% Architecture (schema van geheel, beschrijving van alle onderdelen)
+\include{architecture}
 
 % Evaluation (testresultaten)
 
