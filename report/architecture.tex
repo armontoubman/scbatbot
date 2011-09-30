@@ -70,11 +70,35 @@ EnemyUnitDataManager keeps track of enemy units. By default, BWAPI only allows a
 
 There is an important difference between the position and the last known position. While an enemy unit is visible, we update its position, and its last known position is changed to that position. When it moves somewhere we cannot see it (for example, into fog of war) we change its position to "unknown" and keep its last known position. We can then send scouts to make that position visible. If the unit is still there, we can update its position again.
 
+The information kept by this manager is used to create combat and scout tasks, but could also for example be used to determine the technological progress of the enemy and make predictions about the tactics the enemy will use.
+
 \section{ResourceManager}
+
+There are two main resources in StarCraft that have to be gathered: gas and minerals. Without these, you cannot build buildings and units, purchase upgrades and research technology. Minerals are mined from mineral patches by workers. Gas is gathered from extractors that have to be built atop geysers. Once gathered, the resources are dropped off by the workers at resource deposits. For the Zerg, the resource deposit is a Hatchery or one of its upgraded forms (Hive or Lair). Mineral patches and geysers are usually grouped together at certain locations on the map, called base locations. It makes sense to establish bases at these locations, to gain control of and allow easy gathering of the resources.
+
+The ResourceManager catalogs the resources available at our bases. It keeps track of mineral patches, geysers and gas extractors near our bases. Since geysers are ungatherable without an extractor, it notifies the managers concerned with building when we have available geysers. The manager also creates tasks for our mineral patches and gas extractors, so that drones can be assigned to gather resources from them.
+
+This manager needs to be kept updated for a number of reasons. Mineral patches and geysers can be exhausted after which they will no longer provide resources. Second, gas extractors are buildings and can be destroyed. Also, when new bases (expansions) are created, new resources on that location usually become available. The way this manager decides which resources are "ours" (by checking their distance to our bases) also prevents the bot from sending workers to resources being mined by the enemy, most likely resulting in the death of our workers.
 
 \section{TaskManager}
 
+Some of the managers (currently EnemyUnitDataManager and ResourceManager) create tasks based on their data. The job of the TaskManager is to collect these tasks, group them into categories and prepare them for assignment. Tasks have information associated with them such as a location and a target unit. The categories are:
+
+\begin{description}
+\item[ScoutTask] Created for locations we want visible.
+\item[CombatTask] Created for each visible enemy unit.
+\item[PrepareTask] This task is for gathering armies, so they don't go attack in small groups which is ineffective.
+\item[DetectorTask] When an enemy unit uses a stealth ability, we create want an Overlord to try and expose it at its last known location.
+\item[DefendTask] Created for locations that we want to defend with extra military units.
+\item[GatherMineralsTask] Created for minerals we want workers to gather.
+\item[GatherGasTask] Created for gas we want workers to gather from extractors.
+\end{description}
+
+The TaskManager also creates some tasks itself. In the beginning of the game, it creates ScoutTasks for each base location. This results in Overlords flying across the map to find the enemy's starting location. Later in the game, when we have reached a certain number of units, we want all base locations visible at all times, to expose any expansions the enemy might have created.
+
 \section{TaskAssigner}
+
+The tasks collected by the TaskManager are taken by the TaskAssigner to assign them to units.
 
 \section{ProductionManager}
 
