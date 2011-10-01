@@ -98,9 +98,21 @@ The TaskManager also creates some tasks itself. In the beginning of the game, it
 
 \section{TaskAssigner}
 
-The tasks collected by the TaskManager are taken by the TaskAssigner to assign them to units.
+The tasks collected by the TaskManager are taken by the TaskAssigner to assign them to unit groups. For each group, the TaskAssigner goes through all the collected tasks and compiles three lists: ideal tasks, good tasks and bad tasks. Tasks that are best fitted to the group are put in the ideal tasks list. Tasks that could be done by the group but are best left for another group are put into the good tasks list. Bad tasks are tasks that should not be done by this group, or may even be impossible to be performed by the group. The group is then assigned an ideal task. If there is none, it is assigned a good task. If there is no good task either, it is assigned a bad task.
+
+What constitutes an ideal, good or bad task for a group is determined by a set of rules. For example, DetectorTasks are ideal tasks for Overlords and not even considered for other groups with other units because Overlords are the only units that can detect stealth units. ScoutTasks are always good tasks for Overlord. By not making ScoutTasks ideal for Overlords, we ensure that DetectorTasks take priority during assignment. CombatTasks are bad for Overlords because they have no combat abilities.
+
+Since TaskAssigner assigns tasks to unit groups, and EigenUnitGroupManager seperates Drones from the other units, Drones are also assigned tasks seperately. Currently they are only assigned gathering tasks. They are also capable of doing ScoutTasks and CombatTasks but that is not implemented in the current decision rules.
 
 \section{ProductionManager}
+
+The ProductionManager decides two things: which buildings, technology and upgrades (henceforth called tech) we should have, and what tech are going to build right now. These decisions are kept in what we call the wantlist and the buildlist.
+
+We identify a number of stages in terms of at what tech we should have. Each of these stages is defined by a set of tech. When we have all the desired tech, we move up one stage. The tech defined by the current stage is kept in the wantlist. Simply put, we want the tech that is in the wantlist.
+
+When the ProductionManager sees tech in the wantlist that we have not actually built yet, it copies that tech into the buildlist. The buildlist can be seen as an ingame build queue. The manager also adds units to the buildlist. The type of units we want to build is determined according to a set of rules. These rules take into account information such as at what stage we are (and thus what units we can actually build), enemy units that we have seen, and the race of the enemy. The list of rules is extensive, and can be said to form the heart of the strategy of \massexpand .
+
+diagram
 
 \section{ConstructionManager}
 
