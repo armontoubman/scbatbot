@@ -112,10 +112,24 @@ We identify a number of stages in terms of at what tech we should have. Each of 
 
 When the ProductionManager sees tech in the wantlist that we have not actually built yet, it copies that tech into the buildlist. The buildlist can be seen as an ingame build queue. The manager also adds units to the buildlist. The type of units we want to build is determined according to a set of rules. These rules take into account information such as at what stage we are (and thus what units we can actually build), enemy units that we have seen, and the race of the enemy. The list of rules is extensive, and can be said to form the heart of the strategy of \massexpand .
 
-diagram
-
 \section{ConstructionManager}
+
+The ConstructionManager takes the buildlist from the ProductionManager and tries to realize as much of the tech as possible. The only limiting factor is our resources.
+
+If we can afford the first item in the list in terms of gas, minerals and supply, and we have the technological capability of building or researching the item, the order to purchase it is sent to the appropriate unit. In case the first item is a building, the ContractManager is told to create a new Contract (more on this later). We then check to see if we can afford the second item, taking into account the resources we just used on the first item. Once we can't afford an item, the process is stopped.
+
+The ConstructionManager and the MicroManager are the only managers that send orders back to StarCraft. When we purchase a unit, an upgrade or a technology, the ConstructionManager looks up which unit builds or researches it with helpful methods from BWAPI and sends the right orders to that unit.
 
 \section{ContractManager}
 
+Orders to to build new buildings are given to Drones by specifying the type of building we want and the location where we want it. The Drone then moves to that location and morphs into the building. However, between giving the order and the Drone reaching the desired location, a lot can happen. The Drone could for example run into enemies and be killed or otherwise stopped from accomplishing its task. This is why we have come up with the ContractManager.
+
+For each building we want built, we tell the ContractManager to create a Contract. Drones are then assigned to Contracts without a contractor. Contracted Drones are given a building location and are told to move there and build the desired building. The Contracts allow us to keep track of which desired buildings have been built. This way, when a Drone is killed en route to its destination, the ContractManager sees that the contracted Drone has died and will assign another Drone to the Contract (and perhaps a different building location). This method also ensures that building orders for specific buildings are given only once. In the past, there have been problems with multiple Drones taking the same orders, leading to an exodus of Drones to a single building spot, all of them blocking each other's building sites. The use of Contracts now prevent this behaviour.
+
 \section{MicroManager}
+
+The MicroManager is what makes \massexpand move. The name comes from micromanagement: detailed management of units in combat. The MicroManager sends orders to move and attack to our mobile units. The specific orders are determined by decision trees.
+
+There is a decision tree for each type of unit. At the beginning of the tree, the task of the unit is retrieved. Decisions are then made based on this task and the unit's surroundings. For example, Drones are usually assigned to gather the resource pointed to in their task, but may be forced to fight in case their base is under attack. Mutalisks are to engage the enemies pointed to by their combat tasks, but have to do so with special maneuvers. Overlords have to reach their scouting tasks, but avoid anti-air defenses. There are too many details to describe here.
+
+The manager usually iterates through all units and runs them through the decision trees. To speed up this process, we have given the manager the ability to grab nearby groups of units and give them the same orders. This is especially handy in combat situations, because enemy units can be brought down fast with focus fire.
