@@ -1,4 +1,19 @@
 % !TEX root = report.tex
 
-\chapter{BWAPI, BWSAL and BWTA}
+\chapter{Brood War AI development}
 
+StarCraft's internal AI is script-based and not very sophisticated. Since its release, the modding community has been looking for ways to create and use their own AI. One example of such an attempt is the Brood War AI Project\footnote{See \url{http://www.entropyzero.org/BroodwarAI.html}}, which enabled people to create their own scripts and inject them into StarCraft. The scripts allowed macromanagement (building units, general attack orders and managing resources) but not micromanagement (giving orders to individual units). The BWAPI family of libraries solved this problem by giving developers complete access to StarCraft.
+
+\section{BWAPI}
+
+Early 2009, a team of StarCraft enthusiasts released BWAPI (Brood War Application Programming Interface). Unlike the tools that used AI scripts, BWAPI provided programmers with complete access to the game's internals. This was achieved by reverse engineering StarCraft. While this constitutes as a third party hack to the game, and therefore violating the End User License Agreement that comes with StarCraft, Blizzard seems to condone its usage.
+
+BWAPI is a library of classes representing game objects and methods for interacting with them. One example of the classes included is Unit, which represents units and buildings. This class has methods for getting information (like the number of hitpoints) and giving orders, such as attack orders for units capable of attacking, and build or research orders for buildings. Of course, not all buildings and units are the same. Information about what units and buildings can and cannot do and basic information that is the same for units of all types is kept in a class called UnitType. There is also a class for players which gives information about resources (among other things) and a class for that represents the game in general, with methods that for example allow bots to concede and chat with the opponent. More abstract is the Position class, used as a unified notation for positions on the game map, which can be used to coordinate the movement of units and the placement of buildings.
+
+\section{BWSAL}
+
+The classes and methods in BWAPI are very low level: they are small building blocks with which bots can be constructed. To get developers underway with the creation of new bots, the team behind BWAPI created BWSAL (Brood War Standard Abstraction Layer). BWSAL is an extension of BWAPI, providing classes with more high level functions. BWSAL consists of classes called managers. Each manager is responsible for a part of a bot's operation. For example, BWSAL has a Build Order Manager, which as the name implies, manages build orders. The managers can bid for control of units, which is assigned by a class called the Arbitrator. As we will later show, the idea of using managers like this appealed to us but we found BWSAL too constricting in its methodology to use for our own bot. However, BWSAL also provides two general classes called UnitGroup and BuildingPlacer, which turned out very useful and were incorporated in \massexpand.
+
+\section{BWTA}
+
+Besides BWAPI and BWSAL, the team also created BWTA (Brood War Terrain Analyzer). BWTA is an add-on for BWAPI which analyzes StarCraft maps. It can identify base locations, chokepoints (narrow passages which can be of strategic interest) and divide maps into regions. BWTA also provides general functions such as functions to get the distance between to points on the map and functions to determine whether it is even possible to walk between to points on a map (a useful function for maps with islands). BWTA is by default included with BWAPI.
