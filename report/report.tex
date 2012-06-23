@@ -25,15 +25,23 @@
 \usepackage{array} % for better arrays (eg matrices) in maths
 \usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
 \usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
-\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{graphicx}
+%\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[cc]{titlepic}
 % These packages are all incorporated in the memoir class to one degree or another...
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
 \pagestyle{fancy} % options: empty , plain , fancy
 \renewcommand{\headrulewidth}{0pt} % customise the layout...
-\lhead{}\chead{}\rhead{\slshape \leftmark}
-\lfoot{}\cfoot{\thepage}\rfoot{}
+\lhead{}
+\chead{}
+\rhead{\slshape \leftmark}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
 
 %%% SECTION TITLE APPEARANCE
 \usepackage{sectsty}
@@ -59,14 +67,30 @@
 %%% The "real" document content comes below...
 
 \title{\huge Design and Development of \textsc{Mass Expand},\\ a Bot for StarCraft\textsuperscript{\small \textregistered}: Brood War\textsuperscript{\small \textregistered}}
-\author{Ben Haanstra and Armon Toubman}
+\author{Ben Haanstra 5964911\\
+Armon Toubman XXXXXX}
+\titlepic{\includegraphics[scale=0.8]{cover.jpg}}
 %\date{} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
 
 \begin{document}
 \maketitle
 
-% lege pagina
+
+
+%\begin{figure}
+%\centering
+%\includegraphics[scale=0.2]{cover.jpg}
+%\end{figure}
+
+
+
+\chapter*{\centering Abstract}
+abstractje
+\\
+\\
+
+
 \noindent{}StarCraft and Brood War are \textcopyright{}1998 Blizzard Entertainment, Inc. All rights reserved. StarCraft, Brood War and Blizzard Entertainment are trademarks or registered trademarks of Blizzard Entertainment, Inc. in the U.S. and/or other countries.
 \pagestyle{empty}
 \clearpage
@@ -75,12 +99,13 @@
 
 \tableofcontents
 
-\listoffigures
+%\listoffigures
 
 %\listoftables
 
 \mainmatter
 
+\pagestyle{fancy}
 % Introduction
 \include{introduction}
 
@@ -101,10 +126,14 @@
 
 % Conclusion
 
-\backmatter
-
 % Tijdlijn
 \include{timeline}
+
+% Conclusie/reflectie
+\include{conclusion}
+
+
+\backmatter
 
 % Resources (links naar source/docs/bwapi etc.)
 \include{resources}
