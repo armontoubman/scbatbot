@@ -219,7 +219,8 @@ The difficulty lies in choosing the right order, or priority, of rules. We solve
 \begin{figure}
 \centering
 \includegraphics[scale=0.35]{starcraft_zerg_diagram_groot}
-\caption{\label{fig:micro} Flow chart illustration of the decision tree for Zergling units. The blue rhombus is the start and is a decision node. Green rhombi are also decision nodes. Red squares are decision terminals that are to be executed. Green lines indicate a 'yes' answer to the respective question, and red lines indicate 'no'.}
+\label{fig:micro}
+\caption{Flow chart illustration of the decision tree for Zergling units. The blue rhombus is the start and is a decision node. Green rhombi are also decision nodes. Red squares are decision terminals that are to be executed. Green lines indicate a 'yes' answer to the respective question, and red lines indicate 'no'.}
 \end{figure}
 
 We do not believe that our approach produces the best behaviour. In fact, because of the decision tree structure and our incomplete understanding of the game, it is very likely that certain decisions are not always appropriate. However, this is not the goal of the bot: instead we designed it to be capable of making decisions by itself, not only to initiate combat, but also to respond to the decisions of the opponent.
